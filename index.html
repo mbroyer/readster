@@ -148,6 +148,8 @@ details.tip summary{cursor:pointer;font-weight:800}details.tip ul{margin:8px 0 0
 .result-card{display:flex;flex-direction:column;gap:12px}.result-card .rhead{font-family:var(--f-display);font-size:1.45rem;font-weight:600;line-height:1.2}
 .result-card .bars{display:flex;flex-direction:column;gap:6px}
 .rec.me{background:var(--bg);border-radius:16px;padding:12px 14px}.rec.me b{font-family:var(--f-display);font-weight:600;font-size:1.1rem}
+.chk{display:flex;flex-direction:column;gap:4px;background:var(--bg);border-radius:16px;padding:12px 14px}.chk b{font-family:var(--f-display);font-weight:600;font-size:1.15rem}
+.rtext .w.srm{text-decoration:underline dotted var(--accent);text-decoration-thickness:3px;text-underline-offset:6px}
 .opts{display:flex;flex-direction:column;gap:8px}
 .opt{font:inherit;font-weight:800;text-align:left;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:12px 14px;min-height:48px;cursor:pointer}
 .opt.right{border-color:var(--good);background:var(--good-bg);color:var(--good)}.opt.miss{border-color:var(--bad);background:var(--bad-bg)}.opt.off{opacity:.55}.opt:disabled{cursor:default}
@@ -472,7 +474,7 @@ TEXTS.forEach(function(t){
 });
 (function(){var ds=TEXTS.map(function(t){return t.diff;}).sort(function(a,b){return a-b;}),med=ds[Math.floor(ds.length/2)];TEXTS.forEach(function(t){t.stars=t.diff>=med?2:1;});})();
 /* ---------- Zustand ---------- */
-function defaults(){return {xp:0,done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Nunito',size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true}};}
+function defaults(){return {xp:0,done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Nunito',size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,chk:false}};}
 function fixState(d){
   /* Ältere Stände: gesammelte Wörter in den Wort-Jäger übernehmen */
   Object.keys(d.stolper||{}).forEach(function(w){if(!d.wj[w])d.wj[w]={n:d.stolper[w],ok:[],done:false};});
@@ -561,7 +563,7 @@ window.addEventListener('popstate',function(){
   if(!$('#sheet').hidden){closeBox('#sheet');}
   if(!$('#modal').hidden){closeBox('#modal');}
   if(CUR==='home')return;
-  recStop(false);stopListen();R=null;renderHome();show('home');
+  recStop(false);srAbort();stopListen();R=null;renderHome();show('home');
 });
 function openBox(id,html){var b=$(id);b.innerHTML=html;b.hidden=false;}
 function closeBox(id){$(id).hidden=true;$(id).innerHTML='';}
@@ -624,7 +626,7 @@ function readStyle(){
 }
 function openText(id){
   var t=byId[id];
-  recStop(false);
+  recStop(false);srAbort();
   R={t:t,phase:'read',round:0,rounds:[],marks:{},all:{},qs:[null,null],pick:[null,null],opts:t.q.map(function(q){return shuffle([q.a].concat(q.f||[]));}),t0:0};
   var h='<div class="backrow"><button class="back" data-a="leave">‹ Zurück</button><div class="steps" id="rsteps"></div></div>';
   h+='<div><span class="eyebrow">'+esc(t.cat)+'</span><h2>'+esc(t.title)+'</h2></div>';
@@ -674,7 +676,7 @@ function renderCtl(){
     dk='<div class="row">'+(R.round<3?'<button class="btn ghost" data-a="again">Nochmal lesen</button>':'')+'<button class="btn" data-a="check">Zu den Fragen</button></div>';
     top='<section class="card result-card"><span class="eyebrow">Auswertung · Durchgang '+R.rounds.length+'</span><b class="rhead" id="rhead">'+esc(R.head||'')+'</b>'+
       '<div class="tiles">'+(S.set.nums?'<div class="tile"><b>'+w+'</b><span>Wörter pro Minute</span></div>':'')+'<div class="tile"><b>'+fmtSec(R.sec)+'</b><span>Lesezeit</span></div><div class="tile" id="sugtile">'+sugTile()+'</div></div>'+
-      '<p class="fb" id="cmptxt">'+esc(compareText(w))+'</p><span class="hint fb" id="fbtxt">'+esc(R.fb||'')+'</span>'+(S.set.nums&&R.rounds.length>1?'<div class="bars">'+bars()+'</div>':'')+
+      '<div id="chkbox"></div><p class="fb" id="cmptxt">'+esc(compareText(w))+'</p><span class="hint fb" id="fbtxt">'+esc(R.fb||'')+'</span>'+(S.set.nums&&R.rounds.length>1?'<div class="bars">'+bars()+'</div>':'')+
       '<div id="recm"></div></section>';
     h+='<div class="card"><h2>Wie war das für dich?</h2><div class="row selfrow">'+[[2,'Flüssig'],[1,'Ging so'],[0,'Holprig']].map(function(o){return '<button class="btn '+(en&&en.self===o[0]?'on':'ghost')+'" data-a="self" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><span class="hint">Es gibt kein Falsch.</span></div>';
     h+='<div class="card"><h2>Welche Wörter waren schwer?</h2><p class="hint fb">Tippe sie oben im Text an. Sie kommen in den Wort-Jäger.</p><div id="sugbox"></div></div>';
@@ -693,7 +695,7 @@ function renderCtl(){
   }
   c.innerHTML=h;setDock(dk);var rt=$('#rtop');if(rt)rt.innerHTML=top;
   if(R.phase==='read')fillRec($('#recold'),t.id,false);
-  if(R.phase==='mark'){fillRec($('#recm'),t.id,true);updateMarkInfo();}else{var os=document.querySelectorAll('#rtext .w.sug');for(var oi=0;oi<os.length;oi++)os[oi].classList.remove('sug');}
+  if(R.phase==='mark'){fillRec($('#recm'),t.id,true);updateMarkInfo();}else{var os=document.querySelectorAll('#rtext .w.sug,#rtext .w.srm');for(var oi=0;oi<os.length;oi++)os[oi].classList.remove('sug','srm');}
 }
 /* Vorlesen */
 function setBtn(){var b=$('#bL');if(b)b.textContent=lab('a','Zuhören');var r=$('#bR');if(r)r.textContent=lab('b','Rätsel anhören');}
@@ -912,6 +914,17 @@ function compareText(w){
 function updateMarkInfo(){
   var o=document.querySelectorAll('#rtext .w.sug');for(var i=0;i<o.length;i++)o[i].classList.remove('sug');
   var fb=$('#fbtxt');if(fb&&R.fb)fb.textContent=R.fb;var st=$('#sugtile');if(st)st.innerHTML=sugTile();
+  var cb=$('#chkbox'),om=document.querySelectorAll('#rtext .w.srm');for(var mi=0;mi<om.length;mi++)om[mi].classList.remove('srm');
+  if(cb){var c=R.chk;
+    if(!c)cb.innerHTML='';
+    else if(c.state==='wait')cb.innerHTML='<div class="chk"><span class="eyebrow">Wort-Prüfung (Test)</span><span class="hint">Wird ausgewertet …</span></div>';
+    else if(c.state==='err')cb.innerHTML='<div class="chk"><span class="eyebrow">Wort-Prüfung (Test)</span><span class="hint">'+esc(c.msg)+'</span></div>';
+    else{
+      c.miss.forEach(function(k){var w=$('#rtext .w[data-i="'+k+'"]');if(w)w.classList.add('srm');});
+      cb.innerHTML='<div class="chk"><span class="eyebrow">Wort-Prüfung (Test)</span><b>'+c.ok+' von '+c.n+' Wörtern erkannt</b>'+
+        (c.miss.length?'<span class="hint">Blau gepunktet: Diese Wörter hat die Erkennung nicht sicher gehört. Lies sie ruhig noch einmal. Die Erkennung verhört sich auch mal.</span>':'<span class="hint fb">Alle Wörter erkannt!</span>')+'</div>';
+    }
+  }
   var sb=$('#sugbox');
   if(R.phase==='mark'&&R.sug&&R.sug.length){
     R.sug.forEach(function(k){var w=$('#rtext .w[data-i="'+k+'"]');if(w)w.classList.add('sug');});
@@ -1055,6 +1068,61 @@ function fillRec(el,id,withMark){
   });
 }
 /* Ablauf */
+/* Wort-Prüfung (Test): Spracherkennung des Browsers, nur wenn eingeschaltet */
+var SR={want:false,r:null,done:'',cur:'',im:'',err:'',fin:null};
+function srAvail(){return !!(window.SpeechRecognition||window.webkitSpeechRecognition);}
+function srStart(){
+  SR.done='';SR.cur='';SR.im='';SR.err='';SR.fin=null;SR.want=false;
+  if(!S.set.chk||!srAvail())return;
+  SR.want=true;srRun();
+}
+function srRun(){
+  var C=window.SpeechRecognition||window.webkitSpeechRecognition,r;
+  try{r=new C();r.lang='de-DE';r.continuous=true;r.interimResults=true;r.maxAlternatives=1;}catch(e){SR.err='start';SR.want=false;return;}
+  SR.r=r;
+  r.onresult=function(ev){var f=[],im=[];for(var i=0;i<ev.results.length;i++){var x=ev.results[i][0].transcript;if(ev.results[i].isFinal)f.push(x);else im.push(x);}SR.cur=f.join(' ');SR.im=im.join(' ');};
+  r.onerror=function(ev){if(ev&&(ev.error==='not-allowed'||ev.error==='service-not-allowed')){SR.err='blocked';SR.want=false;}};
+  r.onend=function(){
+    SR.done+=' '+SR.cur+' '+SR.im;SR.cur='';SR.im='';if(SR.r===r)SR.r=null;
+    if(SR.want&&!SR.fin){try{srRun();}catch(e){}}
+    else if(SR.fin){var f=SR.fin;SR.fin=null;f(SR.done);}
+  };
+  try{r.start();}catch(e){SR.err='start';SR.want=false;SR.r=null;}
+}
+function srStop(){
+  return new Promise(function(res){
+    var r=SR.r,fired=false;function fin(x){if(fired)return;fired=true;SR.fin=null;res(x);}
+    SR.want=false;
+    if(!r){fin(SR.done+' '+SR.cur+' '+SR.im);return;}
+    SR.fin=fin;try{r.stop();}catch(e){}
+    setTimeout(function(){fin(SR.done+' '+SR.cur+' '+SR.im);},2500);
+  });
+}
+function srAbort(){SR.want=false;SR.fin=null;var r=SR.r;SR.r=null;if(r){try{r.onend=null;r.abort();}catch(e){}}}
+var NUMW={'0':'null','1':'eins','2':'zwei','3':'drei','4':'vier','5':'fünf','6':'sechs','7':'sieben','8':'acht','9':'neun','10':'zehn','11':'elf','12':'zwölf','100':'hundert','1000':'tausend'};
+function normW(x){x=String(x).toLowerCase().replace(/ß/g,'ss').replace(/[^a-z0-9äöü]/g,'');return NUMW[x]?NUMW[x].replace(/ß/g,'ss'):x;}
+function lev(a,b){var m=a.length,n=b.length,p=[],i,j;for(j=0;j<=n;j++)p[j]=j;for(i=1;i<=m;i++){var q=[i];for(j=1;j<=n;j++)q[j]=Math.min(p[j]+1,q[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=q;}return p[n];}
+function simW(a,b){if(a===b)return true;var L=Math.max(a.length,b.length);if(L<4)return false;return lev(a,b)<=(L>=8?2:1);}
+function srAlign(t,heard){
+  var T=[],ix=[];
+  for(var i=0;i<t.rs;i++){var w=t.words[i],n=normW(w.pre+w.sy.join('')+w.post);if(n&&!/[0-9]/.test(n)){T.push(n);ix.push(i);}}
+  var H=heard.split(/\s+/).map(normW).filter(function(x){return x&&!/[0-9]/.test(x);});
+  var N=T.length,M=H.length,D=[],B=[];
+  for(i=0;i<=N;i++){D[i]=new Array(M+1);B[i]=new Array(M+1);}
+  for(i=0;i<=N;i++){for(var j=0;j<=M;j++){
+    if(!i&&!j){D[0][0]=0;continue;}
+    var best=1e9,bk=0;
+    if(i&&D[i-1][j]+1<best){best=D[i-1][j]+1;bk=1;}
+    if(j&&D[i][j-1]+1<best){best=D[i][j-1]+1;bk=2;}
+    if(i&&j){var c=simW(T[i-1],H[j-1])?0:1;if(D[i-1][j-1]+c<best){best=D[i-1][j-1]+c;bk=c?4:3;}}
+    if(i&&j>1&&simW(T[i-1],H[j-2]+H[j-1])&&D[i-1][j-2]<best){best=D[i-1][j-2];bk=5;}
+    D[i][j]=best;B[i][j]=bk;
+  }}
+  var ok={},a=N,b=M;
+  while(a>0||b>0){var k=B[a][b];if(k===3){ok[a-1]=1;a--;b--;}else if(k===5){ok[a-1]=1;a--;b-=2;}else if(k===4){a--;b--;}else if(k===1)a--;else b--;}
+  var miss=[],cnt=0;for(i=0;i<N;i++){if(ok[i])cnt++;else miss.push(ix[i]);}
+  return {n:N,ok:cnt,miss:miss};
+}
 function recFailText(){
   if((REC.fail==='NotAllowedError'||REC.fail==='SecurityError')&&FRAMED)return 'In dieser Vorschau darf Readster das Mikrofon nicht nutzen. Du kannst trotzdem lesen. Aufnehmen geht, wenn Readster als eigene Seite geöffnet ist.';
   if(REC.fail==='NotAllowedError'||REC.fail==='SecurityError')return 'Das Mikrofon ist gesperrt. Erlaube es in den Einstellungen für diese Seite. Du kannst trotzdem lesen.';
@@ -1065,17 +1133,24 @@ function startRound(){
   var rr=R;
   recStart().then(function(ok){
     if(R!==rr)return;R.recTried=true;R.recOn=ok;if(ok&&R.phase==='timing')R.t0=Date.now();
-    if(R.phase==='timing')renderCtl();
+    if(R.phase==='timing'){srStart();renderCtl();}
   });
 }
 function stopRound(){
   var sec=(Date.now()-R.t0)/1000,t=R.t,minSec=Math.max(8,t.rs/4),keep=sec>=minSec,p=recStop(keep);
-  if(!keep){R.phase='read';R.msg='Das ging sehr schnell. Hast du den ganzen Text gelesen? Lies ihn einmal ganz laut und tippe dann auf „Fertig gelesen“.';renderCtl();R.msg='';window.scrollTo(0,0);return;}
+  if(!keep){srAbort();R.phase='read';R.msg='Das ging sehr schnell. Hast du den ganzen Text gelesen? Lies ihn einmal ganz laut und tippe dann auf „Fertig gelesen“.';renderCtl();R.msg='';window.scrollTo(0,0);return;}
   var wpm=Math.max(1,Math.round(R.t.rs/(sec/60)));
-  R.round++;R.rounds.push(wpm);R.marks={};R.phase='mark';R.sug=[];R.sec=sec;R.sugState=REC.want&&S.set.rec?'wait':'none';
+  R.round++;R.rounds.push(wpm);R.marks={};R.phase='mark';R.sug=[];R.sec=sec;R.sugState=R.recOn?'wait':'none';R.chk=null;
   var prev=S.log.filter(function(x){return x.id===t.id&&x.wpm;}),ent={ts:Date.now(),id:t.id,wpm:wpm,sug:null,marked:null,self:null};
   R.prev=prev;R.entry=ent;R.head=headline(wpm,prev);R.fb=feedback(t,wpm,prev,null);
   S.log.push(ent);if(S.log.length>600)S.log.shift();save();
+  if(SR.want){R.chk={state:'wait'};srStop().then(function(heard){
+    if(!R||R.entry!==ent)return;
+    if(SR.err==='blocked'){R.chk={state:'err',msg:'Die Spracherkennung ist auf diesem Gerät gesperrt.'};}
+    else if(!heard.trim()){R.chk={state:'err',msg:'Die Erkennung hat nichts gehört. Sprich ruhig etwas lauter.'};}
+    else{var a=srAlign(t,heard);R.chk={state:'done',n:a.n,ok:a.ok,miss:a.miss};ent.chk=[a.ok,a.n];save();}
+    updateMarkInfo();
+  });}
   var o=document.querySelectorAll('.w.st');for(var i=0;i<o.length;i++)o[i].classList.remove('st');
   renderCtl();
   window.scrollTo(0,0);
@@ -1224,6 +1299,7 @@ function renderSheet(){
   h+='<div class="setrow"><span class="eyebrow">Name deines Monsters</span><input class="name" id="nameIn" maxlength="16" autocomplete="off" placeholder="z. B. Krümel" value="'+esc(S.name||'')+'"></div>';
   h+='<div class="setrow"><span class="eyebrow">Farbe deines Monsters</span><div class="seg">'+COLS.map(function(c){return '<button class="sw" data-a="col" data-v="'+c+'" aria-label="Farbe" aria-pressed="'+(S.col===c)+'" style="background:'+c+'"></button>';}).join('')+'</div></div>';
   h+='<div class="setrow"><span class="eyebrow">Aufnahme beim Lesen</span>'+seg('rec',[[true,'An'],[false,'Aus']])+'<span class="hint">Die Aufnahmen bleiben nur auf diesem Gerät.</span><button class="link" id="delRecsBtn" data-a="delRecs">Alle Aufnahmen löschen</button></div>';
+  h+='<div class="setrow"><span class="eyebrow">Wörter prüfen (Test)</span>'+(srAvail()?seg('chk',[[true,'An'],[false,'Aus']])+'<span class="hint">Nutzt die Spracherkennung von Apple oder Google. Dafür geht der Ton beim Lesen an deren Server. Bei Kindern verhört sie sich öfter.</span>':'<span class="hint">Auf diesem Gerät nicht verfügbar.</span>')+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Vorlese-Tempo</span>'+seg('speed',[['slow','Langsam'],['normal','Normal']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Tempo-Zahlen zeigen</span>'+seg('nums',[[true,'An'],[false,'Aus']])+'<span class="hint">Aus: Es gibt nur „schneller als beim ersten Mal“, keine Wörter pro Minute.</span></div>';
   h+='<div class="rtext syl-on" style="--rf:\''+esc(s.font)+'\';--rsize:'+[1.25,1.5,1.8][s.size]+'rem;--rline:'+[1.7,2,2.35][s.line]+';--rsp:'+[0,.04,.08][s.space]+'em;background:var(--bg);border-radius:14px;padding:12px 14px"><span class="w"><span class="sy s0">Ge</span><span class="sy s1">cko</span></span> <span class="w"><span class="sy s0">läuft</span></span> <span class="w"><span class="sy s0">an</span></span> <span class="w"><span class="sy s0">der</span></span> <span class="w"><span class="sy s0">Wand</span></span>.</div>';
@@ -1279,7 +1355,7 @@ document.addEventListener('click',function(e){
     case 'cat':renderCat(v);break;
     case 'open':openText(v);break;
     case 'nextread':stopListen();closeBox('#modal');openText(v);break;
-    case 'leave':recStop(false);stopListen();renderHome();show('home');break;
+    case 'leave':recStop(false);srAbort();stopListen();renderHome();show('home');break;
     case 'listen':listen(undefined,'a');break;
     case 'listenR':listen(undefined,'b');break;
     case 'start':startRound();break;
@@ -1293,7 +1369,7 @@ document.addEventListener('click',function(e){
     case 'opaNext':opaStep('next');break;
     case 'opaBack':opaStep('back');break;
     case 'stop':stopRound();break;
-    case 'cancel':recStop(false);R.phase='read';renderCtl();break;
+    case 'cancel':recStop(false);srAbort();R.phase='read';renderCtl();break;
     case 'again':R.phase='read';renderCtl();window.scrollTo(0,0);break;
     case 'check':R.phase='check';renderCtl();try{$('#qcard').scrollIntoView({block:'start',behavior:'smooth'});}catch(er){}break;
     case 'pick':var pq=v.split('-'),qi=+pq[0],oj=+pq[1];if(R.pick[qi]===null){R.pick[qi]=oj;R.qs[qi]=R.opts[qi][oj]===R.t.q[qi].a?1:0;renderCtl();}break;
@@ -1304,7 +1380,7 @@ document.addEventListener('click',function(e){
     case 'card':var t=byId[v];openBox('#modal','<div class="card">'+cardHTML(t,true)+'<div class="cfbtns"><button class="btn ghost" data-a="closeModal">Schließen</button><button class="btn" data-a="nextread" data-v="'+t.id+'">Nochmal lesen</button></div></div>');break;
     case 'closeModal':stopListen();closeBox('#modal');break;
     case 'settings':renderSheet();break;
-    case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl'||k==='rec'||k==='nums')val=(v==='true');S.set[k]=val;save();renderSheet();readStyle();break;
+    case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl'||k==='rec'||k==='nums'||k==='chk')val=(v==='true');S.set[k]=val;save();renderSheet();readStyle();break;
     case 'sheetOk':closeBox('#sheet');break;
     case 'reset':renderReset();break;
     case 'delRecs':recDelAll().then(function(){var b=$('#delRecsBtn');if(b)b.textContent='Aufnahmen gelöscht';});break;
