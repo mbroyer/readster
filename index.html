@@ -942,7 +942,7 @@ function updateMarkInfo(){
   var cb=$('#chkbox'),om=document.querySelectorAll('#rtext .w.srm');for(var mi=0;mi<om.length;mi++)om[mi].classList.remove('srm');
   if(cb){var c=R.chk;
     if(!c)cb.innerHTML='';
-    else if(c.state==='wait')cb.innerHTML='<div class="chk"><span class="eyebrow">Genaue Auswertung</span><span class="hint">'+(WH.ready?'Wird ausgewertet … das kann eine Minute dauern. Du kannst schon weitermachen.':esc(whStatus()||'Lade Sprachmodell …')+' Das passiert nur beim ersten Mal.')+'</span></div>';
+    else if(c.state==='wait')cb.innerHTML='<div class="chk"><span class="eyebrow">Genaue Auswertung</span><span class="hint">'+(WH.ready?(WH_SERVER?'Wird ausgewertet … einen Moment.':'Wird ausgewertet … das kann eine Minute dauern. Du kannst schon weitermachen.'):esc(whStatus()||'Lade Sprachmodell …')+' Das passiert nur beim ersten Mal.')+'</span></div>';
     else if(c.state==='err')cb.innerHTML='<div class="chk"><span class="eyebrow">Genaue Auswertung</span><span class="hint">'+esc(c.msg)+'</span></div>';
     else{
       c.miss.forEach(function(k){var w=$('#rtext .w[data-i="'+k+'"]');if(w)w.classList.add('srm');});
@@ -1102,6 +1102,8 @@ function simW(a,b){if(a===b)return true;var L=Math.max(a.length,b.length);if(L<4
 var WH={w:null,ready:false,loading:false,p:0,cb:{},seq:0,err:''};
 var WH_MODELS=['onnx-community/whisper-base_timestamped','onnx-community/whisper-tiny_timestamped'],WH_BUSY='readster.whBusy',WH_LIB='https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1';
 if(window.__whLib)WH_LIB=window.__whLib;
+/* Adresse des Cloudflare-Workers (siehe cloudflare/ANLEITUNG.md). Leer = Whisper läuft im Browser. */
+var WH_SERVER='';if(WH_SERVER.indexOf('http')!==0)WH_SERVER='';if(window.__whServer)WH_SERVER=window.__whServer;
 function whModel(){var m=S.set.whm;if(m!==0&&m!==1)m=IOS?1:0;return m;}
 function whWorkerSrc(){return "import {pipeline,env} from '"+WH_LIB+"';env.allowLocalModels=false;try{env.backends.onnx.wasm.numThreads=1;}catch(e){}let P=null;const files={};\n"+
   "function load(){return P||(P=pipeline('automatic-speech-recognition','"+WH_MODELS[whModel()]+"',{dtype:'q8',device:'wasm',progress_callback:function(p){if(p&&p.status==='progress'&&p.file){files[p.file]=[p.loaded||0,p.total||0];let l=0,t=0;for(const k in files){l+=files[k][0];t+=files[k][1];}self.postMessage({type:'progress',p:t?l/t:0});}}}).catch(function(e){P=null;throw e;}));}\n"+
@@ -1129,14 +1131,30 @@ function whInit(){
   WH.w.onerror=function(){try{WH.w.terminate();}catch(e){}WH.w=null;whFail('Dieser Browser kann die genaue Auswertung nicht starten.');};
   return WH.w;
 }
-function whPreload(){if(window.__whMock){WH.ready=true;return;}WH.err='';var w=whInit();if(w&&!WH.ready&&!WH.loading){WH.loading=true;whMark(true);w.postMessage({id:0});whUI();}}
-function whRun(x){return new Promise(function(res){
+function whPreload(){if(window.__whMock||WH_SERVER){WH.ready=true;WH.err='';return;}WH.err='';var w=whInit();if(w&&!WH.ready&&!WH.loading){WH.loading=true;whMark(true);w.postMessage({id:0});whUI();}}
+function wavPCM16(x){
+  var n=x.length,b=new ArrayBuffer(44+n*2),v=new DataView(b),i;
+  function str(o,t){for(var k=0;k<t.length;k++)v.setUint8(o+k,t.charCodeAt(k));}
+  str(0,'RIFF');v.setUint32(4,36+n*2,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,16000,true);v.setUint32(28,32000,true);v.setUint16(32,2,true);v.setUint16(34,16,true);str(36,'data');v.setUint32(40,n*2,true);
+  for(i=0;i<n;i++){var q=Math.max(-1,Math.min(1,x[i]));v.setInt16(44+i*2,q<0?q*32768:q*32767,true);}
+  return new Blob([b],{type:'audio/wav'});
+}
+function whServer(x){
+  var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ctl)ctl.abort();},120000);
+  return fetch(WH_SERVER,{method:'POST',headers:{'Content-Type':'audio/wav'},body:wavPCM16(x),signal:ctl?ctl.signal:undefined})
+    .then(function(r){return r.json().catch(function(){return {};}).then(function(j){if(!r.ok)throw new Error(j.fehler||('HTTP '+r.status));return j;});})
+    .then(function(j){clearTimeout(tm);return {type:'done',chunks:(j.words||[]).map(function(w){return {text:' '+w.word,timestamp:[w.start,w.end]};})};},
+          function(e){clearTimeout(tm);return {type:'error',msg:String(e&&e.message||e)};});
+}
+function whRun(x){if(WH_SERVER&&!window.__whMock)return whServer(x);return new Promise(function(res){
   if(window.__whMock){whMark(true);window.__whMock(x).then(function(c){whMark(false);res({type:'done',chunks:c});},function(){whMark(false);res({type:'error'});});return;}
   var w=whInit();if(!w){res({type:'error'});return;}
   var id=++WH.seq;WH.cb[id]=res;if(!WH.ready)WH.loading=true;whMark(true);
   try{w.postMessage({id:id,audio:x},[x.buffer]);}catch(e){delete WH.cb[id];res({type:'error'});}
 });}
 function whStatus(){
+  if(WH_SERVER)return 'Bereit. Die Auswertung läuft über Cloudflare.';
   if(WH.err)return WH.err;
   if(WH.ready)return 'Bereit. Läuft ganz auf diesem Gerät.';
   if(WH.loading)return 'Lade Sprachmodell … '+(WH.p>0?Math.round(WH.p*100)+' %':'');
@@ -1249,7 +1267,7 @@ function stopRound(){
       function showSug(list){ent.sug=list.length;save();if(R&&R.entry===ent){R.sugState='done';R.sug=expandSug(list,t);R.fb=feedback(t,wpm,prev,ent.sug);updateMarkInfo();}}
       if(!useWh||!an.pa){showSug(sug);return;}
       return whRun(to16k(an.x,an.sr)).then(function(m){
-        if(m.type!=='done'){showSug(sug);if(R&&R.entry===ent){R.chk={state:'err',msg:WH.err||'Die genaue Auswertung hat diesmal nicht geklappt. Die Pausen sind trotzdem gemessen.'};updateMarkInfo();}return;}
+        if(m.type!=='done'){showSug(sug);if(R&&R.entry===ent){R.chk={state:'err',msg:(WH_SERVER?'Die Auswertung über das Internet hat diesmal nicht geklappt. Die Pausen sind trotzdem gemessen.':WH.err||'Die genaue Auswertung hat diesmal nicht geklappt. Die Pausen sind trotzdem gemessen.')};updateMarkInfo();}return;}
         var r2=whCombine(t,m.chunks,an.pa);
         if(!r2.heard){showSug(sug);if(R&&R.entry===ent){R.chk={state:'err',msg:'Whisper hat nichts verstanden. Halte das Gerät ruhig etwas näher.'};updateMarkInfo();}return;}
         ent.chk=[r2.ok,r2.n];
@@ -1388,7 +1406,7 @@ function renderSheet(){
   h+='<div class="setrow"><span class="eyebrow">Name deines Monsters</span><input class="name" id="nameIn" maxlength="16" autocomplete="off" placeholder="z. B. Krümel" value="'+esc(S.name||'')+'"></div>';
   h+='<div class="setrow"><span class="eyebrow">Farbe deines Monsters</span><div class="seg">'+COLS.map(function(c){return '<button class="sw" data-a="col" data-v="'+c+'" aria-label="Farbe" aria-pressed="'+(S.col===c)+'" style="background:'+c+'"></button>';}).join('')+'</div></div>';
   h+='<div class="setrow"><span class="eyebrow">Aufnahme beim Lesen</span>'+seg('rec',[[true,'An'],[false,'Aus']])+'<span class="hint">Die Aufnahmen bleiben nur auf diesem Gerät.</span><button class="link" id="delRecsBtn" data-a="delRecs">Alle Aufnahmen löschen</button></div>';
-  h+='<div class="setrow"><span class="eyebrow">Genaue Auswertung (Whisper)</span>'+seg('wh',[[true,'An'],[false,'Aus']])+'<span class="hint">Erkennt Stockstellen und ausgelassene Wörter genauer. Beim ersten Einschalten werden einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB geladen, am besten im WLAN. Danach läuft alles auf diesem Gerät, der Ton verlässt es nicht.</span><span class="hint fb" id="whst">'+esc(S.set.wh?whStatus():'')+'</span></div>';
+  h+='<div class="setrow"><span class="eyebrow">Genaue Auswertung (Whisper)</span>'+seg('wh',[[true,'An'],[false,'Aus']])+'<span class="hint">Erkennt Stockstellen und ausgelassene Wörter genauer. '+(WH_SERVER?'Die Aufnahme geht dafür kurz an Cloudflare und wird dort nicht gespeichert.':'Beim ersten Einschalten werden einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB geladen, am besten im WLAN. Danach läuft alles auf diesem Gerät, der Ton verlässt es nicht.')+'</span><span class="hint fb" id="whst">'+esc(S.set.wh?whStatus():'')+'</span></div>';
   h+='<div class="setrow"><span class="eyebrow">Vorlese-Tempo</span>'+seg('speed',[['slow','Langsam'],['normal','Normal']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Tempo-Zahlen zeigen</span>'+seg('nums',[[true,'An'],[false,'Aus']])+'<span class="hint">Aus: Es gibt nur „schneller als beim ersten Mal“, keine Wörter pro Minute.</span></div>';
   h+='<div class="rtext syl-on" style="--rf:\''+esc(s.font)+'\';--rsize:'+[1.25,1.5,1.8][s.size]+'rem;--rline:'+[1.7,2,2.35][s.line]+';--rsp:'+[0,.04,.08][s.space]+'em;background:var(--bg);border-radius:14px;padding:12px 14px"><span class="w"><span class="sy s0">Ge</span><span class="sy s1">cko</span></span> <span class="w"><span class="sy s0">läuft</span></span> <span class="w"><span class="sy s0">an</span></span> <span class="w"><span class="sy s0">der</span></span> <span class="w"><span class="sy s0">Wand</span></span>.</div>';
