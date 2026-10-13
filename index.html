@@ -474,7 +474,7 @@ TEXTS.forEach(function(t){
 });
 (function(){var ds=TEXTS.map(function(t){return t.diff;}).sort(function(a,b){return a-b;}),med=ds[Math.floor(ds.length/2)];TEXTS.forEach(function(t){t.stars=t.diff>=med?2:1;});})();
 /* ---------- Zustand ---------- */
-function defaults(){return {xp:0,done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Nunito',size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false}};}
+function defaults(){return {whNote:'',xp:0,done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Nunito',size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1}};}
 function fixState(d){
   /* Ältere Stände: gesammelte Wörter in den Wort-Jäger übernehmen */
   Object.keys(d.stolper||{}).forEach(function(w){if(!d.wj[w])d.wj[w]={n:d.stolper[w],ok:[],done:false};});
@@ -571,6 +571,7 @@ function closeBox(id){$(id).hidden=true;$(id).innerHTML='';}
 function renderHome(){
   var p=lvlProg(S.xp),sg=suggest(),wk=weekInfo(),n=doneCount();
   var h='<header class="top"><h1 class="brand">Readster</h1><div class="chips"><span class="chip lvl">Level '+p.L+'</span><button class="iconbtn" data-a="stats" aria-label="Dein Fortschritt"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="12" width="4" height="7" rx="1.5" fill="currentColor"/><rect x="9" y="7" width="4" height="12" rx="1.5" fill="currentColor"/><rect x="15" y="3" width="4" height="16" rx="1.5" fill="currentColor"/></svg></button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
+  if(S.whNote)h+='<section class="card left whnote"><p class="fb">'+esc(S.whNote)+'</p><button class="btn ghost sm" data-a="whNoteOk">Okay</button></section>';
   var stn=MON.STAGES[rankOf(p.L)].n;
   h+='<section class="card hero">'+stageHTML(rankOf(p.L))+'<div class="info"><span class="eyebrow">'+(S.name?'Dein Monster · '+esc(stn):'Dein Monster')+'</span><span class="stagename">'+esc(S.name||stn)+'</span><div class="bar" role="progressbar" aria-valuenow="'+p.pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+p.pct+'%"></i></div><span class="xptext">noch '+p.need+' XP bis Level '+(p.L+1)+'</span></div></section>';
   h+='<section class="card week"><div class="row" style="flex-wrap:nowrap;justify-content:space-between;align-items:baseline"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></div><div class="dots">'+wk.arr.map(function(d){return '<div class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></div>';}).join('')+'</div></section>';
@@ -1099,31 +1100,40 @@ function lev(a,b){var m=a.length,n=b.length,p=[],i,j;for(j=0;j<=n;j++)p[j]=j;for
 function simW(a,b){if(a===b)return true;var L=Math.max(a.length,b.length);if(L<4)return false;return lev(a,b)<=(L>=8?2:1);}
 /* Genaue Auswertung: Whisper läuft im Browser (Web Worker), der Ton verlässt das Gerät nicht */
 var WH={w:null,ready:false,loading:false,p:0,cb:{},seq:0,err:''};
-var WH_MODEL='onnx-community/whisper-base_timestamped',WH_LIB='https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1';
+var WH_MODELS=['onnx-community/whisper-base_timestamped','onnx-community/whisper-tiny_timestamped'],WH_BUSY='readster.whBusy',WH_LIB='https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1';
 if(window.__whLib)WH_LIB=window.__whLib;
-function whWorkerSrc(){return "import {pipeline,env} from '"+WH_LIB+"';env.allowLocalModels=false;let P=null;const files={};\n"+
-  "function load(){return P||(P=pipeline('automatic-speech-recognition','"+WH_MODEL+"',{dtype:'q8',device:'wasm',progress_callback:function(p){if(p&&p.status==='progress'&&p.file){files[p.file]=[p.loaded||0,p.total||0];let l=0,t=0;for(const k in files){l+=files[k][0];t+=files[k][1];}self.postMessage({type:'progress',p:t?l/t:0});}}}).catch(function(e){P=null;throw e;}));}\n"+
+function whModel(){var m=S.set.whm;if(m!==0&&m!==1)m=IOS?1:0;return m;}
+function whWorkerSrc(){return "import {pipeline,env} from '"+WH_LIB+"';env.allowLocalModels=false;try{env.backends.onnx.wasm.numThreads=1;}catch(e){}let P=null;const files={};\n"+
+  "function load(){return P||(P=pipeline('automatic-speech-recognition','"+WH_MODELS[whModel()]+"',{dtype:'q8',device:'wasm',progress_callback:function(p){if(p&&p.status==='progress'&&p.file){files[p.file]=[p.loaded||0,p.total||0];let l=0,t=0;for(const k in files){l+=files[k][0];t+=files[k][1];}self.postMessage({type:'progress',p:t?l/t:0});}}}).catch(function(e){P=null;throw e;}));}\n"+
   "self.onmessage=async function(e){const m=e.data;try{const a=await load();self.postMessage({type:'ready'});if(m.audio){const out=await a(m.audio,{language:'german',task:'transcribe',return_timestamps:'word',chunk_length_s:30,stride_length_s:5});self.postMessage({type:'done',id:m.id,chunks:out.chunks||[]});}}catch(err){self.postMessage({type:'error',id:m.id,msg:String(err&&err.message||err)});}};";}
-function whFail(msg){WH.err=msg;WH.loading=false;var c=WH.cb;WH.cb={};Object.keys(c).forEach(function(k){c[k]({type:'error'});});whUI();}
+function whMark(on){try{if(on)localStorage.setItem(WH_BUSY,JSON.stringify({m:whModel(),ts:Date.now()}));else localStorage.removeItem(WH_BUSY);}catch(e){}}
+function whCrashCheck(){
+  var b=null;try{b=JSON.parse(localStorage.getItem(WH_BUSY)||'null');localStorage.removeItem(WH_BUSY);}catch(e){}
+  if(!b||!S.set.wh||Date.now()-b.ts>15*60*1000)return;
+  if(b.m===0){S.set.whm=1;S.whNote='Die genaue Auswertung war für dieses Gerät zu schwer. Readster nimmt jetzt ein kleineres Sprachmodell (etwa 40 MB). Probier es noch einmal.';}
+  else{S.set.wh=false;S.whNote='Die genaue Auswertung ist für dieses Gerät leider zu schwer und ist jetzt ausgeschaltet. Die Pausenmessung läuft weiter.';}
+  save();
+}
+function whFail(msg){whMark(false);WH.err=msg;WH.loading=false;var c=WH.cb;WH.cb={};Object.keys(c).forEach(function(k){c[k]({type:'error'});});whUI();}
 function whInit(){
   if(WH.w)return WH.w;
   try{var u=URL.createObjectURL(new Blob([whWorkerSrc()],{type:'text/javascript'}));WH.w=new Worker(u,{type:'module'});}
   catch(e){whFail('Dieser Browser kann die genaue Auswertung nicht starten.');return null;}
   WH.w.onmessage=function(e){var m=e.data||{};
     if(m.type==='progress'){WH.p=m.p;if(!WH.ready)WH.loading=true;whUI();}
-    else if(m.type==='ready'){if(!WH.ready){WH.ready=true;WH.loading=false;WH.err='';whUI();}}
+    else if(m.type==='ready'){if(!WH.ready){WH.ready=true;WH.loading=false;WH.err='';if(!Object.keys(WH.cb).length)whMark(false);whUI();}}
     else if(m.type==='done'||m.type==='error'){
       if(m.type==='error'&&!WH.ready){whFail('Das Sprachmodell konnte nicht geladen werden. Prüfe die Internetverbindung und schalte die genaue Auswertung noch einmal ein.');return;}
-      var cb=WH.cb[m.id];delete WH.cb[m.id];if(cb)cb(m);}
+      var cb=WH.cb[m.id];delete WH.cb[m.id];if(!Object.keys(WH.cb).length)whMark(false);if(cb)cb(m);}
   };
   WH.w.onerror=function(){try{WH.w.terminate();}catch(e){}WH.w=null;whFail('Dieser Browser kann die genaue Auswertung nicht starten.');};
   return WH.w;
 }
-function whPreload(){if(window.__whMock){WH.ready=true;return;}WH.err='';var w=whInit();if(w&&!WH.ready){WH.loading=true;w.postMessage({id:0});whUI();}}
+function whPreload(){if(window.__whMock){WH.ready=true;return;}WH.err='';var w=whInit();if(w&&!WH.ready&&!WH.loading){WH.loading=true;whMark(true);w.postMessage({id:0});whUI();}}
 function whRun(x){return new Promise(function(res){
-  if(window.__whMock){window.__whMock(x).then(function(c){res({type:'done',chunks:c});},function(){res({type:'error'});});return;}
+  if(window.__whMock){whMark(true);window.__whMock(x).then(function(c){whMark(false);res({type:'done',chunks:c});},function(){whMark(false);res({type:'error'});});return;}
   var w=whInit();if(!w){res({type:'error'});return;}
-  var id=++WH.seq;WH.cb[id]=res;if(!WH.ready)WH.loading=true;
+  var id=++WH.seq;WH.cb[id]=res;if(!WH.ready)WH.loading=true;whMark(true);
   try{w.postMessage({id:id,audio:x},[x.buffer]);}catch(e){delete WH.cb[id];res({type:'error'});}
 });}
 function whStatus(){
@@ -1378,7 +1388,7 @@ function renderSheet(){
   h+='<div class="setrow"><span class="eyebrow">Name deines Monsters</span><input class="name" id="nameIn" maxlength="16" autocomplete="off" placeholder="z. B. Krümel" value="'+esc(S.name||'')+'"></div>';
   h+='<div class="setrow"><span class="eyebrow">Farbe deines Monsters</span><div class="seg">'+COLS.map(function(c){return '<button class="sw" data-a="col" data-v="'+c+'" aria-label="Farbe" aria-pressed="'+(S.col===c)+'" style="background:'+c+'"></button>';}).join('')+'</div></div>';
   h+='<div class="setrow"><span class="eyebrow">Aufnahme beim Lesen</span>'+seg('rec',[[true,'An'],[false,'Aus']])+'<span class="hint">Die Aufnahmen bleiben nur auf diesem Gerät.</span><button class="link" id="delRecsBtn" data-a="delRecs">Alle Aufnahmen löschen</button></div>';
-  h+='<div class="setrow"><span class="eyebrow">Genaue Auswertung (Whisper)</span>'+seg('wh',[[true,'An'],[false,'Aus']])+'<span class="hint">Erkennt Stockstellen und ausgelassene Wörter genauer. Beim ersten Einschalten werden einmalig etwa 80 MB geladen, am besten im WLAN. Danach läuft alles auf diesem Gerät, der Ton verlässt es nicht.</span><span class="hint fb" id="whst">'+esc(S.set.wh?whStatus():'')+'</span></div>';
+  h+='<div class="setrow"><span class="eyebrow">Genaue Auswertung (Whisper)</span>'+seg('wh',[[true,'An'],[false,'Aus']])+'<span class="hint">Erkennt Stockstellen und ausgelassene Wörter genauer. Beim ersten Einschalten werden einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB geladen, am besten im WLAN. Danach läuft alles auf diesem Gerät, der Ton verlässt es nicht.</span><span class="hint fb" id="whst">'+esc(S.set.wh?whStatus():'')+'</span></div>';
   h+='<div class="setrow"><span class="eyebrow">Vorlese-Tempo</span>'+seg('speed',[['slow','Langsam'],['normal','Normal']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Tempo-Zahlen zeigen</span>'+seg('nums',[[true,'An'],[false,'Aus']])+'<span class="hint">Aus: Es gibt nur „schneller als beim ersten Mal“, keine Wörter pro Minute.</span></div>';
   h+='<div class="rtext syl-on" style="--rf:\''+esc(s.font)+'\';--rsize:'+[1.25,1.5,1.8][s.size]+'rem;--rline:'+[1.7,2,2.35][s.line]+';--rsp:'+[0,.04,.08][s.space]+'em;background:var(--bg);border-radius:14px;padding:12px 14px"><span class="w"><span class="sy s0">Ge</span><span class="sy s1">cko</span></span> <span class="w"><span class="sy s0">läuft</span></span> <span class="w"><span class="sy s0">an</span></span> <span class="w"><span class="sy s0">der</span></span> <span class="w"><span class="sy s0">Wand</span></span>.</div>';
@@ -1449,6 +1459,7 @@ document.addEventListener('click',function(e){
     case 'opaBack':opaStep('back');break;
     case 'stop':stopRound();break;
     case 'shareRec':shareRec();break;
+    case 'whNoteOk':S.whNote='';save();renderHome();break;
     case 'cancel':recStop(false);R.phase='read';renderCtl();break;
     case 'again':R.phase='read';renderCtl();window.scrollTo(0,0);break;
     case 'check':R.phase='check';renderCtl();try{$('#qcard').scrollIntoView({block:'start',behavior:'smooth'});}catch(er){}break;
@@ -1481,6 +1492,7 @@ document.addEventListener('change',function(e){
   if(e.target&&e.target.id==='impFile'&&e.target.files&&e.target.files[0]){var fr=new FileReader();fr.onload=function(){applyBackup(fr.result);};fr.readAsText(e.target.files[0]);}
 });
 if(window.speechSynthesis){try{window.speechSynthesis.onvoiceschanged=function(){};}catch(e){}}
+whCrashCheck();
 renderHome();show('home');
 })();
 </script>
