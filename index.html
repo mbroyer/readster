@@ -832,40 +832,64 @@ function sayWord(w){
 }
 /* ---------- Auswertung der Aufnahme: Pausen, Rückmeldung ---------- */
 function pauseAnalyze(x,sr){
-  var hop=Math.max(1,Math.round(sr*0.02)),n=Math.floor(x.length/hop),i,j;
+  /* Stockstellen: Pausen, die deutlich länger sind als die eigenen Pausen zwischen Wörtern */
+  var F=0.02,hop=Math.max(1,Math.round(sr*F)),n=Math.floor(x.length/hop),i,j;
   if(n<50)return null;
   var e=new Float32Array(n);
   for(i=0;i<n;i++){var s=0,o=i*hop;for(j=0;j<hop;j++){var v=x[o+j];s+=v*v;}e[i]=Math.sqrt(s/hop);}
   var srt=Array.prototype.slice.call(e).sort(function(a,b){return a-b;});
-  var floor=srt[Math.floor(n*0.1)],peak=srt[Math.floor(n*0.95)],thr=Math.max(floor*3,peak*0.08,1e-4),first=-1,last=-1;
+  var floor=srt[Math.floor(n*0.1)],peak=srt[Math.floor(n*0.95)],thr=Math.max(floor*2.5,peak*0.1,1e-4),first=-1,last=-1;
   for(i=0;i<n;i++){if(e[i]>thr){if(first<0)first=i;last=i;}}
   if(first<0||last-first<50)return null;
-  var minGap=Math.round(1.5/0.02),pauses=[],run=0,lost=0;
+  /* Lücken sammeln; kurze Geräusche (unter 60 ms) beenden keine Lücke */
+  var gaps=[],run=0,sp=0,gs=-1;
   for(i=first;i<=last;i++){
-    if(e[i]>thr){if(run>=minGap){pauses.push({len:run*0.02,before:(i-run-first)-lost});lost+=run;}run=0;}
-    else run++;
+    if(e[i]>thr){sp++;if(sp>=3&&gs>=0){if(run>=3)gaps.push({s:gs,len:run*F});gs=-1;run=0;}}
+    else{if(gs<0){gs=i;run=0;}run+=1+(sp>0&&sp<3?sp:0);sp=0;}
   }
-  return {pauses:pauses,total:(last-first+1)-lost};
+  var lost=0,total=last-first+1;
+  gaps.forEach(function(g){total-=Math.round(g.len/F);});
+  gaps.forEach(function(g){g.before=(g.s-first)-lost;lost+=Math.round(g.len/F);});
+  return {gaps:gaps,total:total};
 }
 function suggestWords(t,res){
-  if(!res||!res.pauses.length||res.total<=0)return [];
-  var cum=[],c=0,i;
-  for(i=0;i<t.rs;i++){var w=t.words[i];c+=w.sy.join('').length+2+(/[.,;:!?]/.test(w.post)?3:0);cum.push(c);}
-  var out=[];
-  res.pauses.slice().sort(function(a,b){return b.len-a.len;}).forEach(function(p){
-    if(out.length>=2)return;
-    var target=p.before/res.total*c,b=0;
-    while(b<cum.length-1&&cum[b]<target)b++;
-    var base=b?cum[b-1]:0,wg=cum[b]-base,into=wg>0?(target-base)/wg:0;
-    var idx=into>0.5?b+1:b;
-    if(idx<=0||idx>=t.rs)return;
-    if(/[.,;:!?]/.test(t.words[idx-1].post))return;
-    if(out.indexOf(idx)<0)out.push(idx);
+  /* Jede Lücke wird einer Wortgrenze zugeordnet (Reihenfolge bleibt, Satzzeichen ziehen Pausen an).
+     Stockstelle = Lücke an einer Grenze ohne Satzzeichen, deutlich länger als die eigenen Wortpausen. */
+  if(!res||!res.gaps||!res.gaps.length||res.total<=0)return [];
+  var n=t.rs,cum=[],c=0,i,g,w;
+  for(i=0;i<n;i++){c+=t.words[i].sy.join('').length+1;cum.push(c);}
+  var sc=c/n,G=res.gaps,W=n-1;if(W<1)return [];
+  function punct(k){return /[.,;:!?]/.test(t.words[k].post);}
+  var pos=G.map(function(x){return x.before/res.total*c;});
+  var D=[],P=[];
+  for(g=0;g<G.length;g++){
+    D[g]=new Float64Array(W);P[g]=new Int32Array(W);
+    var bm=g>0?1e18:0,bi=-1;
+    for(w=0;w<W;w++){
+      var cost=Math.abs(pos[g]-cum[w])/sc,bon=punct(w)?Math.min(1.2,G[g].len/0.4):0;
+      var a1=cost-bon+bm,a2=g>0?cost+1+D[g-1][w]:1e18;
+      if(a2<a1){D[g][w]=a2;P[g][w]=w;}else{D[g][w]=a1;P[g][w]=bi;}
+      if(g>0&&D[g-1][w]<bm){bm=D[g-1][w];bi=w;}
+    }
+  }
+  var asg=new Array(G.length),bw=0;
+  for(w=1;w<W;w++)if(D[G.length-1][w]<D[G.length-1][bw])bw=w;
+  for(g=G.length-1;g>=0;g--){asg[g]=bw;if(g>0)bw=P[g][bw];}
+  var inner=[];for(g=0;g<G.length;g++)if(!punct(asg[g]))inner.push(G[g].len);
+  inner.sort(function(a,b){return a-b;});
+  var med=inner.length?inner[Math.floor(inner.length/2)]:0.15,lim=Math.min(1.2,Math.max(0.75,med*3));
+  var cand=[];
+  for(g=0;g<G.length;g++){var L=G[g].len,pw=punct(asg[g]);if(pw?L>=Math.max(1.5,lim+0.9):L>=lim)cand.push({idx:asg[g]+1,len:L});}
+  var cap=Math.max(3,Math.min(10,Math.round(n/8))),out=[];
+  cand.sort(function(a,b){return b.len-a.len;}).forEach(function(x){
+    if(out.length>=cap||x.idx<=0||x.idx>=n)return;
+    for(var k=0;k<out.length;k++)if(out[k]===x.idx)return;
+    out.push(x.idx);
   });
   return out.sort(function(a,b){return a-b;});
 }
 function expandSug(c,t){
-  var s={};c.forEach(function(k){for(var d=-1;d<=1;d++){var j=k+d;if(j>=0&&j<t.rs)s[j]=1;}});
+  var s={};c.forEach(function(k){if(k>=0&&k<t.rs)s[k]=1;});
   return Object.keys(s).map(Number).sort(function(a,b){return a-b;});
 }
 function analyzeBlob(b,t){
@@ -928,7 +952,7 @@ function updateMarkInfo(){
   var sb=$('#sugbox');
   if(R.phase==='mark'&&R.sug&&R.sug.length){
     R.sug.forEach(function(k){var w=$('#rtext .w[data-i="'+k+'"]');if(w)w.classList.add('sug');});
-    if(sb)sb.innerHTML='<p class="hint">Irgendwo hier hast du länger überlegt (gelb gestrichelt). War da ein schweres Wort?</p>';
+    if(sb)sb.innerHTML='<p class="hint">Vor den gelb gestrichelten Wörtern hast du länger überlegt. War da ein schweres Wort?</p>';
   }else if(sb)sb.innerHTML='';
 }
 /* ---------- Fortschritt ---------- */
