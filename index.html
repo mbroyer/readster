@@ -1103,7 +1103,7 @@ var WH={w:null,ready:false,loading:false,p:0,cb:{},seq:0,err:''};
 var WH_MODELS=['onnx-community/whisper-base_timestamped','onnx-community/whisper-tiny_timestamped'],WH_BUSY='readster.whBusy',WH_LIB='https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1';
 if(window.__whLib)WH_LIB=window.__whLib;
 /* Adresse des Cloudflare-Workers (siehe cloudflare/ANLEITUNG.md). Leer = Whisper läuft im Browser. */
-var WH_SERVER='';if(WH_SERVER.indexOf('http')!==0)WH_SERVER='';if(window.__whServer)WH_SERVER=window.__whServer;
+var WH_SERVER='https://readster-whisper.mark-broyer.workers.dev';if(WH_SERVER.indexOf('http')!==0)WH_SERVER='';if(window.__whServer)WH_SERVER=window.__whServer;
 function whModel(){var m=S.set.whm;if(m!==0&&m!==1)m=IOS?1:0;return m;}
 function whWorkerSrc(){return "import {pipeline,env} from '"+WH_LIB+"';env.allowLocalModels=false;try{env.backends.onnx.wasm.numThreads=1;}catch(e){}let P=null;const files={};\n"+
   "function load(){return P||(P=pipeline('automatic-speech-recognition','"+WH_MODELS[whModel()]+"',{dtype:'q8',device:'wasm',progress_callback:function(p){if(p&&p.status==='progress'&&p.file){files[p.file]=[p.loaded||0,p.total||0];let l=0,t=0;for(const k in files){l+=files[k][0];t+=files[k][1];}self.postMessage({type:'progress',p:t?l/t:0});}}}).catch(function(e){P=null;throw e;}));}\n"+
