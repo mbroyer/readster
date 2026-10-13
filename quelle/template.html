@@ -1,0 +1,1354 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07202b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Readster">
+<link rel="apple-touch-icon" href="__ICON__">
+<link rel="icon" href="__ICON__">
+<title>Readster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&family=Lexend:wght@400;500;600&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: eine schmale Spalte fürs Tablet. Start = Monster, Wochenziel, nächster Text, Themen. Lesen = ein Text pro Bildschirm. Stil und Farben wie Vokamon. */
+:root{
+  --bg:#07202b;--surface:#0f3342;--ink:#e8f8ff;--muted:#8fbccc;--line:#1d4d61;
+  --accent:#2fd6d0;--accent-edge:#169a96;--accent-ink:#042321;
+  --xp:#ffd04d;--xp-edge:#c79500;--xp-ink:#3d2a00;
+  --good:#4fd18b;--good-bg:#12392a;--bad:#ff7c82;--bad-bg:#46202a;--warn-bg:#443a14;
+  --sy-a:#8be9e3;--sy-b:#ffd9a0;
+  --f-display:'Fredoka','Trebuchet MS',system-ui,sans-serif;
+  --f-body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.45;padding-inline:16px;padding-block:14px 32px}
+.app{max-width:720px;margin-inline:auto;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3,p{margin:0}
+h2{font-family:var(--f-display);font-weight:600;font-size:1.45rem;text-wrap:balance;line-height:1.2}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:12px}
+.eyebrow{font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.view{display:flex;flex-direction:column;gap:18px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.brand{font-family:var(--f-display);font-weight:700;font-size:1.6rem;color:var(--ink)}
+.chips{display:flex;gap:8px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:800;font-size:.92rem;font-variant-numeric:tabular-nums}
+.chip.lvl{background:var(--xp);border-color:var(--xp-edge);color:var(--xp-ink)}
+.iconbtn{cursor:pointer;background:var(--surface);border:2px solid var(--line);border-radius:50%;width:44px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center;color:var(--accent);font-family:var(--f-display);font-weight:600;font-size:1rem}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.btn{font-family:var(--f-display);font-weight:600;font-size:1.2rem;padding:14px 22px;border-radius:18px;border:0;background:var(--accent);color:var(--accent-ink);box-shadow:0 5px 0 var(--accent-edge);cursor:pointer;transition:transform .08s,box-shadow .08s;text-align:center;min-height:52px}
+.btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 var(--accent-edge)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:var(--surface);color:var(--ink);border:2px solid var(--line);box-shadow:0 5px 0 var(--line)}
+.btn.ghost:active:not(:disabled){box-shadow:0 1px 0 var(--line)}
+.btn.wide{width:100%}
+.btn.on{background:var(--warn-bg);border-color:var(--xp)}
+.link{background:none;border:0;color:var(--muted);font-weight:800;cursor:pointer;padding:10px;text-decoration:underline;text-underline-offset:3px;min-height:44px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>*{flex:1 1 180px}
+.bar{height:16px;border-radius:999px;background:var(--bg);border:2px solid var(--line);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:999px;background:var(--xp);box-shadow:inset 0 -4px 0 var(--xp-edge);transition:width .5s ease}
+.xptext{font-size:.9rem;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+.mon{width:112px;height:116px;flex:none;--mi:#4ade80;--tile:var(--surface);padding:4px}
+.mon .m{fill:var(--mi)}.mon .k{fill:var(--tile)}
+.mon .ms{fill:none;stroke:var(--mi);stroke-linecap:round;stroke-linejoin:round}
+.mon .ks{fill:none;stroke:var(--tile);stroke-linecap:round;stroke-linejoin:round}
+.sw{flex:0 0 48px!important;min-width:48px;height:48px;border-radius:50%!important;padding:0!important}
+.sw[aria-pressed="true"]{outline:4px solid var(--ink);outline-offset:2px}
+.evo{display:flex;align-items:center;justify-content:center;gap:10px}
+.evo .mon{width:120px;height:134px}.evo-old{opacity:.55}.evo-ar{font-size:2rem;color:var(--xp)}
+.rank{display:inline-block;background:var(--xp);color:#1b1500;border-radius:999px;padding:2px 12px;font-weight:800;font-size:.85rem}
+.mon svg{width:100%;height:100%;display:block;overflow:visible}
+.mon.big{width:150px;height:156px}
+.hero{flex-direction:row;align-items:center;gap:16px}
+.hero .info{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
+.stagename{font-family:var(--f-display);font-weight:700;font-size:1.7rem;line-height:1.05}
+.week{gap:10px}
+.dots{display:flex;gap:8px;justify-content:space-between}
+.dot{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0}
+.dot i{width:100%;max-width:44px;aspect-ratio:1;border-radius:50%;border:3px solid var(--line);background:var(--bg);display:block}
+.dot.on i{background:var(--xp);border-color:var(--xp-edge)}
+.dot.today i{border-color:var(--accent)}
+.dot span{font-size:.75rem;font-weight:800;color:var(--muted)}
+.next{gap:10px}
+.next .q{font-family:var(--f-display);font-weight:600;font-size:1.5rem;line-height:1.2;text-wrap:balance}
+.cats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:520px){.cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cat{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:14px 12px;cursor:pointer;display:flex;flex-direction:column;gap:6px;align-items:flex-start;text-align:left;box-shadow:0 4px 0 var(--line);min-height:96px}
+.cat:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.cat svg{width:32px;height:32px;color:var(--accent)}
+.cat b{font-family:var(--f-display);font-weight:600;font-size:1.15rem}
+.cat span{font-size:.85rem;color:var(--muted);font-weight:800;font-variant-numeric:tabular-nums}
+.backrow{display:flex;align-items:center;gap:12px}
+.back{background:none;border:0;cursor:pointer;color:var(--muted);font-weight:800;padding:10px 8px 10px 0;min-height:44px}
+.steps{display:flex;gap:6px;flex:1}
+.steps i{height:8px;flex:1;border-radius:999px;background:var(--line)}
+.steps i.on{background:var(--accent)}
+.list{display:flex;flex-direction:column;gap:10px}
+.trow{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:14px 16px;cursor:pointer;text-align:left;width:100%;box-shadow:0 4px 0 var(--line);min-height:64px}
+.trow:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.trow b{font-weight:800;font-size:1.05rem;min-width:0;overflow-wrap:anywhere}
+.badge{flex:none;font-size:.8rem;font-weight:800;border-radius:999px;padding:3px 10px;background:var(--bg);color:var(--muted);border:2px solid var(--line)}
+.badge.done{background:var(--good-bg);color:var(--good);border-color:var(--good)}
+/* Lesetext */
+.rtext{--rf:'Nunito';--rsize:1.5rem;--rline:1.9;--rsp:0em;font-family:var(--rf),system-ui,sans-serif;font-size:var(--rsize);line-height:var(--rline);letter-spacing:var(--rsp);word-spacing:.12em;font-weight:600;max-width:36em;overflow-wrap:break-word}
+.rtext .w{border-radius:8px;padding:2px 3px;margin-inline:-3px;transition:background .15s}
+.rtext.syl-on .sy.s0{color:var(--sy-a)}
+.rtext.syl-on .sy.s1{color:var(--sy-b)}
+.rtext .w.now{background:var(--warn-bg);box-shadow:0 0 0 3px var(--accent)}
+.rtext.marking .w{cursor:pointer}
+.rtext.seek .w{cursor:pointer}
+.rtext .w.st{background:var(--bad-bg);text-decoration:underline wavy var(--bad);text-underline-offset:6px}
+.card.riddle{border:2px dashed var(--accent)}
+.card.riddle.locked{opacity:.75}
+.card.riddle .rl{display:block;font-family:'Fredoka',system-ui,sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.card.riddle.reveal{animation:rpop .6s ease-out}
+@keyframes rpop{0%{transform:scale(.92);opacity:0}60%{transform:scale(1.03);opacity:1}100%{transform:scale(1)}}
+.card.riddle .rtext{padding:0}
+.rtext .w.sug{outline:2px dashed var(--xp);outline-offset:1px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tile{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:12px 6px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.tile b{font-family:var(--f-display);font-size:1.9rem;color:var(--xp);line-height:1.1}
+.tile span{font-size:.8rem;font-weight:800;color:var(--muted)}
+.chart{width:100%;height:auto;display:block}
+.chart .ax{stroke:var(--line);stroke-width:1}
+.chart .ln{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.chart .dt{fill:var(--accent);stroke:var(--surface);stroke-width:2}
+.chart .dt.sel{stroke:var(--ink)}
+.chart .hit{fill:transparent;cursor:pointer}
+.chart text{fill:var(--muted);font-size:10px;font-family:var(--f-body);font-weight:700}
+.sb{display:grid;grid-template-columns:5.5rem 1fr 2rem;gap:8px;align-items:center;font-weight:800;font-size:.95rem}
+.sb i{display:block;height:12px;border-radius:6px;background:var(--accent);min-width:2px}
+table.tb{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:8px}table.tb td,table.tb th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}
+.fb{font-weight:700;color:var(--ink)}
+.sent.todo{opacity:.35}.sent.done{opacity:.65}
+.sent.cur{background:var(--warn-bg);border-radius:10px;padding:2px 4px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.turn{display:flex;flex-direction:column;gap:2px;padding:12px 16px;border-radius:14px;border:2px solid var(--line);background:var(--surface)}
+.turn b{font-family:var(--f-display);font-size:1.3rem}
+.turn.opa b{color:var(--xp)}.turn.kid b{color:var(--accent)}
+.rec{display:flex;flex-direction:column;gap:8px}.rec audio{width:100%}
+.recdot{color:var(--bad);font-weight:800}
+details.tip{border:2px solid var(--line);border-radius:14px;padding:10px 14px;background:var(--surface)}
+details.tip summary{cursor:pointer;font-weight:800}details.tip ul{margin:8px 0 0;padding-left:1.2em;color:var(--muted);font-weight:700}
+.hint{color:var(--muted);font-weight:700;font-size:.95rem}
+.result{display:flex;flex-direction:column;gap:10px;background:var(--bg);border-radius:16px;padding:14px 16px}
+.result b{font-family:var(--f-display);font-size:1.5rem;font-weight:600}
+.rb{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;font-weight:800;font-size:.9rem;font-variant-numeric:tabular-nums}
+.rb i{display:block;height:12px;border-radius:999px;background:var(--accent)}
+.rb.best i{background:var(--xp)}
+.qa{display:flex;flex-direction:column;gap:8px;background:var(--bg);border-radius:16px;padding:14px 16px}
+.qa p{font-weight:800}
+.result-card{display:flex;flex-direction:column;gap:12px}.result-card .rhead{font-family:var(--f-display);font-size:1.45rem;font-weight:600;line-height:1.2}
+.result-card .bars{display:flex;flex-direction:column;gap:6px}
+.rec.me{background:var(--bg);border-radius:16px;padding:12px 14px}.rec.me b{font-family:var(--f-display);font-weight:600;font-size:1.1rem}
+.chk{display:flex;flex-direction:column;gap:4px;background:var(--bg);border-radius:16px;padding:12px 14px}.chk b{font-family:var(--f-display);font-weight:600;font-size:1.15rem}
+.rtext .w.srm{text-decoration:underline dotted var(--accent);text-decoration-thickness:3px;text-underline-offset:6px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{font:inherit;font-weight:800;text-align:left;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:12px 14px;min-height:48px;cursor:pointer}
+.opt.right{border-color:var(--good);background:var(--good-bg);color:var(--good)}.opt.miss{border-color:var(--bad);background:var(--bad-bg)}.opt.off{opacity:.55}.opt:disabled{cursor:default}
+.qfb{font-weight:800}.qfb.ok{color:var(--good)}
+.qa .ans{background:var(--good-bg);color:var(--good);border-radius:12px;padding:8px 12px;font-weight:800}
+/* Karten */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kcard{--c:#2fa868;background:var(--surface);border:2px solid color-mix(in srgb,var(--c) 70%,var(--line));border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;cursor:pointer;color:var(--ink);box-shadow:0 4px 0 color-mix(in srgb,var(--c) 45%,var(--bg));width:100%}
+.kcard .mon{width:100%;height:auto;aspect-ratio:120/134;max-width:150px}
+.kcard .kn{font-family:var(--f-display);font-weight:600;font-size:1.05rem;line-height:1.15;overflow-wrap:anywhere}
+.kcard .kc{font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.kcard.lock{--c:#4a5d6b;box-shadow:0 4px 0 var(--line);cursor:default}
+.kcard.lock .mon{--mi:#1b3a4a;--tile:var(--surface)}
+.kcard.lock .mon .q{font-family:var(--f-display);font-weight:700;font-size:44px;fill:#5d8296}
+.kcard.lock .kn{color:var(--muted)}
+.kfull{width:100%;max-width:340px;margin-inline:auto;padding:20px;gap:10px}
+.kfull .mon{width:200px;height:auto;aspect-ratio:120/134}
+.kfull .mn{font-family:var(--f-display);font-weight:700;font-size:1.9rem;line-height:1}
+.kfull .kn{font-size:1.6rem}
+.kfull .kf{font-weight:700;font-size:1.05rem;line-height:1.4}
+.wj{display:flex;flex-wrap:wrap;gap:8px}
+.wj span{background:var(--bg);border:2px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:800;font-size:.95rem}
+/* Overlays */
+.cfbox{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+[hidden]{display:none!important}
+.cfbox[hidden]{display:none!important}
+.cfbox .card{max-width:440px;width:100%;margin-block:auto;text-align:center;align-items:center}
+.cfbox .card.left{text-align:left;align-items:stretch}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button{flex:1 1 90px;background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:10px 12px;font-weight:800;cursor:pointer;min-height:48px}
+.seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.setrow{display:flex;flex-direction:column;gap:8px}
+.cfbtns{display:flex;gap:10px;width:100%}
+.cfbtns .btn{flex:1}
+.xpgain{font-family:var(--f-display);font-weight:700;font-size:1.6rem;color:var(--xp)}
+.xplist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;font-weight:700;color:var(--muted);font-size:.95rem}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.fxp{position:absolute;display:block;opacity:0;left:50%;top:40%}
+.fxs{width:14px;height:14px;background:var(--xp);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:fxs 900ms ease-out forwards}
+@keyframes fxs{0%{opacity:1;transform:translate(0,0) scale(.4) rotate(0)}70%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.6) rotate(var(--rot))}}
+@media (prefers-reduced-motion:reduce){#fx{display:none}.mbob,.eyes,.wing,.aura,.tw{animation:none!important}}
+.foot{display:flex;justify-content:center;padding:28px 0 20px}
+.madeby{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:.9}
+.madeby span{font:800 10px/1 'Nunito',system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#fff}
+.madeby img{width:80px;height:auto;display:block;filter:brightness(0) invert(1)}
+</style>
+<style>
+/* Feste Leiste unten: die wichtigsten Knöpfe der Lesephase sind immer erreichbar */
+body{padding-top:max(14px,env(safe-area-inset-top));padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+body.hasdock{padding-bottom:calc(var(--dockh,120px) + 24px)}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:40;background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-top:2px solid var(--line);padding:10px max(16px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.dock .in{max-width:720px;margin-inline:auto;display:flex;flex-direction:column;gap:8px}
+.dock .row{flex-wrap:nowrap;gap:10px}
+.dock .row>*{flex:1 1 0;min-width:0}
+.dock .row>.sm{flex:0 0 auto}
+.dock .btn{padding:12px 14px;font-size:1.1rem}
+.dock .lbl{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-weight:800}
+.dock .lbl b{font-family:var(--f-display);font-size:1.15rem;font-weight:600}
+.dock .lbl.opa b{color:var(--xp)}.dock .lbl.kid b{color:var(--accent)}
+.dock .lbl span{color:var(--muted);font-size:.85rem}
+/* Größere Tippflächen für Wörter beim Markieren */
+.rtext.marking .w,.rtext.opa .w{padding:6px 4px;margin-inline:-4px}
+.result .wpm{font-weight:800;color:var(--muted);font-size:.95rem;font-variant-numeric:tabular-nums}
+details.adult{border:0;padding:0;background:none}
+details.adult summary{color:var(--muted);font-weight:800;font-size:.9rem;cursor:pointer;min-height:32px}
+details.adult p{color:var(--muted);font-weight:700;font-size:.92rem;margin-top:6px}
+.badge.star{color:var(--xp);border-color:var(--line);letter-spacing:.05em}
+/* Wort-Jäger */
+.wjcta{display:flex;align-items:center;gap:14px;text-align:left;width:100%;background:var(--surface);border:2px solid var(--xp-edge);border-radius:22px;padding:16px 18px;cursor:pointer;box-shadow:0 5px 0 var(--xp-edge)}
+.wjcta:active{transform:translateY(4px);box-shadow:0 1px 0 var(--xp-edge)}
+.wjcta svg{flex:none;width:40px;height:40px;color:var(--xp)}
+.wjcta b{font-family:var(--f-display);font-weight:600;font-size:1.3rem;display:block}
+.wjcta span{color:var(--muted);font-weight:800;font-size:.9rem}
+.wjword{font-family:var(--rf,'Nunito'),system-ui,sans-serif;font-weight:700;font-size:2.6rem;text-align:center;line-height:1.3;overflow-wrap:anywhere;letter-spacing:var(--rsp,0)}
+.claps{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.clap{font-family:var(--rf,'Nunito'),system-ui,sans-serif;font-weight:700;font-size:1.8rem;min-width:72px;min-height:72px;padding:8px 16px;border-radius:18px;background:var(--bg);border:3px solid var(--line);color:var(--ink);cursor:pointer;box-shadow:0 4px 0 var(--line)}
+.clap.s0{color:var(--sy-a)}.clap.s1{color:var(--sy-b)}
+.clap.on{border-color:var(--xp);background:var(--warn-bg)}
+.clap:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.rdots{display:flex;justify-content:center;gap:12px}
+.rdots i{width:28px;height:28px;border-radius:50%;border:3px solid var(--line);background:var(--bg)}
+.rdots i.on{background:var(--xp);border-color:var(--xp-edge)}
+.wjstep{text-align:center;color:var(--muted);font-weight:800}
+.wj span.ok{border-color:var(--good);color:var(--good)}
+textarea.code{width:100%;min-height:90px;font:600 .8rem/1.3 ui-monospace,Menlo,monospace;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:8px;resize:vertical}
+input.name{width:100%;font:700 1.1rem var(--f-body);color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px 12px;min-height:48px}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="view" id="v-home"></div>
+  <div class="view" id="v-cat" hidden></div>
+  <div class="view" id="v-read" hidden></div>
+  <div class="view" id="v-album" hidden></div>
+  <div class="view" id="v-stats" hidden></div>
+  <div class="view" id="v-wj" hidden></div>
+</div>
+<div class="dock" id="dock" hidden><div class="in" id="dockin"></div></div>
+<div class="cfbox" id="sheet" hidden></div>
+<div class="cfbox" id="modal" hidden></div>
+<div id="fx" aria-hidden="true"></div>
+
+<script>
+__MON_JS__
+</script>
+<script>
+var AUDIO=__AUDIO__;
+</script>
+<script>
+(function(){
+'use strict';
+var XPK=20,WEEKGOAL=4,KEY='lesemonster.v1'; /* Speicher-Schlüssel bleibt, damit der Fortschritt nach der Umbenennung erhalten bleibt */
+var MADEBY='__MADEBY__';
+var CATS=[
+ {id:'Tiere',ic:'<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><ellipse cx="16" cy="21" rx="7" ry="6"/><circle cx="7" cy="14" r="3"/><circle cx="12.5" cy="8.5" r="3"/><circle cx="19.5" cy="8.5" r="3"/><circle cx="25" cy="14" r="3"/></svg>'},
+ {id:'Weltall',ic:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="16" cy="16" r="7" fill="currentColor" stroke="none"/><ellipse cx="16" cy="16" rx="14" ry="5" transform="rotate(-20 16 16)"/></svg>'},
+ {id:'Technik',ic:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="16" cy="16" r="9" stroke-width="5" stroke-dasharray="3.2 3.2"/><circle cx="16" cy="16" r="7.5" stroke-width="3"/><circle cx="16" cy="16" r="2.5" fill="currentColor" stroke="none"/></svg>'},
+ {id:'Körper',ic:'<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 28C6 21 3 15 3 10.5 3 6.9 5.8 4 9.3 4c2.8 0 5 1.6 6.7 4 1.7-2.400 3.900-4 6.700-4C26.200 4 29 6.900 29 10.500 29 15 26 21 16 28z"/></svg>'},
+ {id:'Sport',ic:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="16" cy="16" r="12"/><path d="M4 16h24M16 4c-6 6-6 18 0 24M16 4c6 6 6 18 0 24"/></svg>'},
+ {id:'Rätsel',ic:'<svg viewBox="0 0 32 32" aria-hidden="true"><text x="16" y="26" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="30" fill="currentColor">?</text></svg>'}
+];
+var TILE={'Tiere':'#4ade80','Weltall':'#a78bfa','Technik':'#fb923c','Körper':'#f472b6','Sport':'#facc15','Rätsel':'#2dd4bf'};
+var MNAME=['Klebo','Bunto','Trio','Halbi','Schnarch','Rasso','Sturzo','Wumm','Glühi','Kratzo','Ringo','Zisch','Hopsi','Nordo','Poch','Brrr','Knack','Blitzo','Dunko','Marat','Platsch','Nessi','Steino','Blubb'];
+var COLS=['#2fd6d0','#4ade80','#a78bfa','#fb923c','#f472b6','#facc15'];
+function rankOf(L){var r=0;MON.STAGES.forEach(function(s,i){if(L>=s.lv)r=i;});return r;}
+var TEXTS=__DATA__;
+var TIMES=__TIMES__;
+var byId={};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function $(s,r){return (r||document).querySelector(s);}
+function tokenize(syl){
+  return syl.split(' ').map(function(tk){
+    var m=/^([^A-Za-zÄÖÜäöüß0-9]*)(.*?)([^A-Za-zÄÖÜäöüß0-9]*)$/.exec(tk);
+    var sy=m[2].split('·');
+    return {pre:m[1],sy:sy,post:m[3],plain:sy.join('')};
+  });
+}
+TEXTS.forEach(function(t,i){
+  t.i=i;byId[t.id]=t;t.words=tokenize(t.syl);
+  t.plain=t.words.map(function(w){return w.pre+w.plain+w.post;}).join(' ');
+  t.ask=t.r||'';t.rs=t.r?t.words.length-t.r.split(/\s+/).length:t.words.length;
+});
+TEXTS.forEach(function(t){
+  t.sents=[];var s=0;
+  for(var i=0;i<t.rs;i++){if(/[.!?]/.test(t.words[i].post)||i===t.rs-1){t.sents.push([s,i+1]);s=i+1;}}
+});
+/* Schwierigkeit: lange Wörter und Silben pro Wort. Die schwerere Hälfte bekommt zwei Sterne. */
+var WSY={};
+TEXTS.forEach(function(t){
+  var lw=0,sy=0;
+  for(var i=0;i<t.rs;i++){var w=t.words[i];sy+=w.sy.length;if(w.plain.replace(/[^A-Za-zÄÖÜäöüß]/g,'').length>=11)lw++;
+    var k=w.plain;if(/[A-Za-zÄÖÜäöüß]/.test(k)&&!WSY[k])WSY[k]={sy:w.sy.slice(),id:t.id,i:i};}
+  t.diff=lw*2+sy/t.rs*10;
+});
+(function(){var ds=TEXTS.map(function(t){return t.diff;}).sort(function(a,b){return a-b;}),med=ds[Math.floor(ds.length/2)];TEXTS.forEach(function(t){t.stars=t.diff>=med?2:1;});})();
+/* ---------- Zustand ---------- */
+function defaults(){return {whNote:'',xp:0,done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Nunito',size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1}};}
+function fixState(d){
+  /* Ältere Stände: gesammelte Wörter in den Wort-Jäger übernehmen */
+  Object.keys(d.stolper||{}).forEach(function(w){if(!d.wj[w])d.wj[w]={n:d.stolper[w],ok:[],done:false};});
+  if(!Array.isArray(d.log))d.log=[];
+  return d;
+}
+function merge(j){
+  var d=defaults();
+  if(j&&typeof j==='object'){for(var k in d){if(j[k]!==undefined&&k!=='set')d[k]=j[k];}
+    for(var q in d.set){if(j.set&&j.set[q]!==undefined)d.set[q]=j.set[q];}}
+  return fixState(d);
+}
+function load(){
+  var j=null;
+  try{j=JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){}
+  return merge(j);
+}
+var S=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+function lvl(xp){return Math.floor(Math.sqrt(xp/XPK))+1;}
+function lvlProg(xp){var L=lvl(xp),a=XPK*(L-1)*(L-1),b=XPK*L*L;return {L:L,pct:Math.max(0,Math.min(100,Math.round((xp-a)/(b-a)*100))),need:b-xp};}
+function doneCount(){return Object.keys(S.done).length;}
+function dkey(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function weekInfo(){
+  var now=new Date(),dow=(now.getDay()+6)%7,arr=[],n=0,lab=['Mo','Di','Mi','Do','Fr','Sa','So'];
+  for(var i=0;i<7;i++){var d=new Date(now.getFullYear(),now.getMonth(),now.getDate()-dow+i),on=!!S.days[dkey(d)];if(on)n++;arr.push({on:on,today:i===dow,lab:lab[i]});}
+  return {arr:arr,n:n};
+}
+function suggest(){
+  var l=S.last&&byId[S.last];
+  if(l){var f=byId[l.next];if(f&&!S.done[f.id])return {t:f,from:l};}
+  if(!doneCount())return {t:TEXTS[0],from:null};
+  var open=TEXTS.filter(function(t){return !S.done[t.id];}).sort(function(a,b){return a.diff-b.diff;});
+  return open.length?{t:open[0],from:null}:null;
+}
+/* Wiederholen: ein Text, der vor 2 bis 10 Tagen gelesen wurde, bevorzugt einer, der holprig war */
+function lastRead(id){
+  var d=S.done[id];if(d&&d.ts)return d.ts;
+  var ts=0;S.log.forEach(function(x){if(x.id===id&&x.ts>ts)ts=x.ts;});S.opa.forEach(function(x){if(x.id===id&&x.ts>ts)ts=x.ts;});return ts;
+}
+function daysAgo(ts){var a=new Date(ts),b=new Date();a.setHours(0,0,0,0);b.setHours(0,0,0,0);return Math.round((b-a)/864e5);}
+function repeatPick(){
+  var best=null,bs=-1;
+  Object.keys(S.done).forEach(function(id){
+    var t=byId[id];if(!t)return;var ts=lastRead(id);if(!ts)return;var ag=daysAgo(ts);if(ag<2||ag>10)return;
+    var d=S.done[id],sc=(d.hard?3:0)+(d.marked?2:0)+(d.qmiss?1:0)+(d.rounds<=1?1:0)+ag/10;
+    if(sc>bs){bs=sc;best=t;}
+  });
+  return best;
+}
+/* Wort-Jäger: höchstens 5 Wörter pro Runde, nicht zweimal am selben Tag */
+var WJ_MAX=5,WJ_NEED=3;
+function wjDue(){
+  var today=dkey(new Date());
+  return Object.keys(S.wj).filter(function(w){var e=S.wj[w];return !e.done&&e.last!==today;})
+    .sort(function(a,b){return (S.wj[b].n||0)-(S.wj[a].n||0);});
+}
+function wjAdd(w){
+  if(!/[A-Za-zÄÖÜäöüß]/.test(w))return;
+  var e=S.wj[w]||{n:0,ok:[],done:false};e.n=(e.n||0)+1;if(e.done){e.done=false;e.ok=[];}S.wj[w]=e;
+}
+function monHTML(i,tile,cls){
+  var svg=(i==='lock')?'<svg viewBox="0 -10 120 134" aria-hidden="true"><text class="q" x="60" y="72" text-anchor="middle">?</text></svg>':MON.svg(i);
+  return '<div class="mon '+(cls||'')+(i==='lock'?' lockm':'')+'" style="--mi:'+tile+'">'+svg+'</div>';}
+function stageHTML(n,cls){return '<div class="mon '+(cls||'')+'" style="--mi:'+S.col+'">'+MON.stage(n,null)+'</div>';}
+var CUR='home',HPUSH=false;
+function show(v){
+  ['home','cat','read','album','stats','wj'].forEach(function(x){$('#v-'+x).hidden=(x!==v);});
+  CUR=v;
+  if(v!=='read')stopListen();
+  if(v!=='read'&&v!=='wj')setDock('');
+  /* Zurück-Geste von iOS und Browser-Zurück führen zur Übersicht statt aus der App */
+  if(v!=='home'&&!HPUSH){try{history.pushState({lm:1},'');HPUSH=true;}catch(e){}}
+  window.scrollTo(0,0);
+}
+function setDock(html){
+  var d=$('#dock');
+  if(!html){d.hidden=true;$('#dockin').innerHTML='';document.body.classList.remove('hasdock');return;}
+  $('#dockin').innerHTML=html;d.hidden=false;document.body.classList.add('hasdock');
+  document.body.style.setProperty('--dockh',d.offsetHeight+'px');
+}
+window.addEventListener('resize',function(){var d=$('#dock');if(!d.hidden)document.body.style.setProperty('--dockh',d.offsetHeight+'px');});
+window.addEventListener('popstate',function(){
+  HPUSH=false;
+  if(!$('#sheet').hidden){closeBox('#sheet');}
+  if(!$('#modal').hidden){closeBox('#modal');}
+  if(CUR==='home')return;
+  recStop(false);stopListen();R=null;renderHome();show('home');
+});
+function openBox(id,html){var b=$(id);b.innerHTML=html;b.hidden=false;}
+function closeBox(id){$(id).hidden=true;$(id).innerHTML='';}
+/* ---------- Startseite ---------- */
+function renderHome(){
+  var p=lvlProg(S.xp),sg=suggest(),wk=weekInfo(),n=doneCount();
+  var h='<header class="top"><h1 class="brand">Readster</h1><div class="chips"><span class="chip lvl">Level '+p.L+'</span><button class="iconbtn" data-a="stats" aria-label="Dein Fortschritt"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="12" width="4" height="7" rx="1.5" fill="currentColor"/><rect x="9" y="7" width="4" height="12" rx="1.5" fill="currentColor"/><rect x="15" y="3" width="4" height="16" rx="1.5" fill="currentColor"/></svg></button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
+  if(S.whNote)h+='<section class="card left whnote"><p class="fb">'+esc(S.whNote)+'</p><button class="btn ghost sm" data-a="whNoteOk">Okay</button></section>';
+  var stn=MON.STAGES[rankOf(p.L)].n;
+  h+='<section class="card hero">'+stageHTML(rankOf(p.L))+'<div class="info"><span class="eyebrow">'+(S.name?'Dein Monster · '+esc(stn):'Dein Monster')+'</span><span class="stagename">'+esc(S.name||stn)+'</span><div class="bar" role="progressbar" aria-valuenow="'+p.pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+p.pct+'%"></i></div><span class="xptext">noch '+p.need+' XP bis Level '+(p.L+1)+'</span></div></section>';
+  h+='<section class="card week"><div class="row" style="flex-wrap:nowrap;justify-content:space-between;align-items:baseline"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></div><div class="dots">'+wk.arr.map(function(d){return '<div class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></div>';}).join('')+'</div></section>';
+  if(sg){
+    var teaser=sg.from?'Offene Frage':(n?'Neuer Text':'Los geht’s');
+    h+='<section class="card next"><span class="eyebrow">'+teaser+'</span><p class="q">'+esc(sg.from?sg.from.ask:sg.t.title)+'</p><button class="btn wide" data-a="open" data-v="'+sg.t.id+'">Lesen</button></section>';
+  }else{
+    h+='<section class="card next"><span class="eyebrow">Geschafft</span><p class="q">Alle 24 Texte gelesen. Such dir einen aus und lies ihn nochmal.</p></section>';
+  }
+  var due=wjDue().length;
+  if(due)h+='<button class="wjcta" data-a="wj"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg><div><b>Wort-Jäger</b><span>'+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' zum Üben</span></div></button>';
+  var rp=repeatPick();
+  if(rp)h+='<section class="card next"><span class="eyebrow">Nochmal lesen</span><p class="q" style="font-size:1.2rem">'+esc(rp.title)+'</p><span class="hint">Beim zweiten Mal geht es leichter.</span><button class="btn ghost wide" data-a="open" data-v="'+rp.id+'">Nochmal lesen</button></section>';
+  h+='<section><div class="cats">'+CATS.map(function(c){
+    var tot=TEXTS.filter(function(t){return t.cat===c.id;}),d=tot.filter(function(t){return S.done[t.id];}).length;
+    return '<button class="cat" data-a="cat" data-v="'+c.id+'">'+c.ic+'<b>'+c.id+'</b><span>'+d+' von '+tot.length+'</span></button>';
+  }).join('')+'</div></section>';
+  h+='<button class="btn ghost wide" data-a="album">Wissensalbum · '+n+' von '+TEXTS.length+' Karten</button>';
+  h+='<div class="foot"><div class="madeby"><span>Made with love by</span><img alt="A Simple Man’s Lab" src="'+MADEBY+'"></div></div>';
+  $('#v-home').innerHTML=h;
+}
+function renderCat(id){
+  var items=TEXTS.filter(function(t){return t.cat===id;}).sort(function(a,b){return a.diff-b.diff;});
+  var h='<div class="backrow"><button class="back" data-a="home">‹ Zurück</button></div><h2>'+esc(id)+'</h2><p class="hint">Ein Stern: leichter. Zwei Sterne: kniffliger.</p><div class="list">';
+  h+=items.map(function(t){
+    var d=S.done[t.id],b=d?'<span class="badge done">'+(d.best&&S.set.nums?d.best+' W/min':'gelesen')+'</span>':'<span class="badge star" aria-label="'+(t.stars>1?'kniffliger':'leichter')+'">'+(t.stars>1?'★★':'★')+'</span>';
+    return '<button class="trow" data-a="open" data-v="'+t.id+'"><b>'+esc(t.title)+'</b>'+b+'</button>';
+  }).join('')+'</div>';
+  $('#v-cat').innerHTML=h;show('cat');
+}
+/* ---------- Lesen ---------- */
+var R=null,tts={tok:0,timer:null,on:false};
+function fontStack(f){return f;}
+function wordsHTML(t,s,e){
+  var a=[];
+  for(var i=s;i<e;i++){
+    var w=t.words[i],sy=w.sy.map(function(x,k){return '<span class="sy s'+(k%2)+'">'+esc(x)+'</span>';}).join('');
+    a.push('<span class="w" data-i="'+i+'">'+esc(w.pre)+sy+esc(w.post)+'</span>');
+  }
+  return a.join(' ');
+}
+function textHTML(t){return wordsHTML(t,0,t.rs);}
+function riddleBlock(t,reveal){
+  if(t.rs>=t.words.length)return '';
+  return '<section class="card riddle'+(reveal?' reveal':'')+'"><span class="rl">Rätsel</span><div class="rtext syl-on" id="rr">'+wordsHTML(t,t.rs,t.words.length)+'</div><div class="row" style="margin-top:12px"><button class="btn ghost" data-a="listenR" id="bR">'+lab('b','Rätsel anhören')+'</button></div></section>';
+}
+function readStyle(){
+  var s=S.set,sz=[1.25,1.5,1.8][s.size],ln=[1.7,2,2.35][s.line],sp=[0,.04,.08][s.space];
+  var els=document.querySelectorAll('.rtext');
+  for(var i=0;i<els.length;i++){var el=els[i];
+    el.style.setProperty('--rf',"'"+s.font+"'");el.style.setProperty('--rsize',sz+'rem');el.style.setProperty('--rline',ln);el.style.setProperty('--rsp',sp+'em');
+    el.classList.toggle('syl-on',!!s.syl);}
+}
+function openText(id){
+  var t=byId[id];
+  recStop(false);if(S.set.wh)whPreload();
+  R={t:t,phase:'read',round:0,rounds:[],marks:{},all:{},qs:[null,null],pick:[null,null],opts:t.q.map(function(q){return shuffle([q.a].concat(q.f||[]));}),t0:0};
+  var h='<div class="backrow"><button class="back" data-a="leave">‹ Zurück</button><div class="steps" id="rsteps"></div></div>';
+  h+='<div><span class="eyebrow">'+esc(t.cat)+'</span><h2>'+esc(t.title)+'</h2></div>';
+  h+='<div id="rtop"></div><section class="card"><div class="rtext" id="rtext">'+textHTML(t)+'</div></section><div id="rctl" class="view"></div>';
+  $('#v-read').innerHTML=h;readStyle();renderCtl();show('read');
+}
+function stepsHTML(){
+  var idx={read:0,opa:0,timing:0,mark:1,check:2}[R.phase];
+  return [0,1,2].map(function(i){return '<i class="'+(i<=idx?'on':'')+'"></i>';}).join('');
+}
+function bars(){
+  if(!R.rounds.length)return '';
+  var mx=Math.max.apply(null,R.rounds.concat([60])),best=Math.max.apply(null,R.rounds);
+  return R.rounds.map(function(w,i){return '<div class="rb'+(w===best&&R.rounds.length>1?' best':'')+'"><span>'+(i+1)+'.</span><i style="width:'+Math.round(w/mx*100)+'%"></i><span>'+w+'</span></div>';}).join('');
+}
+function adult(txt){return '<details class="adult"><summary>Für Erwachsene</summary>'+txt+'</details>';}
+function renderCtl(){
+  var c=$('#rctl'),t=R.t,h='',dk='',top='';
+  $('#rsteps').innerHTML=stepsHTML();
+  var bk=$('#v-read .back');if(bk)bk.style.visibility=R.phase==='timing'?'hidden':'';
+  var tx=$('#rtext');
+  if(R.opaView&&R.phase!=='opa'){tx.innerHTML=textHTML(t);R.opaView=false;}
+  tx.classList.toggle('marking',R.phase==='mark');tx.classList.toggle('seek',R.phase==='read');tx.classList.toggle('opa',R.phase==='opa');
+  if(R.phase==='read'){
+    dk='<div class="row"><button class="btn ghost" data-a="listen" id="bL">'+btnLabel()+'</button><button class="btn" data-a="start">'+(R.round?'Nochmal lesen':'Ich lese jetzt')+'</button></div>';
+    if(R.msg)h+='<p class="hint fb">'+esc(R.msg)+'</p>';
+    else h+=R.sbsDone?'<p class="hint fb">Super, alle Sätze geschafft! Jetzt lies den ganzen Text am Stück.</p>':'<p class="hint fb">Erst hören, dann selbst lesen.</p>';
+    h+='<div class="row"><button class="btn ghost" data-a="solo">Satz für Satz</button><button class="btn ghost" data-a="opa">Mit Opa lesen</button></div><div id="recold"></div>';
+    h+=adult('<p>„Zuhören“ liest den Text vor, das Wort wird mitgezeigt. Tippt das Kind auf ein Wort, liest die Stimme von dort weiter. „Satz für Satz“: Die Stimme liest einen Satz, das Kind liest ihn nach. „Ich lese jetzt“ startet einen Durchgang am Stück, mit Aufnahme, falls eingeschaltet. Es läuft keine Uhr auf dem Bildschirm. Am Ende wartet ein Rätsel, das zum nächsten Text führt.</p>');
+  }else if(R.phase==='opa'){
+    var n=t.sents.length,lastS=R.si>=n-1,solo=R.who==='solo';
+    dk='<div class="lbl '+R.turn+'"><b>'+(R.turn==='opa'?(solo?'Hör gut zu':'Opa liest vor'):(solo?'Jetzt liest du laut':'Jetzt liest du'))+'</b><span>Satz '+(R.si+1)+' von '+n+'</span></div>';
+    dk+='<div class="row">'+(R.si>0||R.turn==='kid'?'<button class="btn ghost sm" data-a="opaBack" aria-label="Einen Schritt zurück">‹</button>':'')+
+       (solo?'<button class="btn ghost" data-a="soloHear" aria-label="Satz nochmal hören">Nochmal</button>':'')+
+       (R.turn==='opa'?'<button class="btn" data-a="opaKid">'+(solo?'Jetzt ich':'Jetzt du')+'</button>':'<button class="btn" data-a="opaNext">'+(lastS?(solo?'Geschafft':'Fertig'):'Nächster Satz')+'</button>')+'</div>';
+    h+='<p class="hint fb">Schweres Wort? Antippen.</p>';
+    if(solo)h+='<details class="tip"><summary>So geht Satz für Satz</summary><ul><li>Die Stimme liest einen Satz vor.</li><li>Dann liest du ihn laut nach.</li><li>„Nochmal“ spielt den Satz noch einmal.</li><li>Schwere Wörter antippen.</li><li>Danach liest du den ganzen Text am Stück.</li></ul></details>';
+    else h+='<details class="tip"><summary>So klappt es mit Opa</summary><ul><li>Opa liest den Satz ruhig und deutlich vor.</li><li>Dann liest das Kind denselben Satz nach.</li><li>Bleibt das Kind hängen: Wort leise vorsagen, kein Druck.</li><li>Schwere Wörter antippen, sie kommen in den Wort-Jäger.</li><li>Zehn Minuten reichen. Am Ende kurz loben.</li></ul></details>';
+    h+='<button class="link" data-a="cancel">Beenden</button>';
+  }else if(R.phase==='timing'){
+    dk=(R.recOn?'<div class="lbl"><span><span class="recdot">●</span> Aufnahme läuft, bleibt nur auf diesem Gerät</span></div>':'')+'<button class="btn wide" data-a="stop">Fertig gelesen</button>';
+    h+='<p class="hint fb">Lies laut bis zum Ende. Dann tippe auf „Fertig gelesen“.</p>';
+    if(!R.recOn&&R.recTried&&S.set.rec)h+='<p class="hint">'+esc(recFailText())+'</p>';
+    h+='<button class="link" data-a="cancel">Abbrechen</button>';
+  }else if(R.phase==='mark'){
+    var w=R.rounds[R.rounds.length-1],en=R.entry;
+    dk='<div class="row">'+(R.round<3?'<button class="btn ghost" data-a="again">Nochmal lesen</button>':'')+'<button class="btn" data-a="check">Zu den Fragen</button></div>';
+    top='<section class="card result-card"><span class="eyebrow">Auswertung · Durchgang '+R.rounds.length+'</span><b class="rhead" id="rhead">'+esc(R.head||'')+'</b>'+
+      '<div class="tiles">'+(S.set.nums?'<div class="tile"><b>'+w+'</b><span>Wörter pro Minute</span></div>':'')+'<div class="tile"><b>'+fmtSec(R.sec)+'</b><span>Lesezeit</span></div><div class="tile" id="sugtile">'+sugTile()+'</div></div>'+
+      '<div id="chkbox"></div><p class="fb" id="cmptxt">'+esc(compareText(w))+'</p><span class="hint fb" id="fbtxt">'+esc(R.fb||'')+'</span>'+(S.set.nums&&R.rounds.length>1?'<div class="bars">'+bars()+'</div>':'')+
+      '<div id="recm"></div></section>';
+    h+='<div class="card"><h2>Wie war das für dich?</h2><div class="row selfrow">'+[[2,'Flüssig'],[1,'Ging so'],[0,'Holprig']].map(function(o){return '<button class="btn '+(en&&en.self===o[0]?'on':'ghost')+'" data-a="self" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><span class="hint">Es gibt kein Falsch.</span></div>';
+    h+='<div class="card"><h2>Welche Wörter waren schwer?</h2><p class="hint fb">Tippe sie oben im Text an. Sie kommen in den Wort-Jäger.</p><div id="sugbox"></div></div>';
+  }else if(R.phase==='check'){
+    var ok=R.qs[0]!==null&&R.qs[1]!==null;
+    dk='<button class="btn wide" data-a="finish"'+(ok?'':' disabled')+'>Karte holen</button>';
+    h+='<div class="card" id="qcard"><span class="eyebrow">Zwei Fragen</span><span class="hint">Tippe die richtige Antwort an.</span>';
+    h+=t.q.map(function(q,i){
+      var o=R.opts[i],pk=R.pick[i],done=pk!==null;
+      if(!o||o.length<2)return '<div class="qa"><p>'+esc(q.q)+'</p><div class="ans">'+esc(q.a)+'</div></div>';
+      return '<div class="qa"><p>'+esc(q.q)+'</p><div class="opts">'+o.map(function(a,j){
+        var cl=done?(a===q.a?' right':(j===pk?' miss':' off')):'';
+        return '<button class="opt'+cl+'" data-a="pick" data-v="'+i+'-'+j+'"'+(done?' disabled':'')+'>'+esc(a)+'</button>';
+      }).join('')+'</div>'+(done?'<p class="qfb '+(R.qs[i]?'ok':'')+'">'+(R.qs[i]?'Richtig!':'Fast! Die richtige Antwort ist grün. Lies die Stelle im Text ruhig noch einmal.')+'</p>':'')+'</div>';
+    }).join('')+'</div>';
+  }
+  c.innerHTML=h;setDock(dk);var rt=$('#rtop');if(rt)rt.innerHTML=top;
+  if(R.phase==='read')fillRec($('#recold'),t.id,false);
+  if(R.phase==='mark'){fillRec($('#recm'),t.id,true);updateMarkInfo();}else{var os=document.querySelectorAll('#rtext .w.sug,#rtext .w.srm');for(var oi=0;oi<os.length;oi++)os[oi].classList.remove('sug','srm');}
+}
+/* Vorlesen */
+function setBtn(){var b=$('#bL');if(b)b.textContent=lab('a','Zuhören');var r=$('#bR');if(r)r.textContent=lab('b','Rätsel anhören');}
+function lab(p,idle){return (tts.on&&tts.part===p)?(tts.paused?'Weiter':'Pause'):idle;}
+function btnLabel(){return lab('a','Zuhören');}
+function stopListen(){
+  tts.tok++;tts.on=false;tts.paused=false;tts.gapK=null;clearTimeout(tts.timer);clearTimeout(tts.gap);
+  if(tts.raf){cancelAnimationFrame(tts.raf);tts.raf=0;}
+  if(tts.srcs){tts.srcs.forEach(function(s){try{s.onended=null;s.stop();}catch(e){}});tts.srcs=null;}
+  if(tts.el){try{tts.el.onended=null;tts.el.pause();}catch(e){}tts.el=null;}
+  try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
+  var n=document.querySelectorAll('.w.now');for(var i=0;i<n.length;i++)n[i].classList.remove('now');
+  setBtn();
+}
+function mark(i){
+  var o=document.querySelectorAll('.w.now');for(var k=0;k<o.length;k++)o[k].classList.remove('now');
+  var e=$('.w[data-i="'+i+'"]');if(e)e.classList.add('now');
+}
+function pickVoice(){
+  try{
+    var vs=window.speechSynthesis.getVoices().filter(function(v){return /^de/i.test(v.lang);});
+    var pref=vs.filter(function(v){return /anna|petra|google|premium|enhanced|markus/i.test(v.name);});
+    return (pref[0]||vs[0]||null);
+  }catch(e){return null;}
+}
+var GAP=2;
+
+function listenTTS(from,part,to){
+  if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){var b0=$('#bL');if(b0)b0.textContent='Kein Ton möglich';return;}
+  stopListen();
+  var t=R.t,tok=++tts.tok,gotB=false,rate=S.set.speed==='slow'?0.7:0.92,pt=0;
+  var bounds=[part==='b'?[t.rs,t.words.length]:[0,t.rs]].filter(function(p){return p[1]>p[0];});
+  from=from||0;
+  function end(){if(tok!==tts.tok)return;tts.on=false;tts.paused=false;clearTimeout(tts.timer);clearTimeout(tts.gap);mark(-1);setBtn();}
+  function est(my,i,e){
+    tts.est=function(){est(my,i,e);};
+    if(tok!==tts.tok||gotB||my!==pt||i>=e||tts.paused)return;
+    mark(i);var ms=(240+55*t.words[i].plain.length)/rate;i++;tts.timer=setTimeout(function(){est(my,i,e);},ms);
+  }
+  function run(k,f){
+    if(tok!==tts.tok)return;
+    if(k>=bounds.length){end();return;}
+    var s=Math.max(bounds[k][0],f),e=to!=null?Math.min(bounds[k][1],to):bounds[k][1],offs=[],pos=0,tx=[];
+    for(var i=s;i<e;i++){var w=t.words[i],x=w.pre+w.plain+w.post;offs.push(pos);pos+=x.length+1;tx.push(x);}
+    var my=++pt,u=new SpeechSynthesisUtterance(tx.join(' '));
+    u.lang='de-DE';u.rate=rate;var v=pickVoice();if(v)u.voice=v;
+    u.onboundary=function(ev){if(tok!==tts.tok||my!==pt)return;gotB=true;clearTimeout(tts.timer);
+      var ci=ev.charIndex||0,j=0;for(var i=0;i<offs.length;i++){if(offs[i]<=ci)j=i;else break;}mark(s+j);};
+    u.onend=function(){if(tok!==tts.tok||my!==pt)return;clearTimeout(tts.timer);
+      if(k+1<bounds.length){tts.gapK=k+1;tts.gap=setTimeout(function(){tts.gapK=null;run(k+1,0);},GAP*1000);}else end();};
+    u.onerror=end;
+    try{window.speechSynthesis.speak(u);}catch(err){end();return;}
+    tts.timer=setTimeout(function(){if(gotB||tok!==tts.tok||my!==pt)return;est(my,s,e);},900);
+  }
+  tts.resumeFn=function(){if(tts.gapK!=null){var k=tts.gapK;tts.gapK=null;run(k,0);}else{try{window.speechSynthesis.resume();}catch(e){}if(tts.est&&!gotB)tts.est();}};
+  tts.pauseFn=function(){clearTimeout(tts.gap);clearTimeout(tts.timer);try{window.speechSynthesis.pause();}catch(e){}};
+  tts.on=true;tts.paused=false;tts.part=part;setBtn();
+  var k0=0;bounds.forEach(function(p,k){if(from>=p[0])k0=k;});
+  run(k0,from);
+}
+/* Vorlesen mit echter Stimme: fertige Aufnahmen mit Wort-Zeiten.
+   Abgespielt über ein Audio-Element, damit "Langsam" auch ohne eigene langsame Aufnahme geht (Tonhöhe bleibt gleich). */
+var AC=null,AURL={},SLOW=0.8;
+function getAC(){if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(C){try{AC=new C();}catch(e){AC=null;}}}return AC;}
+function audioURL(id,sp,pa){
+  var k=id+sp+pa;if(AURL[k])return AURL[k];
+  var v=AUDIO[id][sp][pa];if(/\.mp3(\?|$)/.test(v))return (AURL[k]=v); /* GitHub-Seite: eigene MP3-Datei */
+  var bin=atob(AUDIO[id][sp][pa]),n=bin.length,u=new Uint8Array(n);for(var i=0;i<n;i++)u[i]=bin.charCodeAt(i);
+  AURL[k]=URL.createObjectURL(new Blob([u],{type:'audio/mpeg'}));return AURL[k];
+}
+function pickAudio(id,pk){
+  var A=(typeof AUDIO!=='undefined')&&AUDIO[id];if(!A)return null;
+  var slow=S.set.speed==='slow';
+  if(slow&&A.s&&A.s[pk])return {sp:'s',rate:1};
+  if(A.n&&A.n[pk])return {sp:'n',rate:slow?SLOW:1};
+  if(A.s&&A.s[pk])return {sp:'s',rate:1};
+  return null;
+}
+function chime(ac,at){
+  /* Zwei weiche Glockentöne wie im Flugzeug: hoch, dann tiefer */
+  [[988,0],[740,0.42]].forEach(function(n){
+    [[1,0.34,1.5],[2,0.12,0.9]].forEach(function(p){
+      try{var o=ac.createOscillator(),g=ac.createGain(),s=at+n[1];o.type='sine';o.frequency.value=n[0]*p[0];o.connect(g);g.connect(ac.destination);
+        g.gain.setValueAtTime(0.0001,s);g.gain.exponentialRampToValueAtTime(p[1],s+0.015);g.gain.exponentialRampToValueAtTime(0.0001,s+p[2]);
+        o.start(s);o.stop(s+p[2]+0.05);}catch(e){}
+    });
+  });
+}
+/* Spielt einen Teil (a = Geschichte, b = Rätsel) ab Wort "from" bis vor Wort "to". onIdx bekommt das gerade gesprochene Wort. */
+function playPart(id,pk,from,to,onIdx,onFail){
+  var pa=pickAudio(id,pk);if(!pa){onFail();return;}
+  var T=byId[id],tl=TIMES[id]&&TIMES[id][pa.sp]&&TIMES[id][pa.sp][pk];if(!tl||!tl.length){onFail();return;}
+  stopListen();
+  var tok=++tts.tok,base=pk==='b'?T.rs:0,li=Math.max(0,from-base),cur=-1,el;
+  try{el=new Audio(audioURL(id,pa.sp,pk));}catch(e){onFail();return;}
+  el.preload='auto';el.playbackRate=pa.rate;el.defaultPlaybackRate=pa.rate;
+  try{el.preservesPitch=true;el.webkitPreservesPitch=true;el.mozPreservesPitch=true;}catch(e){}
+  if(li>0&&tl[li]){var seek=function(){try{el.currentTime=Math.max(0,tl[li][0]/1000-0.05);}catch(e){}};seek();el.addEventListener('loadedmetadata',seek,{once:true});}
+  tts.el=el;tts.on=true;tts.paused=false;tts.part=pk;tts.ac=null;setBtn();
+  el.onended=function(){if(tok!==tts.tok)return;stopListen();onIdx(-1);};
+  el.onerror=function(){if(tok!==tts.tok||el.currentTime>0)return;stopListen();onFail();}; /* Datei fehlt oder kein Netz: Gerätestimme */
+  var p=el.play();
+  if(p&&p.catch)p.catch(function(){if(tok!==tts.tok)return;stopListen();onFail();});
+  (function tick(){
+    if(tok!==tts.tok)return;
+    var ms=el.currentTime*1000,i=-1;
+    if(!el.paused||tts.paused){var k=0;while(k+1<tl.length&&tl[k+1][0]<=ms)k++;if(ms>=tl[0][0])i=base+Math.max(k,li);
+      if(to!=null&&to-base<tl.length&&ms>=tl[to-base][0]-30){stopListen();onIdx(-1);return;}}
+    if(i!==cur){cur=i;onIdx(i);}
+    tts.raf=requestAnimationFrame(tick);
+  })();
+}
+function listen(from,part,to){
+  var T=R.t;
+  if(typeof from!=='number'){
+    part=part||'a';
+    if(tts.on&&tts.part===part){
+      if(tts.paused){tts.paused=false;setBtn();if(tts.el){try{tts.el.play();}catch(e){}}else if(tts.resumeFn)tts.resumeFn();}
+      else{tts.paused=true;setBtn();if(tts.el){try{tts.el.pause();}catch(e){}}else if(tts.pauseFn)tts.pauseFn();}
+      return;
+    }
+    from=part==='b'?T.rs:0;
+  }else part=from>=T.rs?'b':'a';
+  var pk=part==='b'?'b':'a';
+  playPart(T.id,pk,from,to,mark,function(){listenTTS(from,part,to);});
+}
+/* Einzelnes Wort vorlesen (Wort-Jäger): Ausschnitt aus der Aufnahme, sonst Gerätestimme */
+function sayWord(w){
+  var src=WSY[w];
+  function tts1(){
+    try{if(!window.speechSynthesis)return;stopListen();var u=new SpeechSynthesisUtterance(w);u.lang='de-DE';u.rate=0.7;var v=pickVoice();if(v)u.voice=v;window.speechSynthesis.speak(u);}catch(e){}
+  }
+  if(!src){tts1();return;}
+  var T=byId[src.id],pk=src.i>=T.rs?'b':'a';
+  playPart(src.id,pk,src.i,src.i+1,function(){},tts1);
+}
+/* ---------- Auswertung der Aufnahme: Pausen, Rückmeldung ---------- */
+function pauseAnalyze(x,sr){
+  /* Stockstellen: Pausen, die deutlich länger sind als die eigenen Pausen zwischen Wörtern */
+  var F=0.02,hop=Math.max(1,Math.round(sr*F)),n=Math.floor(x.length/hop),i,j;
+  if(n<50)return null;
+  var e=new Float32Array(n);
+  for(i=0;i<n;i++){var s=0,o=i*hop;for(j=0;j<hop;j++){var v=x[o+j];s+=v*v;}e[i]=Math.sqrt(s/hop);}
+  var srt=Array.prototype.slice.call(e).sort(function(a,b){return a-b;});
+  var floor=srt[Math.floor(n*0.1)],peak=srt[Math.floor(n*0.95)],thr=Math.max(floor*2.5,peak*0.1,1e-4),first=-1,last=-1;
+  for(i=0;i<n;i++){if(e[i]>thr){if(first<0)first=i;last=i;}}
+  if(first<0||last-first<50)return null;
+  /* Lücken sammeln; kurze Geräusche (unter 60 ms) beenden keine Lücke */
+  var gaps=[],run=0,sp=0,gs=-1;
+  for(i=first;i<=last;i++){
+    if(e[i]>thr){sp++;if(sp>=3&&gs>=0){if(run>=3)gaps.push({s:gs,len:run*F});gs=-1;run=0;}}
+    else{if(gs<0){gs=i;run=0;}run+=1+(sp>0&&sp<3?sp:0);sp=0;}
+  }
+  var lost=0,total=last-first+1;
+  gaps.forEach(function(g){total-=Math.round(g.len/F);});
+  gaps.forEach(function(g){g.before=(g.s-first)-lost;lost+=Math.round(g.len/F);});
+  return {gaps:gaps,total:total};
+}
+function suggestWords(t,res){
+  /* Jede Lücke wird einer Wortgrenze zugeordnet (Reihenfolge bleibt, Satzzeichen ziehen Pausen an).
+     Stockstelle = Lücke an einer Grenze ohne Satzzeichen, deutlich länger als die eigenen Wortpausen. */
+  if(!res||!res.gaps||!res.gaps.length||res.total<=0)return [];
+  var n=t.rs,cum=[],c=0,i,g,w;
+  for(i=0;i<n;i++){c+=t.words[i].sy.join('').length+1;cum.push(c);}
+  var sc=c/n,G=res.gaps,W=n-1;if(W<1)return [];
+  function punct(k){return /[.,;:!?]/.test(t.words[k].post);}
+  var pos=G.map(function(x){return x.before/res.total*c;});
+  var D=[],P=[];
+  for(g=0;g<G.length;g++){
+    D[g]=new Float64Array(W);P[g]=new Int32Array(W);
+    var bm=g>0?1e18:0,bi=-1;
+    for(w=0;w<W;w++){
+      var cost=Math.abs(pos[g]-cum[w])/sc,bon=punct(w)?Math.min(1.2,G[g].len/0.4):0;
+      var a1=cost-bon+bm,a2=g>0?cost+1+D[g-1][w]:1e18;
+      if(a2<a1){D[g][w]=a2;P[g][w]=w;}else{D[g][w]=a1;P[g][w]=bi;}
+      if(g>0&&D[g-1][w]<bm){bm=D[g-1][w];bi=w;}
+    }
+  }
+  var asg=new Array(G.length),bw=0;
+  for(w=1;w<W;w++)if(D[G.length-1][w]<D[G.length-1][bw])bw=w;
+  for(g=G.length-1;g>=0;g--){asg[g]=bw;if(g>0)bw=P[g][bw];}
+  var inner=[];for(g=0;g<G.length;g++)if(!punct(asg[g]))inner.push(G[g].len);
+  inner.sort(function(a,b){return a-b;});
+  var med=inner.length?inner[Math.floor(inner.length/2)]:0.15,lim=Math.min(1.2,Math.max(0.75,med*3));
+  var cand=[];
+  for(g=0;g<G.length;g++){var L=G[g].len,pw=punct(asg[g]);if(pw?L>=Math.max(1.5,lim+0.9):L>=lim)cand.push({idx:asg[g]+1,len:L});}
+  var cap=Math.max(3,Math.min(10,Math.round(n/8))),out=[];
+  cand.sort(function(a,b){return b.len-a.len;}).forEach(function(x){
+    if(out.length>=cap||x.idx<=0||x.idx>=n)return;
+    for(var k=0;k<out.length;k++)if(out[k]===x.idx)return;
+    out.push(x.idx);
+  });
+  return out.sort(function(a,b){return a-b;});
+}
+function expandSug(c,t){
+  var s={};c.forEach(function(k){if(k>=0&&k<t.rs)s[k]=1;});
+  return Object.keys(s).map(Number).sort(function(a,b){return a-b;});
+}
+function analyzeBlob(b,t){
+  return new Promise(function(res){
+    try{
+      var ac=getAC();if(!ac){res(null);return;}
+      var go=function(buf){try{ac.decodeAudioData(buf,function(a){try{var x=a.getChannelData(0),pa=pauseAnalyze(x,a.sampleRate);res({sug:suggestWords(t,pa),pa:pa,x:x,sr:a.sampleRate});}catch(e){res(null);}},function(){res(null);});}catch(e){res(null);}};
+      if(b.arrayBuffer)b.arrayBuffer().then(go,function(){res(null);});
+      else{var fr=new FileReader();fr.onload=function(){go(fr.result);};fr.onerror=function(){res(null);};fr.readAsArrayBuffer(b);}
+    }catch(e){res(null);}
+  });
+}
+function headline(wpm,prev){
+  if(!prev.length)return 'Dein Startwert steht!';
+  var first=prev[0].wpm,best=Math.max.apply(null,prev.map(function(x){return x.wpm;}));
+  if(wpm>first)return S.set.nums?(wpm-first)+' Wörter pro Minute schneller als beim ersten Mal':'Schneller als beim ersten Mal!';
+  if(wpm>=best)return 'So schnell wie dein Bestwert!';
+  return 'Geschafft! Du bleibst dran.';
+}
+function feedback(t,wpm,prev,sug){
+  var m=[];
+  if(!prev.length)m.push('Beim nächsten Mal siehst du, wie du besser wirst.');
+  else{
+    var best=Math.max.apply(null,prev.map(function(x){return x.wpm;})),last=prev[prev.length-1];
+    if(wpm>best&&prev.length>0)m.push('Neuer Bestwert für diesen Text!');
+    else if(wpm<=prev[0].wpm)m.push('Dranbleiben zählt mehr als jede Zahl.');
+    if(sug!=null&&last.sug!=null&&sug<last.sug)m.push('Weniger Stellen zum Überlegen als beim letzten Mal.');
+  }
+  return m.join(' ');
+}
+function fmtSec(x){x=Math.round(x||0);return Math.floor(x/60)+':'+('0'+x%60).slice(-2);}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),x=a[i];a[i]=a[j];a[j]=x;}return a;}
+function sugTile(){
+  if(R.sugState==='wait')return '<b>…</b><span>Stockstellen</span>';
+  if(R.sugState==='done'){var n=R.entry&&R.entry.sug!=null?R.entry.sug:0;return '<b>'+n+'</b><span>'+(n===1?'Stockstelle':'Stockstellen')+'</span>';}
+  return '<b>–</b><span>Stockstellen</span>';
+}
+function compareText(w){
+  var p=R.prev||[];
+  if(!p.length)return R.rounds.length>1?(w>=R.rounds[R.rounds.length-2]?'Flotter als dein Durchgang eben.':'Dein zweiter Durchgang heute, stark dass du dranbleibst.'):'Das ist dein erster Durchgang mit diesem Text.';
+  var f=p[0].wpm,last=p[p.length-1].wpm;
+  if(w>f){var pc=Math.round((w-f)/f*100);return S.set.nums?'Im Vergleich zum ersten Mal: '+pc+' % schneller.':'Schneller als beim ersten Mal.';}
+  if(w>=last)return 'Mindestens so flott wie beim letzten Mal.';
+  return 'Gelesen ist gelesen. Jeder Durchgang trainiert.';
+}
+function updateMarkInfo(){
+  var o=document.querySelectorAll('#rtext .w.sug');for(var i=0;i<o.length;i++)o[i].classList.remove('sug');
+  var fb=$('#fbtxt');if(fb&&R.fb)fb.textContent=R.fb;var st=$('#sugtile');if(st)st.innerHTML=sugTile();
+  var cb=$('#chkbox'),om=document.querySelectorAll('#rtext .w.srm');for(var mi=0;mi<om.length;mi++)om[mi].classList.remove('srm');
+  if(cb){var c=R.chk;
+    if(!c)cb.innerHTML='';
+    else if(c.state==='wait')cb.innerHTML='<div class="chk"><span class="eyebrow">Genaue Auswertung</span><span class="hint">'+(WH.ready?(WH_SERVER?'Wird ausgewertet … einen Moment.':'Wird ausgewertet … das kann eine Minute dauern. Du kannst schon weitermachen.'):esc(whStatus()||'Lade Sprachmodell …')+' Das passiert nur beim ersten Mal.')+'</span></div>';
+    else if(c.state==='err')cb.innerHTML='<div class="chk"><span class="eyebrow">Genaue Auswertung</span><span class="hint">'+esc(c.msg)+'</span></div>';
+    else{
+      c.miss.forEach(function(k){var w=$('#rtext .w[data-i="'+k+'"]');if(w)w.classList.add('srm');});
+      cb.innerHTML='<div class="chk"><span class="eyebrow">Genaue Auswertung</span><b>'+c.ok+' von '+c.n+' Wörtern erkannt</b>'+
+        (c.miss.length?'<span class="hint">Blau gepunktet: Diese Wörter hat Whisper nicht sicher gehört. Lies sie ruhig noch einmal. Whisper verhört sich auch mal.</span>':'<span class="hint fb">Alle Wörter erkannt!</span>')+'</div>';
+    }
+  }
+  var sb=$('#sugbox');
+  if(R.phase==='mark'&&R.sug&&R.sug.length){
+    R.sug.forEach(function(k){var w=$('#rtext .w[data-i="'+k+'"]');if(w)w.classList.add('sug');});
+    if(sb)sb.innerHTML='<p class="hint">Vor den gelb gestrichelten Wörtern hast du länger überlegt. War da ein schweres Wort?</p>';
+  }else if(sb)sb.innerHTML='';
+}
+/* ---------- Fortschritt ---------- */
+function fmtDate(ts){var d=new Date(ts);return d.getDate()+'.'+(d.getMonth()+1)+'.';}
+function avg(a){return a.length?Math.round(a.reduce(function(s,x){return s+x;},0)/a.length):0;}
+function chartSVG(pts){
+  var W=320,H=170,L=34,Rr=12,T=12,B=26,mn=Math.min.apply(null,pts.map(function(p){return p.wpm;})),mx=Math.max.apply(null,pts.map(function(p){return p.wpm;}));
+  if(mx-mn<10){mx+=5;mn=Math.max(0,mn-5);}
+  var lo=Math.max(0,Math.floor(mn/10)*10),hi=Math.ceil(mx/10)*10,n=pts.length;
+  function X(i){return n===1?(L+W-Rr)/2:L+(W-L-Rr)*i/(n-1);}
+  function Y(v){return T+(H-T-B)*(1-(v-lo)/(hi-lo));}
+  var s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Tempo in Wörtern pro Minute, '+n+' Durchgänge, von '+pts[0].wpm+' bis '+pts[n-1].wpm+'">';
+  s+='<line class="ax" x1="'+L+'" y1="'+Y(lo)+'" x2="'+(W-Rr)+'" y2="'+Y(lo)+'"/><line class="ax" x1="'+L+'" y1="'+Y(hi)+'" x2="'+(W-Rr)+'" y2="'+Y(hi)+'" stroke-dasharray="3 4"/>';
+  s+='<text x="'+(L-6)+'" y="'+(Y(lo)+3)+'" text-anchor="end">'+lo+'</text><text x="'+(L-6)+'" y="'+(Y(hi)+3)+'" text-anchor="end">'+hi+'</text>';
+  s+='<text x="'+L+'" y="'+(H-6)+'">'+fmtDate(pts[0].ts)+'</text><text x="'+(W-Rr)+'" y="'+(H-6)+'" text-anchor="end">'+fmtDate(pts[n-1].ts)+'</text>';
+  s+='<polyline class="ln" points="'+pts.map(function(p,i){return X(i).toFixed(1)+','+Y(p.wpm).toFixed(1);}).join(' ')+'"/>';
+  pts.forEach(function(p,i){
+    var ti=byId[p.id]?byId[p.id].title:'';
+    s+='<circle class="dt" data-pt="'+i+'" cx="'+X(i).toFixed(1)+'" cy="'+Y(p.wpm).toFixed(1)+'" r="4.5"/>';
+    s+='<circle class="hit" data-pt="'+i+'" cx="'+X(i).toFixed(1)+'" cy="'+Y(p.wpm).toFixed(1)+'" r="15" tabindex="0" role="button" aria-label="'+esc(fmtDate(p.ts)+', '+ti+', '+p.wpm+' Wörter pro Minute')+'"/>';
+  });
+  return s+'</svg>';
+}
+function renderStats(){
+  var L=S.log.filter(function(x){return x.wpm;}),days=Object.keys(S.days).length;
+  var h='<div class="backrow"><button class="back" data-a="home">‹ Zurück</button></div><h2>Dein Fortschritt</h2>';
+  h+='<div class="tiles"><div class="tile"><b>'+days+'</b><span>Tage geübt</span></div><div class="tile"><b>'+doneCount()+'</b><span>Texte gelesen</span></div><div class="tile"><b>'+L.length+'</b><span>Durchgänge</span></div></div>';
+  if(S.opa.length){
+    var ot={};S.opa.forEach(function(x){ot[x.id]=1;});
+    h+='<section class="card left"><h2>Mit Opa gelesen</h2><p class="fb">'+S.opa.length+(S.opa.length===1?' Mal':' Mal')+', '+Object.keys(ot).length+(Object.keys(ot).length===1?' Text':' verschiedene Texte')+'.</p><span class="hint">Zuletzt: '+esc(byId[S.opa[S.opa.length-1].id]?byId[S.opa[S.opa.length-1].id].title:'')+' am '+fmtDate(S.opa[S.opa.length-1].ts)+'</span></section>';
+  }
+  if(!S.set.nums){
+    h+='<section class="card left"><p class="hint">Die Tempo-Zahlen sind ausgeschaltet. Einschalten kannst du sie unter „Aa“.</p></section>';
+  }else if(!L.length){
+    h+='<section class="card"><p class="q">Hier siehst du bald deinen Weg. Lies einen Text mit „Ich lese jetzt“, dann erscheint dein erster Punkt.</p></section>';
+  }else{
+    var pts=L.slice(-30),w=L.map(function(x){return x.wpm;});
+    h+='<section class="card left"><h2>Dein Tempo</h2><span class="hint">Wörter pro Minute, jeder Punkt ist ein Durchgang.</span>'+chartSVG(pts)+'<p class="hint fb" id="chartread" aria-live="polite">Tippe auf einen Punkt.</p>';
+    if(w.length>=6){
+      var a=avg(w.slice(0,3)),b=avg(w.slice(-3));
+      h+='<p class="fb">Am Anfang lagst du im Schnitt bei '+a+', zuletzt bei '+b+' Wörtern pro Minute.'+(b>a?' Das sind '+(b-a)+' mehr.':'')+'</p>';
+      if(b<=a)h+='<p class="hint">Die Texte sind unterschiedlich schwer, deshalb schwankt das Tempo. Wichtig ist, dass du dranbleibst.</p>';
+    }else h+='<p class="hint">Nach ein paar Durchgängen zeige ich dir, wie du dich verbessert hast.</p>';
+    h+='<details class="tip"><summary>Als Tabelle</summary><table class="tb"><tr><th>Datum</th><th>Text</th><th>Wörter/Min.</th></tr>'+pts.slice().reverse().map(function(p){return '<tr><td>'+fmtDate(p.ts)+'</td><td>'+esc(byId[p.id]?byId[p.id].title:'')+'</td><td>'+p.wpm+'</td></tr>';}).join('')+'</table></details></section>';
+    var per={};L.forEach(function(x){(per[x.id]=per[x.id]||[]).push(x.wpm);});
+    var imp=Object.keys(per).filter(function(k){return per[k].length>=2&&Math.max.apply(null,per[k])>per[k][0];}).map(function(k){return {id:k,a:per[k][0],b:Math.max.apply(null,per[k])};}).sort(function(x,y){return (y.b-y.a)-(x.b-x.a);}).slice(0,5);
+    if(imp.length)h+='<section class="card left"><h2>Besser geworden</h2>'+imp.map(function(x){return '<div class="sb" style="grid-template-columns:1fr auto"><span>'+esc(byId[x.id].title)+'</span><span>'+x.a+' → '+x.b+'</span></div>';}).join('')+'<span class="hint">Erster Durchgang und bester Durchgang pro Text.</span></section>';
+    var sf=L.filter(function(x){return x.self!=null;}).slice(-10);
+    if(sf.length){
+      var c=[0,0,0];sf.forEach(function(x){c[x.self]++;});
+      h+='<section class="card left"><h2>Wie es sich angefühlt hat</h2><span class="hint">Deine letzten '+sf.length+' Einschätzungen.</span>'+[[2,'Flüssig'],[1,'Ging so'],[0,'Holprig']].map(function(o){return '<div class="sb"><span>'+o[1]+'</span><i style="width:'+Math.round(c[o[0]]/sf.length*100)+'%"></i><span>'+c[o[0]]+'</span></div>';}).join('')+'</section>';
+    }
+  }
+  var wa=Object.keys(S.wj),wd=wa.filter(function(w){return S.wj[w].done;}).length;
+  if(wa.length)h+='<section class="card left"><h2>Wort-Jäger</h2><p class="fb">'+wd+' von '+wa.length+' schweren Wörtern geschafft.</p><span class="hint">Ein Wort ist geschafft, wenn du an drei Tagen „Kann ich“ getippt hast.</span></section>';
+  $('#v-stats').innerHTML=h;
+}
+/* ---------- Opa-Modus ---------- */
+function sentHTML(t){
+  return t.sents.map(function(s,k){return '<span class="sent todo" data-s="'+k+'">'+wordsHTML(t,s[0],s[1])+'</span>';}).join(' ');
+}
+function opaMark(){
+  var o=document.querySelectorAll('#rtext .sent');
+  for(var k=0;k<o.length;k++){o[k].classList.toggle('done',k<R.si);o[k].classList.toggle('cur',k===R.si);o[k].classList.toggle('todo',k>R.si);}
+  var c=$('#rtext .sent.cur');try{if(c&&c.scrollIntoView)c.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}
+}
+function opaStart(who){
+  stopListen();R.phase='opa';R.who=who||'opa';R.si=0;R.turn='opa';R.opaView=true;
+  $('#rtext').innerHTML=sentHTML(R.t);
+  opaReMark();
+  renderCtl();opaMark();soloHear();
+}
+function soloHear(){
+  if(R.phase!=='opa'||R.who!=='solo')return;
+  var s=R.t.sents[R.si];listen(s[0],'a',s[1]);
+}
+function opaStep(a){
+  var n=R.t.sents.length;stopListen();
+  if(a==='kid'){R.turn='kid';}
+  else if(a==='next'){
+    if(R.si>=n-1){
+      if(R.who==='solo'){R.phase='read';R.sbsDone=true;renderCtl();opaReMark();window.scrollTo(0,0);return;}
+      R.phase='check';renderCtl();window.scrollTo(0,0);return;}
+    R.si++;R.turn='opa';
+  }else if(a==='back'){
+    if(R.turn==='kid')R.turn='opa';else if(R.si>0){R.si--;R.turn='kid';}
+  }
+  renderCtl();opaMark();
+  if(R.turn==='opa')soloHear();
+}
+function opaReMark(){for(var i in R.all){var w=$('#rtext .w[data-i="'+i+'"]');if(w)w.classList.add('st');}}
+/* ---------- Aufnahme (bleibt nur auf diesem Gerät) ---------- */
+var REC={mem:{},rec:null,stream:null,chunks:[],fail:'',want:false,urls:[]};
+function recDB(){return new Promise(function(res){try{
+  if(!window.indexedDB){res(null);return;}
+  var q=indexedDB.open('lesemonster-rec',1);q.onupgradeneeded=function(){q.result.createObjectStore('r');};
+  q.onsuccess=function(){res(q.result);};q.onerror=function(){res(null);};q.onblocked=function(){res(null);};
+}catch(e){res(null);}});}
+function recPut(k,b){REC.mem[k]=b;return recDB().then(function(db){if(!db)return;return new Promise(function(r){try{var x=db.transaction('r','readwrite');x.objectStore('r').put(b,k);x.oncomplete=r;x.onerror=r;x.onabort=r;}catch(e){r();}});});}
+function recGet(k){return recDB().then(function(db){if(!db)return REC.mem[k]||null;return new Promise(function(r){try{var q=db.transaction('r').objectStore('r').get(k);q.onsuccess=function(){r(q.result||REC.mem[k]||null);};q.onerror=function(){r(REC.mem[k]||null);};}catch(e){r(REC.mem[k]||null);}});});}
+function recDelAll(){REC.mem={};S.recN={};save();return recDB().then(function(db){if(!db)return;return new Promise(function(r){try{var x=db.transaction('r','readwrite');x.objectStore('r').clear();x.oncomplete=r;x.onerror=r;x.onabort=r;}catch(e){r();}});});}
+function recCleanup(){if(REC.stream){REC.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});REC.stream=null;}}
+function recStart(){
+  REC.fail='';
+  if(!S.set.rec)return Promise.resolve(false);
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){REC.fail='nicht unterstützt';return Promise.resolve(false);}
+  return navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){
+    if(!REC.want){st.getTracks().forEach(function(t){try{t.stop();}catch(e){}});return false;}
+    REC.stream=st;REC.chunks=[];
+    var mt='';['audio/mp4','audio/webm;codecs=opus','audio/webm'].some(function(m){try{if(MediaRecorder.isTypeSupported(m)){mt=m;return true;}}catch(e){}return false;});
+    var r=mt?new MediaRecorder(st,{mimeType:mt}):new MediaRecorder(st);
+    r.ondataavailable=function(e){if(e.data&&e.data.size)REC.chunks.push(e.data);};
+    r.start();REC.rec=r;return true;
+  }).catch(function(e){REC.fail=(e&&e.name)||'Fehler';recCleanup();return false;});
+}
+function recStop(keep){
+  REC.want=false;
+  return new Promise(function(res){
+    var r=REC.rec;REC.rec=null;
+    if(!r||r.state==='inactive'){recCleanup();res(null);return;}
+    r.onstop=function(){recCleanup();var b=(keep&&REC.chunks.length)?new Blob(REC.chunks,{type:r.mimeType||'audio/mp4'}):null;REC.chunks=[];res(b);};
+    try{r.stop();}catch(e){recCleanup();res(null);}
+  });
+}
+function audioTag(b){var u=URL.createObjectURL(b);REC.urls.push(u);return '<audio controls preload="metadata" src="'+u+'"></audio>';}
+function freeUrls(){REC.urls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}});REC.urls=[];}
+function fillRec(el,id,withMark){
+  if(!el)return;
+  Promise.all([recGet(id+':first'),recGet(id+':last')]).then(function(r){
+    if(!R||!$('#'+el.id))return;
+    var f=r[0],l=r[1];if(!l){el.innerHTML='';return;}
+    freeUrls();var multi=(S.recN[id]||0)>=2&&f;REC.share={b:l,id:id};
+    var sh=FRAMED?'':'<button class="link" data-a="shareRec">Aufnahme teilen</button>';
+    if(withMark){el.innerHTML='<div class="rec me"><b>Hör dich selbst</b>'+audioTag(l)+'<span class="hint">Wo du stockst, war vielleicht ein Wort schwer. Tippe es unten im Text an.</span>'+sh+'</div>';return;}
+    el.innerHTML='<div class="card rec"><span class="eyebrow">Deine Aufnahmen</span>'+
+      (multi?'<span class="hint">Erste Aufnahme</span>'+audioTag(f)+'<span class="hint">Letzte Aufnahme</span>'+audioTag(l):audioTag(l))+
+      '<span class="hint">Bleibt nur auf diesem Gerät.</span>'+sh+'</div>';
+  });
+}
+/* Ablauf */
+var NUMW={'0':'null','1':'eins','2':'zwei','3':'drei','4':'vier','5':'fünf','6':'sechs','7':'sieben','8':'acht','9':'neun','10':'zehn','11':'elf','12':'zwölf','100':'hundert','1000':'tausend'};
+function normW(x){x=String(x).toLowerCase().replace(/ß/g,'ss').replace(/[^a-z0-9äöü]/g,'');return NUMW[x]?NUMW[x].replace(/ß/g,'ss'):x;}
+function lev(a,b){var m=a.length,n=b.length,p=[],i,j;for(j=0;j<=n;j++)p[j]=j;for(i=1;i<=m;i++){var q=[i];for(j=1;j<=n;j++)q[j]=Math.min(p[j]+1,q[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=q;}return p[n];}
+function simW(a,b){if(a===b)return true;var L=Math.max(a.length,b.length);if(L<4)return false;return lev(a,b)<=(L>=8?2:1);}
+/* Genaue Auswertung: Whisper läuft im Browser (Web Worker), der Ton verlässt das Gerät nicht */
+var WH={w:null,ready:false,loading:false,p:0,cb:{},seq:0,err:''};
+var WH_MODELS=['onnx-community/whisper-base_timestamped','onnx-community/whisper-tiny_timestamped'],WH_BUSY='readster.whBusy',WH_LIB='https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1';
+if(window.__whLib)WH_LIB=window.__whLib;
+/* Adresse des Cloudflare-Workers (siehe cloudflare/ANLEITUNG.md). Leer = Whisper läuft im Browser. */
+var WH_SERVER='__WHSERVER__';if(WH_SERVER.indexOf('http')!==0)WH_SERVER='';if(window.__whServer)WH_SERVER=window.__whServer;
+function whModel(){var m=S.set.whm;if(m!==0&&m!==1)m=IOS?1:0;return m;}
+function whWorkerSrc(){return "import {pipeline,env} from '"+WH_LIB+"';env.allowLocalModels=false;try{env.backends.onnx.wasm.numThreads=1;}catch(e){}let P=null;const files={};\n"+
+  "function load(){return P||(P=pipeline('automatic-speech-recognition','"+WH_MODELS[whModel()]+"',{dtype:'q8',device:'wasm',progress_callback:function(p){if(p&&p.status==='progress'&&p.file){files[p.file]=[p.loaded||0,p.total||0];let l=0,t=0;for(const k in files){l+=files[k][0];t+=files[k][1];}self.postMessage({type:'progress',p:t?l/t:0});}}}).catch(function(e){P=null;throw e;}));}\n"+
+  "self.onmessage=async function(e){const m=e.data;try{const a=await load();self.postMessage({type:'ready'});if(m.audio){const out=await a(m.audio,{language:'german',task:'transcribe',return_timestamps:'word',chunk_length_s:30,stride_length_s:5});self.postMessage({type:'done',id:m.id,chunks:out.chunks||[]});}}catch(err){self.postMessage({type:'error',id:m.id,msg:String(err&&err.message||err)});}};";}
+function whMark(on){try{if(on)localStorage.setItem(WH_BUSY,JSON.stringify({m:whModel(),ts:Date.now()}));else localStorage.removeItem(WH_BUSY);}catch(e){}}
+function whCrashCheck(){
+  var b=null;try{b=JSON.parse(localStorage.getItem(WH_BUSY)||'null');localStorage.removeItem(WH_BUSY);}catch(e){}
+  if(!b||!S.set.wh||Date.now()-b.ts>15*60*1000)return;
+  if(b.m===0){S.set.whm=1;S.whNote='Die genaue Auswertung war für dieses Gerät zu schwer. Readster nimmt jetzt ein kleineres Sprachmodell (etwa 40 MB). Probier es noch einmal.';}
+  else{S.set.wh=false;S.whNote='Die genaue Auswertung ist für dieses Gerät leider zu schwer und ist jetzt ausgeschaltet. Die Pausenmessung läuft weiter.';}
+  save();
+}
+function whFail(msg){whMark(false);WH.err=msg;WH.loading=false;var c=WH.cb;WH.cb={};Object.keys(c).forEach(function(k){c[k]({type:'error'});});whUI();}
+function whInit(){
+  if(WH.w)return WH.w;
+  try{var u=URL.createObjectURL(new Blob([whWorkerSrc()],{type:'text/javascript'}));WH.w=new Worker(u,{type:'module'});}
+  catch(e){whFail('Dieser Browser kann die genaue Auswertung nicht starten.');return null;}
+  WH.w.onmessage=function(e){var m=e.data||{};
+    if(m.type==='progress'){WH.p=m.p;if(!WH.ready)WH.loading=true;whUI();}
+    else if(m.type==='ready'){if(!WH.ready){WH.ready=true;WH.loading=false;WH.err='';if(!Object.keys(WH.cb).length)whMark(false);whUI();}}
+    else if(m.type==='done'||m.type==='error'){
+      if(m.type==='error'&&!WH.ready){whFail('Das Sprachmodell konnte nicht geladen werden. Prüfe die Internetverbindung und schalte die genaue Auswertung noch einmal ein.');return;}
+      var cb=WH.cb[m.id];delete WH.cb[m.id];if(!Object.keys(WH.cb).length)whMark(false);if(cb)cb(m);}
+  };
+  WH.w.onerror=function(){try{WH.w.terminate();}catch(e){}WH.w=null;whFail('Dieser Browser kann die genaue Auswertung nicht starten.');};
+  return WH.w;
+}
+function whPreload(){if(window.__whMock||WH_SERVER){WH.ready=true;WH.err='';return;}WH.err='';var w=whInit();if(w&&!WH.ready&&!WH.loading){WH.loading=true;whMark(true);w.postMessage({id:0});whUI();}}
+function wavPCM16(x){
+  var n=x.length,b=new ArrayBuffer(44+n*2),v=new DataView(b),i;
+  function str(o,t){for(var k=0;k<t.length;k++)v.setUint8(o+k,t.charCodeAt(k));}
+  str(0,'RIFF');v.setUint32(4,36+n*2,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,16000,true);v.setUint32(28,32000,true);v.setUint16(32,2,true);v.setUint16(34,16,true);str(36,'data');v.setUint32(40,n*2,true);
+  for(i=0;i<n;i++){var q=Math.max(-1,Math.min(1,x[i]));v.setInt16(44+i*2,q<0?q*32768:q*32767,true);}
+  return new Blob([b],{type:'audio/wav'});
+}
+function whServer(x){
+  var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ctl)ctl.abort();},120000);
+  return fetch(WH_SERVER,{method:'POST',headers:{'Content-Type':'audio/wav'},body:wavPCM16(x),signal:ctl?ctl.signal:undefined})
+    .then(function(r){return r.json().catch(function(){return {};}).then(function(j){if(!r.ok)throw new Error(j.fehler||('HTTP '+r.status));return j;});})
+    .then(function(j){clearTimeout(tm);return {type:'done',chunks:(j.words||[]).map(function(w){return {text:' '+w.word,timestamp:[w.start,w.end]};})};},
+          function(e){clearTimeout(tm);return {type:'error',msg:String(e&&e.message||e)};});
+}
+function whRun(x){if(WH_SERVER&&!window.__whMock)return whServer(x);return new Promise(function(res){
+  if(window.__whMock){whMark(true);window.__whMock(x).then(function(c){whMark(false);res({type:'done',chunks:c});},function(){whMark(false);res({type:'error'});});return;}
+  var w=whInit();if(!w){res({type:'error'});return;}
+  var id=++WH.seq;WH.cb[id]=res;if(!WH.ready)WH.loading=true;whMark(true);
+  try{w.postMessage({id:id,audio:x},[x.buffer]);}catch(e){delete WH.cb[id];res({type:'error'});}
+});}
+function whStatus(){
+  if(WH_SERVER)return 'Bereit. Die Auswertung läuft über Cloudflare.';
+  if(WH.err)return WH.err;
+  if(WH.ready)return 'Bereit. Läuft ganz auf diesem Gerät.';
+  if(WH.loading)return 'Lade Sprachmodell … '+(WH.p>0?Math.round(WH.p*100)+' %':'');
+  return '';
+}
+function whUI(){var el=document.getElementById('whst');if(el)el.textContent=whStatus();if(R&&R.chk&&R.chk.state==='wait')updateMarkInfo();}
+function to16k(x,sr){
+  if(sr===16000)return new Float32Array(x);
+  var r=sr/16000,n=Math.floor(x.length/r),o=new Float32Array(n);
+  for(var i=0;i<n;i++){var a=Math.floor(i*r),b=Math.min(x.length,Math.floor((i+1)*r)),s=0;for(var j=a;j<b;j++)s+=x[j];o[i]=b>a?s/(b-a):x[a]||0;}
+  return o;
+}
+/* Gehörte Wörter (mit Zeiten) dem Text zuordnen; daraus: ausgelassene Wörter und Stockstellen */
+function whCombine(t,chunks,pa){
+  var H=[],i,j;
+  (chunks||[]).forEach(function(c){var ts=c.timestamp||[],s0=ts[0]==null?0:ts[0],e0=ts[1]==null?s0:ts[1];
+    String(c.text||'').trim().split(/\s+/).forEach(function(w){var n=normW(w);if(n)H.push({n:n,s:s0,e:e0});});});
+  var T=[];for(i=0;i<t.rs;i++){var w=t.words[i];T.push(normW(w.pre+w.sy.join('')+w.post));}
+  var N=T.length,M=H.length,D=[],B=[];
+  for(i=0;i<=N;i++){D[i]=new Float32Array(M+1);B[i]=new Int8Array(M+1);}
+  for(i=0;i<=N;i++)for(j=0;j<=M;j++){
+    if(!i&&!j)continue;
+    var best=1e9,bk=0;
+    if(i&&D[i-1][j]+1<best){best=D[i-1][j]+1;bk=1;}
+    if(j&&D[i][j-1]+1<best){best=D[i][j-1]+1;bk=2;}
+    if(i&&j){var c=simW(T[i-1],H[j-1].n)?0:1;if(D[i-1][j-1]+c<best){best=D[i-1][j-1]+c;bk=c?4:3;}}
+    if(i&&j>1&&simW(T[i-1],H[j-2].n+H[j-1].n)&&D[i-1][j-2]<best){best=D[i-1][j-2];bk=5;}
+    D[i][j]=best;B[i][j]=bk;
+  }
+  var mt=[],hm=[];for(i=0;i<N;i++)mt[i]=-1;for(j=0;j<M;j++)hm[j]=-1;
+  var a=N,b=M;
+  while(a>0||b>0){var k=B[a][b];if(k===3){mt[a-1]=b-1;hm[b-1]=a-1;a--;b--;}else if(k===5){mt[a-1]=b-2;hm[b-2]=a-1;hm[b-1]=-2;a--;b-=2;}else if(k===4){a--;b--;}else if(k===1)a--;else b--;}
+  var miss=[],ok=0,n=0;for(i=0;i<N;i++){if(!T[i])continue;n++;if(mt[i]>=0)ok++;else miss.push(i);}
+  var nxt=new Array(M+1);nxt[M]=-1;for(j=M-1;j>=0;j--)nxt[j]=hm[j]>=0?hm[j]:nxt[j+1];
+  function punct(k){return k>=0&&/[.,;:!?]/.test(t.words[k].post);}
+  var cand={};function add(k,sc){if(k>0&&k<t.rs)cand[k]=Math.max(cand[k]||0,sc);}
+  /* a) lange Pausen: das Wort direkt danach */
+  var gl=(pa&&pa.gaps||[]).map(function(g){return g.len;}).sort(function(x,y){return x-y;});
+  var med=gl.length?gl[Math.floor(gl.length/2)]:0.15,lim=Math.min(1.0,Math.max(0.6,med*2.5));
+  var gp=[];
+  (pa&&pa.gaps||[]).forEach(function(g){
+    var t1=g.s*0.02+g.len;
+    for(j=0;j<M&&H[j].s<t1-0.25;j++);
+    if(j<M&&nxt[j]>=0)gp.push({k:nxt[j],len:g.len});
+  });
+  /* Pausen am Satzanfang mit den eigenen Satzpausen vergleichen */
+  var sp=gp.filter(function(x){return punct(x.k-1)&&x.len>=0.25;}).map(function(x){return x.len;}).sort(function(x,y){return x-y;});
+  var slim=sp.length>=3?Math.max(lim+0.4,sp[Math.floor(sp.length/2)]*1.8):Math.max(1.5,lim+0.9);
+  gp.forEach(function(x){if(x.len>=(punct(x.k-1)?slim:lim))add(x.k,x.len);});
+  /* b) Wiederholungen und Neuansätze: zusätzliche gehörte Wörter vor einem Textwort */
+  for(j=0;j<M;j++)if(hm[j]===-1){
+    var kp=-1;for(var q=j-1;q>=0;q--)if(hm[q]>=0){kp=hm[q];break;}
+    var k2=(kp>=0&&(simW(T[kp],H[j].n)||T[kp].indexOf(H[j].n)===0))?kp:nxt[j];
+    if(k2>0)add(k2,0.9);
+  }
+  /* c) lang gezogene Wörter */
+  var dr=[];for(i=0;i<N;i++)if(mt[i]>=0){var h=H[mt[i]];dr.push({i:i,d:h.e-h.s,r:(h.e-h.s)/Math.max(2,T[i].length)});}
+  var rs=dr.map(function(x){return x.r;}).sort(function(x,y){return x-y;}),rm=rs.length?rs[Math.floor(rs.length/2)]:0;
+  dr.forEach(function(x){if(rm>0&&x.r>3*rm&&x.d>1.0)add(x.i,0.8);});
+  var cap=Math.max(3,Math.min(10,Math.round(t.rs/8)));
+  var out=Object.keys(cand).map(Number).sort(function(x,y){return cand[y]-cand[x];}).slice(0,cap).sort(function(x,y){return x-y;});
+  return {sug:out,miss:miss,ok:ok,n:n,heard:M};
+}
+function shareRec(){
+  var x=REC.share;if(!x||!x.b)return;
+  var ty=x.b.type||'audio/mp4',ext=/webm/.test(ty)?'webm':/ogg/.test(ty)?'ogg':'m4a',d=new Date();
+  var name='readster-'+x.id+'-'+d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2)+'-'+('0'+d.getHours()).slice(-2)+('0'+d.getMinutes()).slice(-2)+'.'+ext;
+  var f=null;try{f=new File([x.b],name,{type:ty});}catch(e){}
+  if(f&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).catch(function(){});return;}
+  var u=URL.createObjectURL(x.b),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(function(){a.remove();URL.revokeObjectURL(u);},4000);
+}
+function recFailText(){
+  if((REC.fail==='NotAllowedError'||REC.fail==='SecurityError')&&FRAMED)return 'In dieser Vorschau darf Readster das Mikrofon nicht nutzen. Du kannst trotzdem lesen. Aufnehmen geht, wenn Readster als eigene Seite geöffnet ist.';
+  if(REC.fail==='NotAllowedError'||REC.fail==='SecurityError')return 'Das Mikrofon ist gesperrt. Erlaube es in den Einstellungen für diese Seite. Du kannst trotzdem lesen.';
+  return 'Aufnahme ist hier nicht möglich. Du kannst trotzdem lesen.';
+}
+function startRound(){
+  stopListen();R.phase='timing';R.t0=Date.now();R.recTried=false;R.recOn=false;REC.want=true;renderCtl();
+  var rr=R;
+  recStart().then(function(ok){
+    if(R!==rr)return;R.recTried=true;R.recOn=ok;if(ok&&R.phase==='timing')R.t0=Date.now();
+    if(R.phase==='timing')renderCtl();
+  });
+}
+function stopRound(){
+  var sec=(Date.now()-R.t0)/1000,t=R.t,minSec=Math.max(8,t.rs/4),keep=sec>=minSec,p=recStop(keep);
+  if(!keep){R.phase='read';R.msg='Das ging sehr schnell. Hast du den ganzen Text gelesen? Lies ihn einmal ganz laut und tippe dann auf „Fertig gelesen“.';renderCtl();R.msg='';window.scrollTo(0,0);return;}
+  var wpm=Math.max(1,Math.round(R.t.rs/(sec/60)));
+  R.round++;R.rounds.push(wpm);R.marks={};R.phase='mark';R.sug=[];R.sec=sec;R.sugState=R.recOn?'wait':'none';R.chk=null;
+  var prev=S.log.filter(function(x){return x.id===t.id&&x.wpm;}),ent={ts:Date.now(),id:t.id,wpm:wpm,sug:null,marked:null,self:null};
+  R.prev=prev;R.entry=ent;R.head=headline(wpm,prev);R.fb=feedback(t,wpm,prev,null);
+  S.log.push(ent);if(S.log.length>600)S.log.shift();save();
+  var useWh=!!(S.set.wh&&R.recOn);if(useWh){R.chk={state:'wait'};whPreload();}
+  var o=document.querySelectorAll('.w.st');for(var i=0;i<o.length;i++)o[i].classList.remove('st');
+  renderCtl();
+  window.scrollTo(0,0);
+  p.then(function(b){
+    if(!b){if(R&&R.entry===ent){R.sugState='none';updateMarkInfo();}return;}
+    return recGet(t.id+':first').then(function(f){
+      var w=f?Promise.resolve():recPut(t.id+':first',b);
+      return w.then(function(){return recPut(t.id+':last',b);});
+    }).then(function(){
+      S.recN[t.id]=(S.recN[t.id]||0)+1;save();
+      if(R&&R.t===t&&R.phase==='mark')fillRec($('#recm'),t.id,true);
+      return analyzeBlob(b,t);
+    }).then(function(an){
+      if(!an){if(R&&R.entry===ent){R.sugState='none';if(R.chk)R.chk={state:'err',msg:'Die Aufnahme konnte nicht ausgewertet werden.'};updateMarkInfo();}return;}
+      var sug=an.sug;
+      function showSug(list){ent.sug=list.length;save();if(R&&R.entry===ent){R.sugState='done';R.sug=expandSug(list,t);R.fb=feedback(t,wpm,prev,ent.sug);updateMarkInfo();}}
+      if(!useWh||!an.pa){showSug(sug);return;}
+      return whRun(to16k(an.x,an.sr)).then(function(m){
+        if(m.type!=='done'){showSug(sug);if(R&&R.entry===ent){R.chk={state:'err',msg:(WH_SERVER?'Die Auswertung über das Internet hat diesmal nicht geklappt. Die Pausen sind trotzdem gemessen.':WH.err||'Die genaue Auswertung hat diesmal nicht geklappt. Die Pausen sind trotzdem gemessen.')};updateMarkInfo();}return;}
+        var r2=whCombine(t,m.chunks,an.pa);
+        if(!r2.heard){showSug(sug);if(R&&R.entry===ent){R.chk={state:'err',msg:'Whisper hat nichts verstanden. Halte das Gerät ruhig etwas näher.'};updateMarkInfo();}return;}
+        ent.chk=[r2.ok,r2.n];
+        if(R&&R.entry===ent)R.chk={state:'done',n:r2.n,ok:r2.ok,miss:r2.miss};
+        showSug(r2.sug);
+      });
+    });
+  });
+}
+function commitMarks(){
+  Object.keys(R.marks).forEach(function(i){if(!R.marks[i])return;R.all[i]=true;});
+}
+function finish(){
+  var t=R.t,first=!S.done[t.id],best=R.rounds.length?Math.max.apply(null,R.rounds):0,gain=0,list=[];
+  var wasRank=rankOf(lvl(S.xp));
+  var markedN=Object.keys(R.all).length;
+  if(R.entry){R.entry.marked=markedN;}
+  if(first){gain+=30;list.push('Text gelesen: 30 XP');}else{gain+=15;list.push('Nochmal gelesen: 15 XP');}
+  if(R.rounds.length>1){var e=Math.min(2,R.rounds.length-1)*10;gain+=e;list.push('Mehrmals gelesen: '+e+' XP');}
+  if(R.rounds.length>1&&best>R.rounds[0]){gain+=10;list.push('Schneller geworden: 10 XP');}
+  if(markedN){gain+=5;list.push('Wörter markiert: 5 XP');}
+  Object.keys(R.all).forEach(function(i){wjAdd(t.words[i].plain);});
+  var d=S.done[t.id]||{rounds:0,best:0};
+  d.rounds+=R.rounds.length;d.best=Math.max(d.best||0,best);d.ts=Date.now();
+  d.hard=!!(R.entry&&R.entry.self===0);d.marked=markedN;d.qmiss=(R.qs[0]===0||R.qs[1]===0);
+  S.done[t.id]=d;
+  var withOpa=R.who==='opa'&&!R.rounds.length;
+  if(withOpa){S.opa.push({ts:Date.now(),id:t.id});if(S.opa.length>300)S.opa.shift();}
+  R.withOpa=withOpa;
+  S.xp+=gain;S.last=t.id;S.days[dkey(new Date())]=1;save();
+  var nowRank=rankOf(lvl(S.xp));
+  stopListen();
+  function reward(){showReward(t,first,gain,list);}
+  if(nowRank!==wasRank){showEvolve(wasRank,nowRank,reward);}else reward();
+}
+function burst(){
+  var f=$('#fx'),h='';
+  for(var i=0;i<18;i++){var a=Math.random()*Math.PI*2,r=90+Math.random()*130;
+    h+='<span class="fxp fxs" style="--dx:'+Math.round(Math.cos(a)*r)+'px;--dy:'+Math.round(Math.sin(a)*r)+'px;--rot:'+Math.round(Math.random()*360)+'deg"></span>';}
+  f.innerHTML=h;setTimeout(function(){f.innerHTML='';},1100);
+}
+function cardHTML(t,full){
+  return '<div class="kcard'+(full?' kfull':'')+'" style="--c:'+TILE[t.cat]+'">'+monHTML(t.i,TILE[t.cat],'')+'<span class="kc">'+esc(t.cat)+'</span>'+(full?'<span class="mn">'+esc(MNAME[t.i])+'</span><span class="kn">'+esc(t.name)+'</span><span class="kf">'+esc(t.card)+'</span>':'<span class="kn">'+esc(MNAME[t.i])+'</span><span class="kc">'+esc(t.name)+'</span>')+'</div>';
+}
+function showReward(t,first,gain,list){
+  var p=lvlProg(S.xp),sg=suggest();
+  var h='<div class="card"><span class="eyebrow">'+(first?'Neue Karte im Wissensalbum':'Text nochmal gelesen')+(R&&R.withOpa?' · mit Opa':'')+'</span>'+cardHTML(t,true)+'<span class="xpgain">+'+gain+' XP</span>'+'<ul class="xplist">'+list.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>';
+  h+='<div class="bar" style="width:100%"><i style="width:'+p.pct+'%"></i></div><span class="xptext">Level '+p.L+' · noch '+p.need+' XP bis zum nächsten</span>';
+  h+=riddleBlock(t,true);
+  h+='<div class="cfbtns">'+(sg?'<button class="btn" data-a="nextread" data-v="'+sg.t.id+'">Weiterlesen</button>':'')+'<button class="btn ghost" data-a="home2">Zur Übersicht</button></div></div>';
+  openBox('#modal',h);readStyle();burst();
+  try{var A0=typeof AUDIO!=='undefined'&&AUDIO[t.id];if(A0&&((A0.n&&A0.n.b)||(A0.s&&A0.s.b))){var cx=getAC();if(cx){cx.resume();chime(cx,cx.currentTime+0.6);}}}catch(e){}
+}
+function showEvolve(a,b,done){
+  var h='<div class="card"><span class="eyebrow">Dein Monster entwickelt sich!</span><div class="evo">'+stageHTML(a,'evo-old')+'<span class="evo-ar">➜</span>'+stageHTML(b,'evo-new')+'</div><h2>'+esc(MON.STAGES[b].n)+'</h2><p class="hint">Level '+lvl(S.xp)+' erreicht</p><button class="btn wide" data-a="evoOk">Weiter</button></div>';
+  openBox('#modal',h);burst();R.afterEvo=done;
+}
+/* ---------- Wort-Jäger: schwere Wörter in Silben üben ---------- */
+var W=null;
+function wjSy(w){var e=WSY[w];return e?e.sy:[w];}
+function wjStart(){
+  var list=wjDue().slice(0,WJ_MAX);if(!list.length){renderHome();show('home');return;}
+  W={list:list,k:0,step:'clap',claps:{},reads:0,res:[]};
+  show('wj');renderWJ();sayWord(list[0]);
+}
+function renderWJ(){
+  var w=W.list[W.k],sy=wjSy(w),s=S.set,n=W.list.length;
+  var st='--rf:\''+esc(s.font)+'\';--rsp:'+[0,.04,.08][s.space]+'em';
+  var h='<div class="backrow"><button class="back" data-a="home">‹ Beenden</button><div class="steps">'+W.list.map(function(x,i){return '<i class="'+(i<=W.k?'on':'')+'"></i>';}).join('')+'</div></div>';
+  h+='<h2>Wort-Jäger</h2>';
+  h+='<section class="card" style="align-items:center"><span class="eyebrow">Wort '+(W.k+1)+' von '+n+'</span><div class="wjword" style="'+st+'">'+sy.map(function(x,i){return '<span class="sy s'+(i%2)+'" style="color:var(--sy-'+(i%2?'b':'a')+')">'+esc(x)+'</span>';}).join('')+'</div><button class="btn ghost" data-a="wjSay">Anhören</button></section>';
+  var dk='';
+  if(W.step==='clap'){
+    h+='<section class="card"><p class="wjstep">'+(sy.length>1?'Tippe jede Silbe an und sprich sie dabei.':'Tippe das Wort an und sprich es dabei.')+'</p><div class="claps">'+sy.map(function(x,i){return '<button class="clap s'+(i%2)+(W.claps[i]?' on':'')+'" style="'+st+'" data-a="wjClap" data-v="'+i+'">'+esc(x)+'</button>';}).join('')+'</div></section>';
+  }else if(W.step==='read'){
+    h+='<section class="card"><p class="wjstep">Jetzt lies das ganze Wort dreimal laut.</p><div class="rdots">'+[0,1,2].map(function(i){return '<i class="'+(i<W.reads?'on':'')+'"></i>';}).join('')+'</div></section>';
+    dk='<button class="btn wide" data-a="wjRead">Gelesen ('+W.reads+' von 3)</button>';
+  }else{
+    h+='<section class="card"><p class="wjstep">Wie gut klappt das Wort schon?</p></section>';
+    dk='<div class="row"><button class="btn ghost" data-a="wjJudge" data-v="0">Nochmal morgen</button><button class="btn" data-a="wjJudge" data-v="1">Kann ich</button></div>';
+  }
+  h+=adult('<p>Schwere Wörter aus dem Lesen werden hier geübt: erst in Silben klatschen, dann dreimal ganz lesen. Ein Wort ist geschafft, wenn das Kind an drei verschiedenen Tagen „Kann ich“ tippt. Pro Tag kommt jedes Wort höchstens einmal dran.</p>');
+  $('#v-wj').innerHTML=h;setDock(dk);
+}
+function wjClap(i){
+  W.claps[i]=true;renderWJ();
+  var sy=wjSy(W.list[W.k]);
+  if(Object.keys(W.claps).length>=sy.length)setTimeout(function(){if(W&&W.step==='clap'){W.step='read';renderWJ();}},450);
+}
+function wjRead(){W.reads++;if(W.reads>=3)W.step='judge';renderWJ();}
+function wjJudge(ok){
+  var w=W.list[W.k],e=S.wj[w],today=dkey(new Date());
+  if(e){e.last=today;if(ok){e.ok=e.ok||[];if(e.ok.indexOf(today)<0)e.ok.push(today);if(e.ok.length>=WJ_NEED)e.done=true;}}
+  W.res.push({w:w,ok:!!ok,done:!!(e&&e.done)});save();
+  if(W.k+1<W.list.length){W.k++;W.step='clap';W.claps={};W.reads=0;renderWJ();window.scrollTo(0,0);sayWord(W.list[W.k]);return;}
+  wjEnd();
+}
+function wjEnd(){
+  var okN=W.res.filter(function(r){return r.ok;}).length,gain=10+okN*5,wasRank=rankOf(lvl(S.xp));
+  S.xp+=gain;S.days[dkey(new Date())]=1;save();setDock('');
+  var list=['Runde geschafft: 10 XP'];if(okN)list.push('Kann ich: '+okN*5+' XP');
+  var done=W.res.filter(function(r){return r.done;}).length;
+  function show2(){
+    var p=lvlProg(S.xp);
+    var h='<div class="card"><span class="eyebrow">Wort-Jäger</span><h2>Super gejagt!</h2>'+stageHTML(rankOf(p.L),'big')+'<span class="xpgain">+'+gain+' XP</span><ul class="xplist">'+list.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>';
+    h+='<div class="wj">'+W.res.map(function(r){return '<span class="'+(r.ok?'ok':'')+'">'+esc(r.w)+(r.done?' ✓':'')+'</span>';}).join('')+'</div>';
+    if(done)h+='<p class="hint fb">'+done+(done===1?' Wort ist':' Wörter sind')+' jetzt ganz geschafft!</p>';
+    h+='<button class="btn wide" data-a="home2">Zur Übersicht</button></div>';
+    openBox('#modal',h);burst();
+  }
+  var nowRank=rankOf(lvl(S.xp));
+  if(nowRank!==wasRank){R=R||{};showEvolve(wasRank,nowRank,show2);}else show2();
+}
+/* Album */
+function renderAlbum(){
+  var n=doneCount();
+  var h='<div class="backrow"><button class="back" data-a="home">‹ Zurück</button></div><h2>Wissensalbum</h2><p class="hint">'+n+' von '+TEXTS.length+' Karten. Jede gelesene Geschichte schaltet eine Karte frei.</p><div class="grid">';
+  h+=TEXTS.map(function(t){
+    if(S.done[t.id])return '<button class="kcard" data-a="card" data-v="'+t.id+'" style="--c:'+TILE[t.cat]+'">'+monHTML(t.i,TILE[t.cat],'')+'<span class="kc">'+esc(t.cat)+'</span><span class="kn">'+esc(MNAME[t.i])+'</span></button>';
+    return '<div class="kcard lock" aria-label="Noch nicht freigeschaltet">'+monHTML('lock','#1b3a4a','')+'<span class="kc">'+esc(t.cat)+'</span><span class="kn">?</span></div>';
+  }).join('')+'</div>';
+  var ws=Object.keys(S.wj).sort(function(a,b){return (S.wj[a].done?1:0)-(S.wj[b].done?1:0)||(S.wj[b].n||0)-(S.wj[a].n||0);}).slice(0,40);
+  h+='<section class="card"><h2>Deine Wort-Jäger-Liste</h2>'+(ws.length?'<p class="hint">Grün mit Haken: geschafft. Die anderen übst du im Wort-Jäger.</p><div class="wj">'+ws.map(function(w){var e=S.wj[w];return '<span class="'+(e.done?'ok':'')+'">'+esc(w)+(e.done?' ✓':'')+'</span>';}).join('')+'</div>':'<p class="hint">Hier erscheinen die Wörter, die du beim Lesen antippst.</p>')+'</section>';
+  $('#v-album').innerHTML=h;show('album');
+}
+/* Lesehilfen */
+function renderSheet(){
+  var s=S.set;
+  function seg(key,opts){return '<div class="seg">'+opts.map(function(o){return '<button data-a="set" data-k="'+key+'" data-v="'+o[0]+'" aria-pressed="'+(String(s[key])===String(o[0]))+'">'+o[1]+'</button>';}).join('')+'</div>';}
+  var h='<div class="card left"><h2>Lesehilfen</h2>';
+  h+='<div class="setrow"><span class="eyebrow">Schrift</span>'+seg('font',[['Nunito','Rund'],['Lexend','Weit'],['Atkinson Hyperlegible','Klar']])+'</div>';
+  h+='<div class="setrow"><span class="eyebrow">Größe</span>'+seg('size',[[0,'Normal'],[1,'Groß'],[2,'Sehr groß']])+'</div>';
+  h+='<div class="setrow"><span class="eyebrow">Zeilenabstand</span>'+seg('line',[[0,'Eng'],[1,'Normal'],[2,'Weit']])+'</div>';
+  h+='<div class="setrow"><span class="eyebrow">Buchstabenabstand</span>'+seg('space',[[0,'Normal'],[1,'Mehr'],[2,'Viel']])+'</div>';
+  h+='<div class="setrow"><span class="eyebrow">Silben in zwei Farben</span>'+seg('syl',[[true,'An'],[false,'Aus']])+'</div>';
+  h+='<div class="setrow"><span class="eyebrow">Name deines Monsters</span><input class="name" id="nameIn" maxlength="16" autocomplete="off" placeholder="z. B. Krümel" value="'+esc(S.name||'')+'"></div>';
+  h+='<div class="setrow"><span class="eyebrow">Farbe deines Monsters</span><div class="seg">'+COLS.map(function(c){return '<button class="sw" data-a="col" data-v="'+c+'" aria-label="Farbe" aria-pressed="'+(S.col===c)+'" style="background:'+c+'"></button>';}).join('')+'</div></div>';
+  h+='<div class="setrow"><span class="eyebrow">Aufnahme beim Lesen</span>'+seg('rec',[[true,'An'],[false,'Aus']])+'<span class="hint">Die Aufnahmen bleiben nur auf diesem Gerät.</span><button class="link" id="delRecsBtn" data-a="delRecs">Alle Aufnahmen löschen</button></div>';
+  h+='<div class="setrow"><span class="eyebrow">Genaue Auswertung (Whisper)</span>'+seg('wh',[[true,'An'],[false,'Aus']])+'<span class="hint">Erkennt Stockstellen und ausgelassene Wörter genauer. '+(WH_SERVER?'Die Aufnahme geht dafür kurz an Cloudflare und wird dort nicht gespeichert.':'Beim ersten Einschalten werden einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB geladen, am besten im WLAN. Danach läuft alles auf diesem Gerät, der Ton verlässt es nicht.')+'</span><span class="hint fb" id="whst">'+esc(S.set.wh?whStatus():'')+'</span></div>';
+  h+='<div class="setrow"><span class="eyebrow">Vorlese-Tempo</span>'+seg('speed',[['slow','Langsam'],['normal','Normal']])+'</div>';
+  h+='<div class="setrow"><span class="eyebrow">Tempo-Zahlen zeigen</span>'+seg('nums',[[true,'An'],[false,'Aus']])+'<span class="hint">Aus: Es gibt nur „schneller als beim ersten Mal“, keine Wörter pro Minute.</span></div>';
+  h+='<div class="rtext syl-on" style="--rf:\''+esc(s.font)+'\';--rsize:'+[1.25,1.5,1.8][s.size]+'rem;--rline:'+[1.7,2,2.35][s.line]+';--rsp:'+[0,.04,.08][s.space]+'em;background:var(--bg);border-radius:14px;padding:12px 14px"><span class="w"><span class="sy s0">Ge</span><span class="sy s1">cko</span></span> <span class="w"><span class="sy s0">läuft</span></span> <span class="w"><span class="sy s0">an</span></span> <span class="w"><span class="sy s0">der</span></span> <span class="w"><span class="sy s0">Wand</span></span>.</div>';
+  h+='<button class="btn wide" data-a="sheetOk">Fertig</button><button class="link" data-a="backup">Fortschritt sichern oder laden</button><button class="link" data-a="reset">Fortschritt zurücksetzen</button></div>';
+  openBox('#sheet',h);
+}
+/* Sichern und Laden: der ganze Fortschritt als Code oder Datei (ohne Aufnahmen) */
+function b64e(str){return btoa(unescape(encodeURIComponent(str)));}
+function b64d(str){return decodeURIComponent(escape(atob(str)));}
+function exportCode(){return 'LM1:'+b64e(JSON.stringify(S));}
+function parseBackup(txt){
+  txt=String(txt||'').trim();var j=null;
+  try{if(txt.indexOf('LM1:')===0)j=JSON.parse(b64d(txt.slice(4).replace(/\s+/g,'')));else if(txt.charAt(0)==='{')j=JSON.parse(txt);}catch(e){j=null;}
+  if(!j||typeof j!=='object'||typeof j.xp!=='number'||!j.done)return null;
+  return merge(j);
+}
+var FRAMED=(function(){try{return window.top!==window;}catch(e){return true;}})();
+var IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+var STANDALONE=(window.navigator.standalone===true)||(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches);
+function renderBackup(msg){
+  var h='<div class="card left"><h2>Sichern und laden</h2>';
+  h+='<p class="hint">Der Fortschritt liegt nur in diesem Browser. Mit dem Code kannst du ihn sichern oder auf ein anderes Gerät mitnehmen. Aufnahmen kommen nicht mit.</p>';
+  h+='<div class="setrow"><span class="eyebrow">Sichern</span><textarea class="code" id="expCode" readonly>'+esc(exportCode())+'</textarea><div class="row"><button class="btn ghost" data-a="copyCode">Code kopieren</button>'+(FRAMED?'':'<button class="btn ghost" data-a="saveFile">Als Datei</button>')+'</div></div>';
+  h+='<div class="setrow"><span class="eyebrow">Laden</span><textarea class="code" id="impCode" placeholder="Code hier einfügen"></textarea><div class="row"><button class="btn ghost" data-a="loadCode">Code laden</button><label class="btn ghost" style="display:flex;align-items:center;justify-content:center">Datei wählen<input type="file" id="impFile" accept=".json,.txt,application/json,text/plain" hidden></label></div></div>';
+  if(msg)h+='<p class="hint fb" id="bkmsg">'+esc(msg)+'</p>';
+  if(IOS&&!STANDALONE)h+='<p class="hint">Tipp für iPhone und iPad: Öffne die App in Safari und wähle „Teilen“ und dann „Zum Home-Bildschirm“. Dann löscht Safari den Fortschritt nicht nach längerer Pause.</p>';
+  h+='<button class="btn wide" data-a="settings">Zurück</button></div>';
+  openBox('#sheet',h);
+}
+function applyBackup(txt){
+  var d=parseBackup(txt);
+  if(!d){renderBackup('Das hat nicht geklappt. Prüfe, ob der Code vollständig ist.');return;}
+  S=d;save();R=null;renderHome();show('home');renderBackup('Geladen: Level '+lvl(S.xp)+', '+doneCount()+' Texte.');
+}
+function renderReset(){
+  openBox('#sheet','<div class="card"><h2>Fortschritt löschen?</h2><p class="hint">Alle Karten, XP und markierten Wörter auf diesem Gerät werden gelöscht.</p><div class="cfbtns"><button class="btn ghost" data-a="sheetOk">Abbrechen</button><button class="btn" data-a="doReset">Löschen</button></div></div>');
+}
+/* Klicks */
+document.addEventListener('click',function(e){
+  var w=e.target.closest('.w');
+  if(w&&R&&R.phase==='mark'&&$('#rtext').contains(w)){var i=w.dataset.i;R.marks[i]=!R.marks[i];w.classList.toggle('st',!!R.marks[i]);if(R.marks[i])R.all[i]=true;else{R.all[i]=false;delete R.all[i];}return;}
+  if(w&&R&&R.phase==='opa'&&$('#rtext').contains(w)){var oi=w.dataset.i;if(R.all[oi]){delete R.all[oi];w.classList.remove('st');}else{R.all[oi]=true;w.classList.add('st');}return;}
+  if(w&&R&&$('#rr')&&$('#rr').contains(w)){listen(+w.dataset.i);return;}
+  if(w&&R&&R.phase==='read'&&$('#rtext').contains(w)){listen(+w.dataset.i);return;}
+  var pt=e.target.closest&&e.target.closest('[data-pt]');
+  if(pt&&$('#v-stats').contains(pt)){var pi=+pt.dataset.pt,pp=S.log.filter(function(x){return x.wpm;}).slice(-30)[pi],cr=$('#chartread');
+    if(cr&&pp)cr.textContent=fmtDate(pp.ts)+' · '+(byId[pp.id]?byId[pp.id].title:'')+' · '+pp.wpm+' Wörter pro Minute';
+    var ds=document.querySelectorAll('#v-stats .dt');for(var di=0;di<ds.length;di++)ds[di].classList.toggle('sel',di===pi);return;}
+  var b=e.target.closest('[data-a]');if(!b)return;
+  var a=b.dataset.a,v=b.dataset.v;
+  switch(a){
+    case 'home':case 'home2':stopListen();closeBox('#modal');renderHome();show('home');break;
+    case 'cat':renderCat(v);break;
+    case 'open':openText(v);break;
+    case 'nextread':stopListen();closeBox('#modal');openText(v);break;
+    case 'leave':recStop(false);stopListen();renderHome();show('home');break;
+    case 'listen':listen(undefined,'a');break;
+    case 'listenR':listen(undefined,'b');break;
+    case 'start':startRound();break;
+    case 'self':if(R&&R.entry){R.entry.self=+v;save();var sb2=document.querySelectorAll('.selfrow .btn');for(var si=0;si<sb2.length;si++){var on=(+sb2[si].dataset.v===+v);sb2[si].classList.toggle('on',on);sb2[si].classList.toggle('ghost',!on);}}break;
+    case 'takeSug':(R.sug||[]).forEach(function(k){R.marks[k]=true;R.all[k]=true;var ww=$('#rtext .w[data-i="'+k+'"]');if(ww)ww.classList.add('st');});break;
+    case 'stats':renderStats();show('stats');break;
+    case 'opa':opaStart('opa');break;
+    case 'solo':opaStart('solo');break;
+    case 'soloHear':soloHear();break;
+    case 'opaKid':opaStep('kid');break;
+    case 'opaNext':opaStep('next');break;
+    case 'opaBack':opaStep('back');break;
+    case 'stop':stopRound();break;
+    case 'shareRec':shareRec();break;
+    case 'whNoteOk':S.whNote='';save();renderHome();break;
+    case 'cancel':recStop(false);R.phase='read';renderCtl();break;
+    case 'again':R.phase='read';renderCtl();window.scrollTo(0,0);break;
+    case 'check':R.phase='check';renderCtl();try{$('#qcard').scrollIntoView({block:'start',behavior:'smooth'});}catch(er){}break;
+    case 'pick':var pq=v.split('-'),qi=+pq[0],oj=+pq[1];if(R.pick[qi]===null){R.pick[qi]=oj;R.qs[qi]=R.opts[qi][oj]===R.t.q[qi].a?1:0;renderCtl();}break;
+    case 'finish':finish();break;
+    case 'evoOk':closeBox('#modal');if(R&&R.afterEvo){var f=R.afterEvo;R.afterEvo=null;f();}break;
+    case 'col':S.col=v;save();renderSheet();if(!$('#v-home').hidden)renderHome();break;
+    case 'album':renderAlbum();break;
+    case 'card':var t=byId[v];openBox('#modal','<div class="card">'+cardHTML(t,true)+'<div class="cfbtns"><button class="btn ghost" data-a="closeModal">Schließen</button><button class="btn" data-a="nextread" data-v="'+t.id+'">Nochmal lesen</button></div></div>');break;
+    case 'closeModal':stopListen();closeBox('#modal');break;
+    case 'settings':renderSheet();break;
+    case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl'||k==='rec'||k==='nums'||k==='wh')val=(v==='true');S.set[k]=val;save();if(k==='wh'&&val)whPreload();renderSheet();readStyle();break;
+    case 'sheetOk':closeBox('#sheet');break;
+    case 'reset':renderReset();break;
+    case 'delRecs':recDelAll().then(function(){var b=$('#delRecsBtn');if(b)b.textContent='Aufnahmen gelöscht';});break;
+    case 'wj':wjStart();break;
+    case 'wjSay':if(W)sayWord(W.list[W.k]);break;
+    case 'wjClap':wjClap(+v);break;
+    case 'wjRead':wjRead();break;
+    case 'wjJudge':wjJudge(v==='1');break;
+    case 'backup':renderBackup();break;
+    case 'copyCode':var ta=$('#expCode');try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(function(){b.textContent='Kopiert';},function(){ta.select();document.execCommand('copy');b.textContent='Kopiert';});}else{ta.select();document.execCommand('copy');b.textContent='Kopiert';}}catch(er){ta.select();}break;
+    case 'saveFile':try{var bl=new Blob([JSON.stringify(S)],{type:'application/json'}),au=URL.createObjectURL(bl),an=document.createElement('a');an.href=au;an.download='readster-'+dkey(new Date())+'.json';document.body.appendChild(an);an.click();setTimeout(function(){URL.revokeObjectURL(au);an.remove();},2000);}catch(er){}break;
+    case 'loadCode':applyBackup($('#impCode').value);break;
+    case 'doReset':S=defaults();save();closeBox('#sheet');R=null;renderHome();show('home');break;
+  }
+});
+document.addEventListener('input',function(e){if(e.target&&e.target.id==='nameIn'){S.name=e.target.value.trim().slice(0,16);save();if(!$('#v-home').hidden)renderHome();}});
+document.addEventListener('change',function(e){
+  if(e.target&&e.target.id==='impFile'&&e.target.files&&e.target.files[0]){var fr=new FileReader();fr.onload=function(){applyBackup(fr.result);};fr.readAsText(e.target.files[0]);}
+});
+if(window.speechSynthesis){try{window.speechSynthesis.onvoiceschanged=function(){};}catch(e){}}
+whCrashCheck();
+renderHome();show('home');
+})();
+</script>
+</body>
+</html>

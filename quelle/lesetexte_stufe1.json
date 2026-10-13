@@ -1,0 +1,810 @@
+{
+  "version": 2,
+  "stufe": 1,
+  "hinweis": "Faktencheck vom 13.10.2026: alle Kernfakten in 'pruefen' kontrolliert (fakten_geprueft = true), Änderungen siehe faktencheck_stufe1.md. Der letzte Satz jedes Textes ist die Folgefrage; 'folge_id' verweist auf den Text mit der Antwort. | Version 2: Enden umgebaut (Brücke, Hinweis, Frage); Feld \"raetsel\" = Hinweis und Frage. | 13.10.2026: Alle Texte flüssiger formuliert (kurze Sätze mit und/aber/denn verbunden, keine Satzfetzen), Fakten und Zahlen unverändert; Gecko mit Luftballon-Vergleich.",
+  "kategorien": [
+    "Tiere",
+    "Weltall",
+    "Technik",
+    "Körper",
+    "Sport",
+    "Rätsel"
+  ],
+  "texte": [
+    {
+      "id": "tier-01",
+      "kategorie": "Tiere",
+      "stufe": 1,
+      "titel": "Warum fällt ein Gecko nicht von der Decke?",
+      "text": "Ein Gecko läuft an der Wand und sogar kopfüber an der Decke. Wie geht das? Hat er etwa Kleber an den Füßen? Nein, seine Zehen sind voller winziger Härchen, und zwar Millionen davon. Kennst du den Trick mit dem Luftballon? Wenn du ihn an deinen Haaren reibst, bleibt er an der Wand kleben. So ähnlich ist es beim Gecko. Seine Härchen kommen ganz dicht an die Wand und halten dort fest, ganz ohne Kleber. Ein Härchen allein hält fast nichts, aber alle zusammen tragen den ganzen Gecko. Wenn er loslassen will, rollt er die Zehen einfach ab. Die Natur hat noch mehr Tricks: Ein Tier kann seine Farbe wechseln und seine Augen einzeln drehen. Wie heißt es?",
+      "fragen": [
+        {
+          "frage": "Hat der Gecko Kleber an den Füßen?",
+          "antwort": "Nein, seine Zehen haben winzige Härchen.",
+          "falsch": [
+            "Ja, er hat klebrigen Schleim an den Füßen.",
+            "Ja, seine Füße saugen sich fest."
+          ]
+        },
+        {
+          "frage": "Was macht der Gecko, wenn er loslassen will?",
+          "antwort": "Er rollt die Zehen ab.",
+          "falsch": [
+            "Er springt einfach ab.",
+            "Er wartet, bis der Kleber trocknet."
+          ]
+        }
+      ],
+      "folge_id": "tier-02",
+      "pruefen": [
+        "Millionen Härchen pro Fuß",
+        "Haftung durch winzige elektrische Anziehung zwischen kleinsten Teilchen (Van-der-Waals-Kräfte); Luftballon (statische Aufladung) nur als ähnliches Bild",
+        "Neu im Rätsel: Chamäleon: Augen unabhängig beweglich"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Die Natur hat noch mehr Tricks: Ein Tier kann seine Farbe wechseln und seine Augen einzeln drehen. Wie heißt es?"
+    },
+    {
+      "id": "tier-02",
+      "kategorie": "Tiere",
+      "stufe": 1,
+      "titel": "Warum wechselt das Chamäleon die Farbe?",
+      "text": "Ein Chamäleon sitzt auf einem Ast. Plötzlich wird es grün, dann gelb und dann fast rot. Viele denken, dass es sich damit versteckt. Das stimmt aber nur ein bisschen, denn meistens zeigt es mit der Farbe seine Laune. Wenn es aufgeregt ist, leuchtet es gelb und rot. Wenn es ruhig ist, bleibt es eher grün. In seiner Haut stecken winzige Kristalle, die das Licht mal so und mal so zurückwerfen. Darum sieht die Haut immer wieder anders aus. Ein Tier im Meer hat acht Arme und blaues Blut. Wie viele Herzen hat es?",
+      "fragen": [
+        {
+          "frage": "Wozu wechselt das Chamäleon meistens die Farbe?",
+          "antwort": "Um seine Laune zu zeigen.",
+          "falsch": [
+            "Um sich vor Feinden zu verstecken.",
+            "Um Insekten anzulocken."
+          ]
+        },
+        {
+          "frage": "Was steckt in der Haut des Chamäleons?",
+          "antwort": "Winzige Kristalle.",
+          "falsch": [
+            "Winzige Härchen.",
+            "Bunte Farbtropfen."
+          ]
+        }
+      ],
+      "folge_id": "tier-03",
+      "pruefen": [
+        "Farbwechsel vor allem für Verständigung (nicht nur Tarnung)",
+        "Kristalle in der Haut"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Ein Tier im Meer hat acht Arme und blaues Blut. Wie viele Herzen hat es?"
+    },
+    {
+      "id": "tier-03",
+      "kategorie": "Tiere",
+      "stufe": 1,
+      "titel": "Welches Tier hat drei Herzen?",
+      "text": "Der Krake hat drei Herzen! Zwei davon pumpen das Blut zu den Kiemen, und das dritte pumpt es durch den Körper. Sein Blut ist auch nicht rot, sondern blau. Außerdem hat der Krake acht Arme, aber keine Knochen. Darum passt er sogar durch ganz enge Spalten. Und er ist ziemlich schlau: In einem Aquarium hat ein Krake schon einmal ein Glas geöffnet. Ein anderes Tier lebt im Meer, atmet aber Luft und springt gern aus dem Wasser. Nachts ruht nur sein halbes Gehirn. Wer ist das?",
+      "fragen": [
+        {
+          "frage": "Wie viele Herzen hat der Krake?",
+          "antwort": "Drei.",
+          "falsch": [
+            "Eins.",
+            "Acht."
+          ]
+        },
+        {
+          "frage": "Welche Farbe hat das Blut vom Kraken?",
+          "antwort": "Blau.",
+          "falsch": [
+            "Rot.",
+            "Grün."
+          ]
+        }
+      ],
+      "folge_id": "tier-04",
+      "pruefen": [
+        "Drei Herzen, blaues Blut, acht Arme",
+        "Krake öffnet Glas im Aquarium (Randfakt, ggf. streichen)",
+        "Neu im Rätsel: Delfin: Säugetier, atmet Luft, springt aus dem Wasser"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Ein anderes Tier lebt im Meer, atmet aber Luft und springt gern aus dem Wasser. Nachts ruht nur sein halbes Gehirn. Wer ist das?"
+    },
+    {
+      "id": "tier-04",
+      "kategorie": "Tiere",
+      "stufe": 1,
+      "titel": "Wer schläft mit halbem Gehirn?",
+      "text": "Der Delfin schläft mit halbem Gehirn! Er ist ein Säugetier und atmet Luft, so wie du. Darum muss er immer wieder zum Atmen auftauchen. Würde er tief schlafen, könnte er ertrinken. Deshalb ruht immer nur eine Hälfte von seinem Gehirn, und die andere bleibt wach. Meist bleibt dabei auch ein Auge offen. Danach wechseln die Hälften. So ruht sich der Delfin aus und bleibt trotzdem sicher. Ein anderes Tier schläft den ganzen Winter lang. Es rollt sich im Laub zusammen und hat Stacheln. Wer ist das?",
+      "fragen": [
+        {
+          "frage": "Warum schläft der Delfin nur mit halbem Gehirn?",
+          "antwort": "Er muss zum Atmen auftauchen und könnte sonst ertrinken.",
+          "falsch": [
+            "Er hat nur ein halbes Gehirn.",
+            "Er muss die ganze Zeit fressen."
+          ]
+        },
+        {
+          "frage": "Was bleibt beim schlafenden Delfin oft offen?",
+          "antwort": "Ein Auge.",
+          "falsch": [
+            "Das Maul.",
+            "Beide Ohren."
+          ]
+        }
+      ],
+      "folge_id": "tier-05",
+      "pruefen": [
+        "Halbseitiger Schlaf bei Delfinen, ein Auge offen",
+        "Neu im Rätsel: Igel: Winterschlaf, Stacheln, Laub"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Ein anderes Tier schläft den ganzen Winter lang. Es rollt sich im Laub zusammen und hat Stacheln. Wer ist das?"
+    },
+    {
+      "id": "tier-05",
+      "kategorie": "Tiere",
+      "stufe": 1,
+      "titel": "Wie schläft ein Igel im Winter?",
+      "text": "Im Winter gibt es kaum Futter, darum macht der Igel Winterschlaf. Er rollt sich in einem Laubhaufen ein, und sein Körper wird kalt. Sein Herz schlägt dann nur noch etwa fünf Mal pro Minute, sonst sind es rund 200 Schläge! So spart er Kraft, bis der Frühling kommt. Wenn er zu früh aufwacht, verbraucht er viel Energie. Darum soll man schlafende Igel nicht stören. Und jetzt das Gegenteil: Ein Tier mit Flecken und langen Beinen ist an Land am schnellsten. Wie heißt es?",
+      "fragen": [
+        {
+          "frage": "Warum macht der Igel Winterschlaf?",
+          "antwort": "Im Winter gibt es kaum Futter.",
+          "falsch": [
+            "Im Winter ist es ihm zu hell.",
+            "Er muss im Winter wachsen."
+          ]
+        },
+        {
+          "frage": "Warum soll man schlafende Igel nicht stören?",
+          "antwort": "Wacht er zu früh auf, verbraucht er viel Energie.",
+          "falsch": [
+            "Er wird sonst wütend und beißt.",
+            "Er schläft dann nie wieder ein."
+          ]
+        }
+      ],
+      "folge_id": "tier-06",
+      "pruefen": [
+        "Herzschlag im Winterschlaf etwa 20 pro Minute, sonst weit über 100",
+        "Neu im Rätsel: Gepard: Flecken, lange Beine, schnellstes Landtier"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Und jetzt das Gegenteil: Ein Tier mit Flecken und langen Beinen ist an Land am schnellsten. Wie heißt es?"
+    },
+    {
+      "id": "tier-06",
+      "kategorie": "Tiere",
+      "stufe": 1,
+      "titel": "Welches Landtier ist am schnellsten?",
+      "text": "Der Gepard ist das schnellste Landtier. Er rennt etwa 100 Kilometer pro Stunde, so schnell wie ein Auto auf der Landstraße. Das schafft er aber nur kurz, denn nach wenigen hundert Metern ist er erschöpft. Dann muss er sich erst einmal ausruhen. Trotzdem ist er an Land unschlagbar. Seine Beine sind lang und sein Körper ist schlank. Mit dem Schwanz hält er beim Rennen das Gleichgewicht. Nur ein Tier ist noch viel schneller. Es fliegt, hat scharfe Augen und fällt im Sturzflug wie ein Pfeil. Wie heißt es?",
+      "fragen": [
+        {
+          "frage": "Wie schnell rennt der Gepard?",
+          "antwort": "Etwa 100 Kilometer pro Stunde.",
+          "falsch": [
+            "Etwa 30 Kilometer pro Stunde.",
+            "Etwa 300 Kilometer pro Stunde."
+          ]
+        },
+        {
+          "frage": "Wie lange kann der Gepard so schnell rennen?",
+          "antwort": "Nur kurz, nach wenigen hundert Metern ist er erschöpft.",
+          "falsch": [
+            "Mehrere Stunden am Stück.",
+            "Einen ganzen Tag lang."
+          ]
+        }
+      ],
+      "folge_id": "tier-07",
+      "pruefen": [
+        "Höchsttempo etwa 100 km/h",
+        "Erschöpfung nach wenigen hundert Metern",
+        "Neu im Rätsel: Falke: scharfe Augen, Sturzflug wie ein Pfeil"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Nur ein Tier ist noch viel schneller. Es fliegt, hat scharfe Augen und fällt im Sturzflug wie ein Pfeil. Wie heißt es?"
+    },
+    {
+      "id": "tier-07",
+      "kategorie": "Tiere",
+      "stufe": 1,
+      "titel": "Wer ist das schnellste Tier der Welt?",
+      "text": "Der Wanderfalke ist das schnellste Tier der Welt. Er jagt andere Vögel in der Luft und sieht seine Beute schon von weit weg. Dann legt er die Flügel an und stürzt wie ein Pfeil nach unten. Im Sturzflug schafft er mehr als 300 Kilometer pro Stunde, der Gepard dagegen nur etwa 100. So trifft der Falke seine Beute mitten im Flug. Das größte Tier der Welt lebt aber im Meer. Es ist länger als zwei Busse und frisst winzige Krebse. Wie heißt es?",
+      "fragen": [
+        {
+          "frage": "Wie jagt der Wanderfalke?",
+          "antwort": "Er stürzt mit angelegten Flügeln nach unten.",
+          "falsch": [
+            "Er läuft schnell am Boden hinterher.",
+            "Er wartet still im Wasser."
+          ]
+        },
+        {
+          "frage": "Wie schnell ist er im Sturzflug?",
+          "antwort": "Mehr als 300 Kilometer pro Stunde.",
+          "falsch": [
+            "Etwa 50 Kilometer pro Stunde.",
+            "Genau 100 Kilometer pro Stunde."
+          ]
+        }
+      ],
+      "folge_id": "tier-08",
+      "pruefen": [
+        "Mehr als 300 km/h im Sturzflug",
+        "Neu im Rätsel: Blauwal: länger als zwei Busse, frisst Krill"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Das größte Tier der Welt lebt aber im Meer. Es ist länger als zwei Busse und frisst winzige Krebse. Wie heißt es?"
+    },
+    {
+      "id": "tier-08",
+      "kategorie": "Tiere",
+      "stufe": 1,
+      "titel": "Welches Tier ist das größte der Welt?",
+      "text": "Der Blauwal ist das größte Tier der Welt. Er wird bis zu 30 Meter lang, das sind mehr als zwei Busse hintereinander. Trotzdem frisst er nur winzige Krebse, die Krill heißen. Davon verschlingt er jeden Tag mehrere Tonnen. Dazu nimmt er einen riesigen Schluck Wasser und presst ihn durch seine Barten wieder hinaus. Barten sind wie ein Sieb, in dem der Krill hängen bleibt. Der Blauwal ist riesig, doch im Weltall gibt es etwas viel Größeres. Es leuchtet hell und ist heiß, und du siehst es jeden Tag. Was ist das?",
+      "fragen": [
+        {
+          "frage": "Wovon ernährt sich der Blauwal?",
+          "antwort": "Von winzigen Krebsen, dem Krill.",
+          "falsch": [
+            "Von großen Fischen und Robben.",
+            "Von Algen und Seegras."
+          ]
+        },
+        {
+          "frage": "Was sind Barten?",
+          "antwort": "Eine Art Sieb im Maul, in dem der Krill hängen bleibt.",
+          "falsch": [
+            "Seine Zähne zum Kauen.",
+            "Die Flossen am Bauch."
+          ]
+        }
+      ],
+      "folge_id": "weltall-01",
+      "pruefen": [
+        "Bis zu 30 m lang",
+        "Mehrere Tonnen Krill pro Tag",
+        "Neu im Rätsel: Sonne: heiß, leuchtet, täglich sichtbar"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Der Blauwal ist riesig, doch im Weltall gibt es etwas viel Größeres. Es leuchtet hell und ist heiß, und du siehst es jeden Tag. Was ist das?"
+    },
+    {
+      "id": "weltall-01",
+      "kategorie": "Weltall",
+      "stufe": 1,
+      "titel": "Wie groß ist die Sonne?",
+      "text": "Die Sonne ist eine riesige Kugel aus glühend heißem Gas. Sie ist so groß, dass über eine Million Erden hineinpassen. Sie ist etwa 150 Millionen Kilometer von uns entfernt. Ihr Licht braucht gut acht Minuten bis zu uns. In ihrer Mitte ist es mehr als 15 Millionen Grad heiß. Ohne die Sonne gäbe es kein Leben auf der Erde. Die Sonne ist ein Stern, und nachts siehst du viele andere Sterne. Das hellste Licht am Nachthimmel ist aber gar kein Stern. Wie heißt es?",
+      "fragen": [
+        {
+          "frage": "Wie viele Erden passen in die Sonne?",
+          "antwort": "Über eine Million.",
+          "falsch": [
+            "Ungefähr zehn.",
+            "Genau tausend."
+          ]
+        },
+        {
+          "frage": "Wie lange braucht das Sonnenlicht bis zu uns?",
+          "antwort": "Gut acht Minuten.",
+          "falsch": [
+            "Ein ganzes Jahr.",
+            "Eine Sekunde."
+          ]
+        }
+      ],
+      "folge_id": "weltall-02",
+      "pruefen": [
+        "Über eine Million Erden",
+        "150 Mio. km Entfernung",
+        "Gut 8 Minuten Lichtlaufzeit",
+        "Mehr als 15 Mio. Grad im Kern",
+        "Neu im Rätsel: Mond ist das hellste Objekt am Nachthimmel"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Die Sonne ist ein Stern, und nachts siehst du viele andere Sterne. Das hellste Licht am Nachthimmel ist aber gar kein Stern. Wie heißt es?"
+    },
+    {
+      "id": "weltall-02",
+      "kategorie": "Weltall",
+      "stufe": 1,
+      "titel": "Wie weit ist der Mond entfernt?",
+      "text": "Der Mond ist etwa 384.000 Kilometer von der Erde entfernt. Mit dem Auto auf der Landstraße bräuchtest du ungefähr 160 Tage bis dorthin, und zwar ohne Pause! Der Mond leuchtet nicht selbst, sondern wirft nur das Licht der Sonne zurück. Dort gibt es keine Luft zum Atmen, darum braucht man einen Raumanzug. Zwölf Menschen sind bisher auf dem Mond gelaufen. Ihre Fußspuren sind immer noch da, denn dort weht kein Wind, der sie verwischen könnte. Und jetzt zu einem Planeten mit berühmten Ringen, der keinen festen Boden hat. Wie heißt er?",
+      "fragen": [
+        {
+          "frage": "Leuchtet der Mond selbst?",
+          "antwort": "Nein, er wirft nur das Licht der Sonne zurück.",
+          "falsch": [
+            "Ja, er hat ein eigenes Feuer.",
+            "Ja, nur in der Nacht."
+          ]
+        },
+        {
+          "frage": "Warum sind die Fußspuren noch da?",
+          "antwort": "Dort weht kein Wind.",
+          "falsch": [
+            "Die Astronauten haben sie nachgemalt.",
+            "Der Boden ist dort aus Beton."
+          ]
+        }
+      ],
+      "folge_id": "weltall-03",
+      "pruefen": [
+        "384.000 km",
+        "160 Tage bei 100 km/h",
+        "Zwölf Menschen auf dem Mond",
+        "Neu im Rätsel: Saturn: keine feste Oberfläche"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Und jetzt zu einem Planeten mit berühmten Ringen, der keinen festen Boden hat. Wie heißt er?"
+    },
+    {
+      "id": "weltall-03",
+      "kategorie": "Weltall",
+      "stufe": 1,
+      "titel": "Welcher Planet hat Ringe?",
+      "text": "Saturn ist der Planet mit den berühmten Ringen. Sie sehen aus wie eine riesige Scheibe, aber in Wahrheit bestehen sie aus Milliarden Eisbrocken. Manche sind klein wie Sand, andere sind groß wie ein Haus. Saturn ist ein Gasplanet und hat keinen festen Boden zum Landen. Er ist sogar leichter als Wasser. Wenn es ein riesiges Becken gäbe, würde er darin schwimmen. Aber wie kommt man überhaupt ins Weltall? Dazu braucht man ein Fahrzeug, das Feuer speit und mit lautem Donner startet. Wie heißt es?",
+      "fragen": [
+        {
+          "frage": "Woraus bestehen die Ringe vom Saturn?",
+          "antwort": "Aus Milliarden Eisbrocken.",
+          "falsch": [
+            "Aus Sand und Steinen.",
+            "Aus heißem Gas."
+          ]
+        },
+        {
+          "frage": "Kann man auf Saturn landen?",
+          "antwort": "Nein, er hat keinen festen Boden.",
+          "falsch": [
+            "Ja, auf seinen Ringen.",
+            "Ja, der Boden ist aus Eis."
+          ]
+        }
+      ],
+      "folge_id": "technik-01",
+      "pruefen": [
+        "Ringe überwiegend aus Eis",
+        "Saturn würde auf Wasser schwimmen (geringe Dichte)",
+        "Neu im Rätsel: Rakete: Start mit Feuer und Lärm"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Aber wie kommt man überhaupt ins Weltall? Dazu braucht man ein Fahrzeug, das Feuer speit und mit lautem Donner startet. Wie heißt es?"
+    },
+    {
+      "id": "technik-01",
+      "kategorie": "Technik",
+      "stufe": 1,
+      "titel": "Wie kommt man ins Weltall?",
+      "text": "Eine Rakete muss sehr schnell sein, um im Weltall zu bleiben, nämlich etwa 28.000 Kilometer pro Stunde! Dafür verbrennt sie riesige Mengen Treibstoff. Die heißen Gase schießen nach unten aus der Düse, und dadurch wird die Rakete nach oben gedrückt. Das nennt man Rückstoß. Du kennst ihn von einem Luftballon, denn wenn du ihn loslässt, flitzt er davon. Eine Rakete funktioniert genauso, nur viel größer. Und wer hat das Flugzeug erfunden? Es waren zwei Brüder aus Amerika, die vorher Fahrräder bauten. Wie hießen sie?",
+      "fragen": [
+        {
+          "frage": "Wie nennt man den Schub, der die Rakete nach oben drückt?",
+          "antwort": "Rückstoß.",
+          "falsch": [
+            "Anziehung.",
+            "Gegenwind."
+          ]
+        },
+        {
+          "frage": "Mit welchem Spielzeug kann man das vergleichen?",
+          "antwort": "Mit einem Luftballon, den man loslässt.",
+          "falsch": [
+            "Mit einem Kreisel, der sich dreht.",
+            "Mit einem Ball, der hüpft."
+          ]
+        }
+      ],
+      "folge_id": "technik-02",
+      "pruefen": [
+        "Etwa 28.000 km/h für eine Umlaufbahn",
+        "Neu im Rätsel: Brüder aus Amerika (Wright)"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Und wer hat das Flugzeug erfunden? Es waren zwei Brüder aus Amerika, die vorher Fahrräder bauten. Wie hießen sie?"
+    },
+    {
+      "id": "technik-02",
+      "kategorie": "Technik",
+      "stufe": 1,
+      "titel": "Wer hat das Flugzeug erfunden?",
+      "text": "Den ersten Flug mit Motor schafften die Brüder Wilbur und Orville Wright. Das war im Jahr 1903 in Amerika. Ihr erster Flug dauerte nur zwölf Sekunden und war etwa 37 Meter weit. Das ist kürzer, als ein Jumbo-Jet lang ist! Vorher bauten die Brüder Fahrräder und tüftelten mehrere Jahre lang. Sie bauten sogar einen eigenen Windkanal, um ihre Flügel zu testen. Heute fliegen Flugzeuge viele Stunden ohne Pause. Aber wie finden Piloten und Seeleute ihren Weg? Sie nutzen ein Gerät mit einer Nadel. Wie heißt es?",
+      "fragen": [
+        {
+          "frage": "Wie lange dauerte der erste Flug?",
+          "antwort": "Zwölf Sekunden.",
+          "falsch": [
+            "Zwölf Minuten.",
+            "Zwei Stunden."
+          ]
+        },
+        {
+          "frage": "Was bauten die Brüder, um Flügel zu testen?",
+          "antwort": "Einen Windkanal.",
+          "falsch": [
+            "Ein Schwimmbad.",
+            "Einen Turm."
+          ]
+        }
+      ],
+      "folge_id": "technik-03",
+      "pruefen": [
+        "1903, 12 Sekunden, etwa 37 m",
+        "Jumbo-Jet ist länger als 37 m (rund 70 m)",
+        "Eigener Windkanal",
+        "Neu im Rätsel: Wright-Brüder betrieben Fahrradwerkstatt/-bau"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Aber wie finden Piloten und Seeleute ihren Weg? Sie nutzen ein Gerät mit einer Nadel. Wie heißt es?"
+    },
+    {
+      "id": "technik-03",
+      "kategorie": "Technik",
+      "stufe": 1,
+      "titel": "Wie funktioniert ein Kompass?",
+      "text": "Eine Kompassnadel zeigt immer nach Norden. Aber wie macht sie das? Die Nadel ist ein kleiner Magnet, und die Erde ist selbst wie ein riesiger Magnet. In ihrem Inneren fließt nämlich flüssiges Metall, und dadurch entsteht ein Magnetfeld. Danach richtet sich die Nadel aus. Schon vor langer Zeit nutzten Seeleute so etwas, damit sie auch bei Nebel ihren Weg fanden. Auch manche Zugvögel können das Magnetfeld spüren. Und jetzt zu dir: In deiner Brust arbeitet Tag und Nacht ein Muskel, den du nicht anhalten kannst. Wie heißt er?",
+      "fragen": [
+        {
+          "frage": "Wohin zeigt die Kompassnadel?",
+          "antwort": "Nach Norden.",
+          "falsch": [
+            "Nach Süden.",
+            "Immer zur Sonne."
+          ]
+        },
+        {
+          "frage": "Wie ist die Erde in diesem Text beschrieben?",
+          "antwort": "Wie ein riesiger Magnet.",
+          "falsch": [
+            "Wie ein riesiger Ball aus Eis.",
+            "Wie ein großes Uhrwerk."
+          ]
+        }
+      ],
+      "folge_id": "koerper-01",
+      "pruefen": [
+        "Flüssiges Metall im Erdinneren erzeugt das Magnetfeld",
+        "Zugvögel nutzen das Magnetfeld",
+        "Neu im Rätsel: Herz ist ein Muskel, schlägt dauerhaft"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Und jetzt zu dir: In deiner Brust arbeitet Tag und Nacht ein Muskel, den du nicht anhalten kannst. Wie heißt er?"
+    },
+    {
+      "id": "koerper-01",
+      "kategorie": "Körper",
+      "stufe": 1,
+      "titel": "Was macht dein Herz den ganzen Tag?",
+      "text": "Dein Herz ist ungefähr so groß wie deine Faust, und es schlägt ohne Pause, Tag und Nacht. Wenn du ruhst, sind es etwa 80 Schläge pro Minute. Das sind mehr als 100.000 Schläge an jedem Tag! Dabei pumpt das Herz das Blut durch deinen ganzen Körper. Wenn du rennst, schlägt es schneller. Du kannst es spüren, wenn du die Hand auf die Brust oder an den Hals legst. Versuch es mal! Bei Kälte oder Angst stehen dir manchmal plötzlich die Haare zu Berge. Wie nennt man das?",
+      "fragen": [
+        {
+          "frage": "Wie groß ist dein Herz ungefähr?",
+          "antwort": "So groß wie deine Faust.",
+          "falsch": [
+            "So groß wie dein Kopf.",
+            "So groß wie eine Erbse."
+          ]
+        },
+        {
+          "frage": "Was passiert mit dem Herzschlag, wenn du rennst?",
+          "antwort": "Er wird schneller.",
+          "falsch": [
+            "Er wird langsamer.",
+            "Er hört kurz auf."
+          ]
+        }
+      ],
+      "folge_id": "koerper-02",
+      "pruefen": [
+        "Ruhepuls bei Kindern etwa 70 bis 100",
+        "Mehr als 100.000 Schläge pro Tag",
+        "Neu im Rätsel: Gänsehaut bei Kälte oder Angst"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Bei Kälte oder Angst stehen dir manchmal plötzlich die Haare zu Berge. Wie nennt man das?"
+    },
+    {
+      "id": "koerper-02",
+      "kategorie": "Körper",
+      "stufe": 1,
+      "titel": "Warum bekommst du Gänsehaut?",
+      "text": "Wenn dir kalt ist, bekommst du Gänsehaut. Das kann auch bei Angst oder bei einem schönen Lied passieren. Fast jedes Haar auf deiner Haut hat einen winzigen Muskel. Der zieht sich zusammen und stellt das Haar auf, und so entstehen die kleinen Hügel. Früher hatten Menschen viel mehr Körperhaare. Aufgestellte Haare hielten sie warm oder ließen sie größer wirken. Heute hilft uns das kaum noch, aber der Körper macht es trotzdem. Etwas in dir ist hart, hält dich aufrecht und schützt dein Gehirn. Was ist das?",
+      "fragen": [
+        {
+          "frage": "Wann bekommst du Gänsehaut?",
+          "antwort": "Zum Beispiel bei Kälte, Angst oder einem schönen Lied.",
+          "falsch": [
+            "Nur, wenn du krank bist.",
+            "Nur beim Schlafen."
+          ]
+        },
+        {
+          "frage": "Was stellt die Haare auf?",
+          "antwort": "Ein winziger Muskel am Haar.",
+          "falsch": [
+            "Der Wind von draußen.",
+            "Ein Knochen unter der Haut."
+          ]
+        }
+      ],
+      "folge_id": "koerper-03",
+      "pruefen": [
+        "Haarmuskel (Haaraufrichter), Erklärung zur Herkunft",
+        "Neu im Rätsel: Knochen: stützen den Körper, über 200"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Etwas in dir ist hart, hält dich aufrecht und schützt dein Gehirn. Was ist das?"
+    },
+    {
+      "id": "koerper-03",
+      "kategorie": "Körper",
+      "stufe": 1,
+      "titel": "Wie viele Knochen hat ein Mensch?",
+      "text": "Ein Erwachsener hat 206 Knochen. Als Baby hattest du sogar noch mehr, nämlich etwa 300. Viele davon wachsen mit der Zeit zusammen. Die meisten Knochen stecken in deinen Händen und Füßen. Der kleinste Knochen sitzt im Ohr und ist nur so groß wie ein Reiskorn. Der größte ist der Oberschenkelknochen. Knochen sind übrigens lebendig, denn sie wachsen und heilen, wenn sie brechen. Das dauert oft einige Wochen. Aber wie schnell kann ein Mensch rennen? Ein Mann aus Jamaika ist schneller gelaufen als jeder andere. Wie heißt er?",
+      "fragen": [
+        {
+          "frage": "Wie viele Knochen hat ein Erwachsener?",
+          "antwort": "206.",
+          "falsch": [
+            "Genau 100.",
+            "Über 1000."
+          ]
+        },
+        {
+          "frage": "Wo sitzt der kleinste Knochen?",
+          "antwort": "Im Ohr.",
+          "falsch": [
+            "Im kleinen Zeh.",
+            "In der Nase."
+          ]
+        }
+      ],
+      "folge_id": "sport-01",
+      "pruefen": [
+        "206 Knochen",
+        "Baby etwa 300 (Angaben schwanken)",
+        "Kleinster Knochen im Ohr, etwa reiskorngroß",
+        "Neu im Rätsel: Schädel schützt das Gehirn (Knochen)"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Aber wie schnell kann ein Mensch rennen? Ein Mann aus Jamaika ist schneller gelaufen als jeder andere. Wie heißt er?"
+    },
+    {
+      "id": "sport-01",
+      "kategorie": "Sport",
+      "stufe": 1,
+      "titel": "Wer ist der schnellste Mensch der Welt?",
+      "text": "Usain Bolt aus Jamaika ist der schnellste Mensch der Welt. Im Jahr 2009 lief er in Berlin 100 Meter in 9,58 Sekunden. Das ist bis heute Weltrekord. Seine Schritte sind sehr lang, deshalb brauchte er für die ganze Strecke nur etwa 41 Schritte. Dabei war er kurz mit mehr als 40 Kilometern pro Stunde unterwegs. Das ist fast so schnell wie ein Auto in der Stadt. Und jetzt zu einem Sport mit Ball und Korb. Der Korb hängt weit über deinem Kopf, aber wie hoch genau?",
+      "fragen": [
+        {
+          "frage": "Aus welchem Land kommt Usain Bolt?",
+          "antwort": "Aus Jamaika.",
+          "falsch": [
+            "Aus Amerika.",
+            "Aus Kenia."
+          ]
+        },
+        {
+          "frage": "Wie viele Meter lief er in 9,58 Sekunden?",
+          "antwort": "100 Meter.",
+          "falsch": [
+            "400 Meter.",
+            "1000 Meter."
+          ]
+        }
+      ],
+      "folge_id": "sport-02",
+      "pruefen": [
+        "9,58 s, Berlin 2009, Weltrekord weiterhin aktuell?",
+        "Etwa 41 Schritte",
+        "Spitzentempo über 40 km/h",
+        "Neu im Rätsel: Basketballkorb hängt 3,05 m hoch"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Und jetzt zu einem Sport mit Ball und Korb. Der Korb hängt weit über deinem Kopf, aber wie hoch genau?"
+    },
+    {
+      "id": "sport-02",
+      "kategorie": "Sport",
+      "stufe": 1,
+      "titel": "Wie hoch hängt ein Basketballkorb?",
+      "text": "Ein Basketballkorb hängt 3,05 Meter hoch, bei den Profis und bei allen Großen. Der Ring ist 45 Zentimeter breit und der Ball etwa 24 Zentimeter groß. Der Ball passt also mit etwas Platz hindurch, aber man braucht viel Gefühl beim Werfen. Manche Spieler springen so hoch, dass sie den Ball von oben in den Korb stopfen. Das nennt man Dunking. Und jetzt zu einem Spiel mit gelbem Ball und Schläger, das einmal drei Tage dauerte! Wie lange spielten die beiden insgesamt?",
+      "fragen": [
+        {
+          "frage": "Wie hoch hängt der Korb?",
+          "antwort": "3,05 Meter.",
+          "falsch": [
+            "2 Meter.",
+            "5 Meter."
+          ]
+        },
+        {
+          "frage": "Wie nennt man es, wenn man den Ball mit der Hand in den Korb stopft?",
+          "antwort": "Dunking.",
+          "falsch": [
+            "Freiwurf.",
+            "Rebound."
+          ]
+        }
+      ],
+      "folge_id": "sport-03",
+      "pruefen": [
+        "3,05 m",
+        "Ringdurchmesser etwa 45 cm",
+        "Ball etwa 24 cm",
+        "Neu im Rätsel: Tennisball ist gelb; Spiel über drei Tage"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Und jetzt zu einem Spiel mit gelbem Ball und Schläger, das einmal drei Tage dauerte! Wie lange spielten die beiden insgesamt?"
+    },
+    {
+      "id": "sport-03",
+      "kategorie": "Sport",
+      "stufe": 1,
+      "titel": "Welches Tennisspiel dauerte drei Tage?",
+      "text": "Im Jahr 2010 spielten John Isner und Nicolas Mahut in Wimbledon gegeneinander. Das Spiel dauerte mehr als elf Stunden und zog sich über drei Tage. Der letzte Satz ging 70 zu 68, dabei endet ein Satz normalerweise bei 6 oder 7. Sogar die Anzeigetafel gab irgendwann auf. Am Ende waren beide völlig erschöpft. Es ist das längste Tennisspiel aller Zeiten. Und jetzt zu einem echten Rätsel: Im Meer zwischen Florida und Bermuda sollen Schiffe und Flugzeuge einfach verschwinden. Wie heißt dieser Ort?",
+      "fragen": [
+        {
+          "frage": "Wie lange dauerte das Spiel?",
+          "antwort": "Mehr als elf Stunden, über drei Tage.",
+          "falsch": [
+            "Genau 90 Minuten.",
+            "Eine Stunde."
+          ]
+        },
+        {
+          "frage": "Wo fand das Spiel statt?",
+          "antwort": "In Wimbledon.",
+          "falsch": [
+            "In Paris.",
+            "In New York."
+          ]
+        }
+      ],
+      "folge_id": "raetsel-01",
+      "pruefen": [
+        "Wimbledon 2010, über 11 Stunden, drei Tage, 70:68",
+        "Anzeigetafel fiel aus",
+        "Noch immer das längste Spiel?",
+        "Neu im Rätsel: Bermuda-Dreieck zwischen Florida und Bermuda"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Und jetzt zu einem echten Rätsel: Im Meer zwischen Florida und Bermuda sollen Schiffe und Flugzeuge einfach verschwinden. Wie heißt dieser Ort?"
+    },
+    {
+      "id": "raetsel-01",
+      "kategorie": "Rätsel",
+      "stufe": 1,
+      "titel": "Was ist das Bermuda-Dreieck?",
+      "text": "Das Bermuda-Dreieck ist ein Gebiet im Atlantik, zwischen Florida, Bermuda und Puerto Rico. Dort sollen Schiffe und Flugzeuge einfach verschwinden, das erzählt man sich schon seit vielen Jahrzehnten. Doch Forscher haben nachgezählt. Dort verschwinden nicht mehr Schiffe als in anderen Meeren, in denen viel los ist. Oft sind Stürme schuld, und manche Geschichten wurden auch ausgeschmückt. Ein echtes Rätsel ist es also nicht. Aber in Schottland soll in einem See ein Monster mit einem langen Hals leben. Wie heißt es?",
+      "fragen": [
+        {
+          "frage": "Wo liegt das Bermuda-Dreieck?",
+          "antwort": "Im Atlantik.",
+          "falsch": [
+            "Im Pazifik.",
+            "In der Nordsee."
+          ]
+        },
+        {
+          "frage": "Was sagen Forscher zu den verschwundenen Schiffen?",
+          "antwort": "Dort verschwinden nicht mehr als anderswo.",
+          "falsch": [
+            "Dort wohnt ein Seeungeheuer.",
+            "Ein Magnet zieht sie nach unten."
+          ]
+        }
+      ],
+      "folge_id": "raetsel-02",
+      "pruefen": [
+        "Gebiet Florida, Bermuda, Puerto Rico",
+        "Keine auffällige Häufung laut Auswertungen",
+        "Neu im Rätsel: Nessie: See in Schottland, langer Hals"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Aber in Schottland soll in einem See ein Monster mit einem langen Hals leben. Wie heißt es?"
+    },
+    {
+      "id": "raetsel-02",
+      "kategorie": "Rätsel",
+      "stufe": 1,
+      "titel": "Gibt es Nessie wirklich?",
+      "text": "Im Loch Ness in Schottland soll ein Monster leben, das man Nessie nennt. Im Jahr 1933 gab es viele Berichte, denn Menschen wollten einen langen Hals im Wasser gesehen haben. Später suchten viele Leute mit Booten, Schallwellen und Kameras, aber gefunden haben sie nichts. Im Jahr 2018 untersuchten Forscher sogar Wasserproben auf Erbgut. Ein Monster fanden sie nicht, aber sehr viel Erbgut von Aalen. Vielleicht haben die Menschen also große Aale gesehen. In Ägypten stehen riesige Steinbauten mit einer Spitze. Damals gab es aber noch keine Kräne. Wie wurden sie gebaut?",
+      "fragen": [
+        {
+          "frage": "In welchem See soll Nessie leben?",
+          "antwort": "Im Loch Ness in Schottland.",
+          "falsch": [
+            "Im Bodensee in Deutschland.",
+            "Im Meer bei Norwegen."
+          ]
+        },
+        {
+          "frage": "Was fanden die Forscher in den Wasserproben?",
+          "antwort": "Viel Erbgut von Aalen, aber kein Monster.",
+          "falsch": [
+            "Knochen von einem Saurier.",
+            "Ein großes Nest."
+          ]
+        }
+      ],
+      "folge_id": "raetsel-03",
+      "pruefen": [
+        "Berichte ab 1933",
+        "Erbgut-Studie 2018: kein Hinweis auf Reptil, viel Aal",
+        "Neu im Rätsel: Nessie-Berichte: langer Hals"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "In Ägypten stehen riesige Steinbauten mit einer Spitze. Damals gab es aber noch keine Kräne. Wie wurden sie gebaut?"
+    },
+    {
+      "id": "raetsel-03",
+      "kategorie": "Rätsel",
+      "stufe": 1,
+      "titel": "Wie wurden die Pyramiden gebaut?",
+      "text": "Die große Pyramide von Gizeh in Ägypten ist rund 4500 Jahre alt. Sie besteht aus mehr als zwei Millionen Steinblöcken, und manche davon wiegen mehrere Tonnen. Wie haben die Menschen das ohne Kräne geschafft? Sie nutzten Rampen, Schlitten und viele Arbeiter. Man hat sogar die Stadt der Arbeiter gefunden, mit Bäckereien und Unterkünften. Nach heutigem Wissen waren es keine Sklaven. Ganz sicher weiß man aber trotzdem nicht alles. Von einer Insel erzählt man, sie sei im Meer versunken, aber vielleicht gab es sie nie. Wie heißt sie?",
+      "fragen": [
+        {
+          "frage": "Wie alt ist die große Pyramide ungefähr?",
+          "antwort": "Rund 4500 Jahre.",
+          "falsch": [
+            "Rund 100 Jahre.",
+            "Eine Million Jahre."
+          ]
+        },
+        {
+          "frage": "Was nutzten die Menschen statt Kränen?",
+          "antwort": "Rampen, Schlitten und viele Arbeiter.",
+          "falsch": [
+            "Riesige Maschinen.",
+            "Elefanten aus Afrika."
+          ]
+        }
+      ],
+      "folge_id": "raetsel-04",
+      "pruefen": [
+        "Cheops-Pyramide etwa 4500 Jahre alt",
+        "Mehr als 2 Mio. Blöcke",
+        "Arbeiterstadt gefunden, keine Sklaven nach heutigem Stand",
+        "Neu im Rätsel: Cheops-Pyramide: Pyramidenform mit Spitze; Rampen-Theorien"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Von einer Insel erzählt man, sie sei im Meer versunken, aber vielleicht gab es sie nie. Wie heißt sie?"
+    },
+    {
+      "id": "raetsel-04",
+      "kategorie": "Rätsel",
+      "stufe": 1,
+      "titel": "Was war Atlantis?",
+      "text": "Atlantis soll eine Insel gewesen sein, die im Meer versunken ist. Davon erzählte der Denker Platon vor mehr als 2300 Jahren. Er beschrieb eine mächtige Stadt mit Häfen und Tempeln. Dann sei sie an einem Tag und in einer Nacht untergegangen. Gefunden hat man sie nie. Die meisten Forscher glauben, dass Platon die Geschichte erfunden hat, um damit etwas zu erklären. Vielleicht erzählst du die Geschichte ja einmal selbst weiter. Und jetzt zurück zu den Tieren: Ein kleines Tier läuft kopfüber an der Decke und fällt nicht herunter. Wie macht es das?",
+      "fragen": [
+        {
+          "frage": "Wer hat die Geschichte von Atlantis erzählt?",
+          "antwort": "Der Denker Platon.",
+          "falsch": [
+            "Ein Seemann aus Spanien.",
+            "Ein Forscher von heute."
+          ]
+        },
+        {
+          "frage": "Was glauben die meisten Forscher über Atlantis?",
+          "antwort": "Dass die Geschichte erfunden ist.",
+          "falsch": [
+            "Dass Atlantis unter dem Eis liegt.",
+            "Dass man es bald findet."
+          ]
+        }
+      ],
+      "folge_id": "tier-01",
+      "pruefen": [
+        "Platon vor etwa 2300+ Jahren",
+        "Mehrheitsmeinung: erfundene Erzählung",
+        "Neu im Rätsel: Gecko: kopfüber an Decke"
+      ],
+      "fakten_geprueft": true,
+      "raetsel": "Vielleicht erzählst du die Geschichte ja einmal selbst weiter. Und jetzt zurück zu den Tieren: Ein kleines Tier läuft kopfüber an der Decke und fällt nicht herunter. Wie macht es das?"
+    }
+  ]
+}

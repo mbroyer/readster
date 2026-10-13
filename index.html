@@ -763,6 +763,7 @@ var AC=null,AURL={},SLOW=0.8;
 function getAC(){if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(C){try{AC=new C();}catch(e){AC=null;}}}return AC;}
 function audioURL(id,sp,pa){
   var k=id+sp+pa;if(AURL[k])return AURL[k];
+  var v=AUDIO[id][sp][pa];if(/\.mp3(\?|$)/.test(v))return (AURL[k]=v); /* GitHub-Seite: eigene MP3-Datei */
   var bin=atob(AUDIO[id][sp][pa]),n=bin.length,u=new Uint8Array(n);for(var i=0;i<n;i++)u[i]=bin.charCodeAt(i);
   AURL[k]=URL.createObjectURL(new Blob([u],{type:'audio/mpeg'}));return AURL[k];
 }
@@ -793,11 +794,12 @@ function playPart(id,pk,from,to,onIdx,onFail){
   try{el=new Audio(audioURL(id,pa.sp,pk));}catch(e){onFail();return;}
   el.preload='auto';el.playbackRate=pa.rate;el.defaultPlaybackRate=pa.rate;
   try{el.preservesPitch=true;el.webkitPreservesPitch=true;el.mozPreservesPitch=true;}catch(e){}
-  if(li>0&&tl[li])el.currentTime=Math.max(0,tl[li][0]/1000-0.05);
+  if(li>0&&tl[li]){var seek=function(){try{el.currentTime=Math.max(0,tl[li][0]/1000-0.05);}catch(e){}};seek();el.addEventListener('loadedmetadata',seek,{once:true});}
   tts.el=el;tts.on=true;tts.paused=false;tts.part=pk;tts.ac=null;setBtn();
   el.onended=function(){if(tok!==tts.tok)return;stopListen();onIdx(-1);};
+  el.onerror=function(){if(tok!==tts.tok||el.currentTime>0)return;stopListen();onFail();}; /* Datei fehlt oder kein Netz: Gerätestimme */
   var p=el.play();
-  if(p&&p.catch)p.catch(function(){if(tok!==tts.tok)return;tts.el=null;tts.on=false;onFail();});
+  if(p&&p.catch)p.catch(function(){if(tok!==tts.tok)return;stopListen();onFail();});
   (function tick(){
     if(tok!==tts.tok)return;
     var ms=el.currentTime*1000,i=-1;
