@@ -19,14 +19,14 @@ Optionen:
     --voice ID               andere Stimme (Standard: Matilda)
     --speed-n 0.95           Tempo "Normal"  (ElevenLabs erlaubt 0.7 bis 1.2)
     --speed-s 0.78           Tempo "Langsam"
-    --model eleven_multilingual_v2
+    --model eleven_multilingual_v2   schönere Stimme, kostet doppelt so viel wie der Standard eleven_flash_v2_5
 
 Ergebnis im Ordner "aufnahmen": pro Text und Tempo eine MP3 und eine JSON-Datei
 mit den Wort-Zeiten in Millisekunden (z. B. tier-01-n-a.mp3 fuer die Geschichte und tier-01-n-b.mp3 fuer das Raetsel, dazu je eine .json).
 
 Den Schluessel nie in den Chat schreiben.
 Alte Aufnahmen von Texten, die es nicht mehr gibt, werden entfernt.
-Kosten: etwa 12.500 Zeichen pro Tempo fuer alle 24 Texte; danach nur noch die geaenderten.
+Kosten fuer alle 24 Texte: etwa 6.300 Credits mit Flash v2.5, etwa 12.500 mit Multilingual v2; danach nur noch die geaenderten.
 """
 import argparse, base64, hashlib, json, os, re, sys, time, urllib.request, urllib.error
 
@@ -85,12 +85,18 @@ def wortzeiten(spans, zeichen, starts, ends):
         erg.append([round(s * 1000), round(e * 1000)])
     return erg
 
+class GuthabenLeer(Exception):
+    pass
+
 def anfrage(key, voice, model, text, speed):
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice}/with-timestamps?output_format=mp3_22050_32"
-    body = json.dumps({
-        "text": text, "model_id": model, "language_code": "de",
+    daten = {
+        "text": text, "model_id": model,
         "voice_settings": {"stability": 0.55, "similarity_boost": 0.75, "style": 0.0, "use_speaker_boost": True, "speed": speed},
-    }).encode()
+    }
+    if "multilingual" not in model:
+        daten["language_code"] = "de"  # laut ElevenLabs nicht für multilingual_v2
+    body = json.dumps(daten).encode()
     req = urllib.request.Request(url, data=body, headers={"xi-api-key": key, "Content-Type": "application/json"})
     for versuch in range(3):
         try:
@@ -98,8 +104,10 @@ def anfrage(key, voice, model, text, speed):
                 return json.load(r)
         except urllib.error.HTTPError as e:
             msg = e.read().decode("utf-8", "replace")[:300]
-            if e.code in (429, 500, 502, 503) and versuch < 2:
+            if e.code in (429, 500, 502, 503) and versuch < 2 and "quota" not in msg:
                 time.sleep(5 * (versuch + 1)); continue
+            if e.code in (401, 402, 429) and ("quota" in msg or "credit" in msg or "limit" in msg):
+                raise GuthabenLeer(msg)
             sys.exit(f"ElevenLabs-Fehler {e.code}: {msg}")
 
 def selftest():
@@ -120,7 +128,7 @@ def main():
     ap.add_argument("--ordner", default="aufnahmen")
     ap.add_argument("--pruefen", action="store_true", help="vorhandene Aufnahmen ohne Fingerabdruck neu erzeugen")
     ap.add_argument("--speed-n", type=float, default=0.95); ap.add_argument("--speed-s", type=float, default=0.78)
-    ap.add_argument("--model", default="eleven_multilingual_v2"); ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--model", default=os.environ.get("ELEVENLABS_MODEL") or "eleven_flash_v2_5"); ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--stimmen", action="store_true", help="listet die Stimmen deines Kontos mit ID auf")
     a = ap.parse_args()
     if a.selftest:
@@ -168,12 +176,18 @@ def main():
             if f != "stand.json" and stamm not in gebraucht:
                 os.remove(os.path.join(a.ordner, f)); stand.pop(stamm, None); print("entfernt (alt):", f)
     zeichen = sum(len(z[3]) for z in auftraege)
-    print(f"Neu zu erzeugen: {len(auftraege)} Aufnahmen, {zeichen} Zeichen")
+    credits = zeichen if "multilingual" in a.model else zeichen // 2
+    print(f"Neu zu erzeugen: {len(auftraege)} Aufnahmen, {zeichen} Zeichen, etwa {credits} Credits ({a.model})")
     if auftraege and not key:
         sys.exit("Bitte ELEVENLABS_API_KEY setzen (siehe Kopf der Datei).")
-    for name, fp, inhalt, text, spans, speed in auftraege:
+    for nr, (name, fp, inhalt, text, spans, speed) in enumerate(auftraege):
         ziel = os.path.join(a.ordner, name)
-        r = anfrage(key, a.voice, a.model, text, speed)
+        try:
+            r = anfrage(key, a.voice, a.model, text, speed)
+        except GuthabenLeer as e:
+            # Was fertig ist, bleibt erhalten. Der Rest kommt beim nächsten Lauf (z. B. nach der Monatsgutschrift).
+            print(f"::warning::ElevenLabs-Guthaben aufgebraucht. {len(auftraege) - nr} Aufnahmen fehlen noch und kommen beim nächsten Lauf. ({str(e)[:120]})")
+            break
         al = r["alignment"]
         z = wortzeiten(spans, al["characters"], al["character_start_times_seconds"], al["character_end_times_seconds"])
         assert len(z) == len(inhalt.split()), (name, len(z))
