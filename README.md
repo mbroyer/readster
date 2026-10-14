@@ -2,7 +2,7 @@
 
 Leseübungs-App (eine HTML-Datei). Läuft über GitHub Pages: https://mbroyer.github.io/readster/
 
-Aufnahmen und Fortschritt bleiben lokal auf dem Gerät.
+Aufnahmen bleiben lokal auf dem Gerät. Der Fortschritt auch, außer man meldet sich mit einem Code an: Dann wird er pro Code beim Cloudflare-Worker gespeichert (siehe `cloudflare/ANLEITUNG.md`).
 
 ## Aufbau
 
