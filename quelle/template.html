@@ -304,6 +304,7 @@ details.tip summary{cursor:pointer;font-weight:500}details.tip ul{margin:8px 0 0
 .seg button{flex:1 1 90px;background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:10px 12px;font-weight:500;cursor:pointer;min-height:48px}
 .seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .setrow{display:flex;flex-direction:column;gap:8px}
+.dbg{display:flex;flex-wrap:wrap;gap:6px}.dbg .btn{flex:0 0 auto}
 .cfbtns{display:flex;gap:10px;width:100%}
 .cfbtns .btn{flex:1}
 .xpgain{font-family:var(--f-display);font-weight:600;font-size:1.6rem;color:var(--xp)}
@@ -1644,6 +1645,11 @@ function renderSheet(){
   h+='<div class="setrow"><span class="eyebrow">Stockstellen erkennen</span>'+seg('wh',[[true,'An'],[false,'Aus']])+'<span class="hint">Markiert nach dem Lesen Wörter, bei denen du hängen geblieben bist. '+(WH_SERVER?'Die Aufnahme geht dafür kurz an Cloudflare und wird dort nicht gespeichert.':'Beim ersten Einschalten werden einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB geladen, am besten im WLAN. Danach läuft alles auf diesem Gerät, der Ton verlässt es nicht.')+'</span><span class="hint fb" id="whst">'+esc(S.set.wh?whStatus():'')+'</span></div>';
   h+='<div class="setrow"><span class="eyebrow">Tempo-Zahlen zeigen</span>'+seg('nums',[[true,'An'],[false,'Aus']])+'<span class="hint">Aus: Es gibt nur „schneller als beim ersten Mal“, keine Wörter pro Minute.</span></div>';
   h+='<h3 class="setgrp">So funktioniert Readster</h3><div class="setrow"><ul class="howto"><li>Zuhören, dann selbst laut lesen (mit Aufnahme).</li><li>Danach: Gesicht wählen, Tempo ansehen, sich selbst anhören und schwere Wörter antippen.</li><li>Zwei Fragen zum Text.</li><li>Jeder Text füllt den Tank. Drei Texte: ein Rennen. Neue Autos kommen mit der Zeit dazu (Garage: aufs Auto tippen).</li><li>Schwere Wörter landen im Wort-Jäger und werden an mehreren Tagen geübt.</li></ul><button class="btn ghost sm" data-a="tourAgain">Einführung nochmal zeigen</button></div>';
+  /* Zum Ausprobieren der Rennen: Level springen und Tank füllen (ändert den echten Fortschritt dieses Codes) */
+  var Lc=lvl(S.xp);
+  h+='<h3 class="setgrp">Rennen testen</h3><div class="setrow"><span class="hint">Jetzt: Level '+Lc+', Tank '+(fuelFull()?'voll':Math.round((S.fuel||0)/XP_RACE*100)+' %')+'. Ändert den Fortschritt dieses Codes.</span><div class="dbg">'+
+    RSTAGES.map(function(s){return '<button class="btn ghost sm'+(rankOf(Lc)===RSTAGES.indexOf(s)?' on':'')+'" data-a="dbgLv" data-v="'+s.lv+'">'+s.lv+' · '+esc(s.n)+'</button>';}).join('')+
+    '</div><button class="btn sm" data-a="dbgFuel">Tank füllen</button></div>';
   h+='<h3 class="setgrp">Dein Code</h3><div class="setrow">'+(CODE?'<span class="hint">Angemeldet mit <b>'+esc(CODE)+'</b>. Der Fortschritt wird automatisch gespeichert und ist auf jedem Gerät mit diesem Code da.</span><button class="link" data-a="login">Anderen Code nutzen</button>':'<button class="link" data-a="login">Mit Code anmelden</button>')+'<button class="link" data-a="reset">Fortschritt zurücksetzen</button></div></div></details>';
   h+='<button class="btn wide" data-a="sheetOk">Fertig</button></div>';
   openBox('#sheet',h);$('#sheet').scrollTop=sc;
@@ -1800,6 +1806,8 @@ document.addEventListener('click',function(e){
     case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl'||k==='rec'||k==='nums'||k==='wh')val=(v==='true');S.set[k]=val;save();if(k==='wh'&&val)whPreload();renderSheet();readStyle();break;
     case 'sheetOk':closeBox('#sheet');break;
     case 'reset':renderReset();break;
+    case 'dbgLv':S.xp=XPK*(+v-1)*(+v-1);var ds=RSTAGES[rankOf(+v)];if(ds.car)S.rcar=ds.car;save();renderSheet();renderHome();break;
+    case 'dbgFuel':if(!hasCar()){S.xp=XPK*(RSTAGES[CAR0].lv-1)*(RSTAGES[CAR0].lv-1);S.rcar=RSTAGES[CAR0].car;}S.fuel=XP_RACE;save();renderSheet();renderHome();break;
     case 'delRecs':recDelAll().then(function(){var b=$('#delRecsBtn');if(b)b.textContent='Aufnahmen gelöscht';});break;
     case 'wj':wjStart();break;
     case 'wjSay':if(W)sayWord(W.list[W.k]);break;
