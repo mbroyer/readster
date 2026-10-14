@@ -181,6 +181,7 @@ details.adult.set[open]>div{display:flex;flex-direction:column;gap:16px;margin-t
 .tankin{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0;align-items:flex-start}.tankin b{font-weight:500;font-size:1.05rem;line-height:1.25}.tankin .bar{width:100%}
 .tankrow{align-items:center}.tankrow .carimg{width:110px;height:73px}
 .pips i.new{animation:pipin .7s cubic-bezier(.2,1.4,.4,1) both}@keyframes pipin{0%{transform:scale(.3);background:var(--bg)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+.btn.race-go{background:var(--good);color:#06301b;box-shadow:0 5px 0 #2a9a5f}.btn.race-go:active{box-shadow:0 1px 0 #2a9a5f}.btn.race-go svg{color:#06301b}
 .btn.race-go{animation:racepulse 1.4s ease-in-out infinite}@keyframes racepulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
 .howrace{display:flex;gap:12px;width:100%}.howrace>div{flex:1;display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:16px;padding:12px}.howrace b{font-size:1.1rem;font-weight:500}
 .tour{gap:16px;text-align:center}.tour h2{font-size:1.7rem;margin:0}
@@ -193,6 +194,10 @@ details.adult.set[open]>div{display:flex;flex-direction:column;gap:16px;margin-t
 .hn{flex:none;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:1.1rem}
 ul.howto{margin:0;padding-left:1.2em;color:var(--muted);font-weight:500;font-size:.95rem;display:flex;flex-direction:column;gap:6px}
 @media (prefers-reduced-motion:reduce){.btn.race-go,.pips i.new{animation:none}}
+.mseg{display:flex;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:4px;gap:4px}
+.mseg button{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border:0;border-radius:999px;background:none;color:var(--muted);font:inherit;font-weight:500;font-size:.95rem;cursor:pointer;padding:0 10px}
+.mseg button svg{width:22px;height:22px;flex:none}
+.mseg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
 .mtog{display:inline-flex;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:3px;gap:2px}
 .mtog button{width:40px;height:34px;border:0;border-radius:999px;background:none;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .mtog button svg{width:22px;height:22px}
@@ -725,8 +730,9 @@ function renderHome(){
   if(!MODE){renderPick();return;}
   if(!S.tour&&$('#modal').hidden)setTimeout(function(){if(!S.tour&&$('#modal').hidden&&CUR==='home')tourOpen(0);},0);
   var p=lvlProg(S.xp),sg=suggest(),wk=weekInfo(),n=doneCount();
-  var h='<header class="top"><h1 class="brand"><img class="wordmark sm" alt="Readster" src="'+LOGO+'"></h1><div class="chips"><div class="mtog" role="group" aria-label="Wie liest du?"><button data-a="mode" data-v="solo" aria-pressed="'+(MODE==='solo')+'" aria-label="Allein">'+IC_SOLO+'</button><button data-a="mode" data-v="partner" aria-pressed="'+(MODE==='partner')+'" aria-label="Mit Partner">'+IC_DUO+'</button></div><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
-  h+=modeTag();
+  var h='<header class="top"><h1 class="brand"><img class="wordmark sm" alt="Readster" src="'+LOGO+'"></h1><div class="chips"><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
+  /* Modus: ein Schalter mit Wörtern, zeigt zugleich, welcher Modus gerade gilt */
+  h+='<div class="mseg" role="group" aria-label="Wie liest du?"><button data-a="mode" data-v="solo" aria-pressed="'+(MODE==='solo')+'">'+IC_SOLO+'<span>Allein lesen</span></button><button data-a="mode" data-v="partner" aria-pressed="'+(MODE==='partner')+'">'+IC_DUO+'<span>Zu zweit lesen</span></button></div>';
   if(S.whNote)h+='<section class="card left whnote"><p class="fb">'+esc(S.whNote)+'</p><button class="btn ghost sm" data-a="whNoteOk">Okay</button></section>';
   var due=wjDue().length;
   /* Ganz oben: Auto und Tank, ohne Level und Erklärungen. Antippen öffnet die Garage. */
