@@ -232,6 +232,7 @@ details.tip summary{cursor:pointer;font-weight:500}details.tip ul{margin:8px 0 0
 .qa{display:flex;flex-direction:column;gap:8px;background:var(--bg);border-radius:16px;padding:14px 16px}
 .qa p{font-weight:500}
 .result-card{display:flex;flex-direction:column;gap:12px}.result-card .rhead{font-family:var(--f-display);font-size:1.45rem;font-weight:500;line-height:1.2}
+.flat{display:flex;flex-direction:column;gap:14px;padding-top:8px}.result-card .rhead{font-size:1.7rem}.tile .was{font-size:.75rem;color:var(--ink);opacity:.8;margin-top:4px}
 .result-card .bars{display:flex;flex-direction:column;gap:6px}
 .rec.me{background:var(--bg);border-radius:16px;padding:12px 14px}.rec.me b{font-family:var(--f-display);font-weight:500;font-size:1.1rem}
 .chk{display:flex;flex-direction:column;gap:4px;background:var(--bg);border-radius:16px;padding:12px 14px}.chk b{font-family:var(--f-display);font-weight:500;font-size:1.15rem}
@@ -702,7 +703,7 @@ function openText(id){
   recStop(false);if(S.set.wh)whPreload();
   R={t:t,phase:'read',qi:0,round:0,rounds:[],marks:{},all:{},qs:[null,null],pick:[null,null],opts:t.q.map(function(q){return shuffle([q.a].concat(q.f||[]));}),t0:0};
   var h='<div class="backrow"><button class="back" data-a="leave">‹ Zurück</button><div class="steps" id="rsteps"></div></div>';
-  h+='<div><span class="eyebrow">'+esc(t.cat)+'</span><h2>'+esc(t.title)+'</h2></div>';
+  h+='<div id="rtitle"><span class="eyebrow">'+esc(t.cat)+'</span><h2>'+esc(t.title)+'</h2></div>';
   h+='<div id="rtop"></div><section class="card"><div class="rtext" id="rtext">'+textHTML(t)+'</div></section><div id="rctl" class="view"></div>';
   $('#v-read').innerHTML=h;readStyle();show('read');if(MODE==='partner')opaStart('opa');else renderCtl();
 }
@@ -723,6 +724,7 @@ function renderCtl(){
   if(R.phase!=='count'&&R.phase!=='timing')cdHide();
   var tx=$('#rtext');
   if(R.opaView&&R.phase!=='opa'){tx.innerHTML=textHTML(t);R.opaView=false;}
+  var rti=$('#rtitle');if(rti)rti.hidden=R.phase==='mark'||R.phase==='check'; /* Titel nur beim Lesen */
   var tcard=tx.closest('section');if(tcard){tcard.hidden=R.phase==='check'||(R.phase==='mark'&&R.ms!=='listen');tcard.classList.toggle('live',R.phase==='timing'&&!!R.recOn);} /* Fragen und die ersten Rückblick-Schritte ohne Text */
   tx.classList.toggle('marking',R.phase==='mark');tx.classList.toggle('seek',R.phase==='read');tx.classList.toggle('opa',R.phase==='opa');
   if(R.phase==='read'){
@@ -754,11 +756,12 @@ function renderCtl(){
     var w=R.rounds[R.rounds.length-1],en=R.entry,ms=R.ms||'self';
     if(ms==='self'){
       dk='<button class="btn wide" data-a="ms" data-v="nums"'+(en&&en.self!=null?'':' disabled')+'>Weiter</button>';
-      top='<section class="card"><span class="eyebrow">Geschafft · Schritt 1 von 3</span><h2>Wie war das Lesen für dich?</h2><div class="selfq selfrow">'+[[2,'Flüssig',IC_F2],[1,'Ging so',IC_F1],[0,'Holprig',IC_F0]].map(function(o){return '<button class="btn '+(en&&en.self===o[0]?'on':'ghost')+'" data-a="self" data-v="'+o[0]+'">'+o[2]+o[1]+'</button>';}).join('')+'</div></section>';
+      top='<div class="flat"><span class="eyebrow">Geschafft · Schritt 1 von 3</span><h2>Wie war das Lesen für dich?</h2><div class="selfq selfrow">'+[[2,'Flüssig',IC_F2],[1,'Ging so',IC_F1],[0,'Holprig',IC_F0]].map(function(o){return '<button class="btn '+(en&&en.self===o[0]?'on':'ghost')+'" data-a="self" data-v="'+o[0]+'">'+o[2]+o[1]+'</button>';}).join('')+'</div></div>';
     }else if(ms==='nums'){
       dk='<button class="btn wide" data-a="ms" data-v="listen">Weiter</button>';
-      top='<section class="card result-card"><span class="eyebrow">Durchgang '+R.rounds.length+' · Schritt 2 von 3</span><b class="rhead" id="rhead">'+esc(R.head||'')+'</b>'+
-        '<div class="tiles">'+(S.set.nums?'<div class="tile"><b>'+w+'</b><span>Wörter pro Minute</span></div>':'')+'<div class="tile"><b>'+fmtSec(R.sec)+'</b><span>Lesezeit</span></div><div class="tile" id="sugtile"'+(R.sugState&&R.sugState!=='none'?'':' hidden')+'>'+sugTile()+'</div></div></section>';
+      var pv=R.prev&&R.prev.length?R.prev[0].wpm:0;
+      top='<div class="flat result-card"><span class="eyebrow">Schritt 2 von 3</span><b class="rhead" id="rhead">'+esc(R.head||'')+'</b>'+
+        '<div class="tiles">'+(S.set.nums?'<div class="tile"><b>'+w+'</b><span>Wörter pro Minute</span>'+(pv?'<span class="was">Beim ersten Mal: '+pv+'</span>':'')+'</div>':'')+'<div class="tile"><b>'+fmtSec(R.sec)+'</b><span>Lesezeit</span></div><div class="tile" id="sugtile"'+(R.sugState&&R.sugState!=='none'?'':' hidden')+'>'+sugTile()+'</div></div></div>';
     }else{
       dk='<div class="row">'+(R.round<3?'<button class="btn ghost" data-a="again">Nochmal lesen</button>':'')+'<button class="btn" data-a="check">Zu den Fragen</button></div>';
       top='<div id="recm"></div><section class="card">'+(R.recOn?'':'<span class="eyebrow">Schritt 3 von 3</span>')+'<h2>Schwere Wörter</h2><p>Tippe im Text die Wörter an, die schwer waren. Sie kommen in den Wort-Jäger.</p><div id="sugbox"></div></section>';
@@ -991,7 +994,7 @@ function analyzeBlob(b,t){
 function headline(wpm,prev){
   if(!prev.length)return 'Dein Startwert steht!';
   var first=prev[0].wpm,best=Math.max.apply(null,prev.map(function(x){return x.wpm;}));
-  if(wpm>first)return S.set.nums?(wpm-first)+' Wörter pro Minute schneller als beim ersten Mal':'Schneller als beim ersten Mal!';
+  if(wpm>first)return 'Schneller als beim ersten Mal!';
   if(wpm>=best)return 'So schnell wie dein Bestwert!';
   return 'Geschafft! Du bleibst dran.';
 }
