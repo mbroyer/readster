@@ -592,7 +592,21 @@ function closeBox(id){$(id).hidden=true;$(id).innerHTML='';}
 /* ---------- Startseite ---------- */
 var IC_SOLO='<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="16" cy="10" r="6"/><path d="M5 28c0-6.6 4.9-11 11-11s11 4.4 11 11z"/></svg>';
 var IC_DUO='<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="11" cy="11" r="5"/><path d="M1.5 27c0-5.8 4.2-9.5 9.5-9.5s9.5 3.7 9.5 9.5z"/><circle cx="22.5" cy="9" r="4" opacity=".65"/><path d="M17.5 17.4c1.4-1 3.1-1.6 5-1.6 4.7 0 8 3.4 8 8.7h-8.7c-.7-2.9-2.2-5.3-4.3-7.1z" opacity=".65"/></svg>';
-var MODE=null; /* Prototyp: wird bei jedem Start neu gewählt */
+var MODE=null;
+/* Monster wächst in Stufen; statt XP zeigen wir, wie viele Texte es ungefähr noch bis zur nächsten Stufe sind */
+var XP_TEXT=40;
+function stageProg(){
+  var r=rankOf(lvl(S.xp)),st=MON.STAGES;
+  if(r>=st.length-1)return {pct:100,next:null,texts:0};
+  var a=XPK*(st[r].lv-1)*(st[r].lv-1),b=XPK*(st[r+1].lv-1)*(st[r+1].lv-1);
+  return {pct:Math.max(0,Math.min(100,Math.round((S.xp-a)/(b-a)*100))),next:st[r+1].n,texts:Math.max(1,Math.ceil((b-S.xp)/XP_TEXT))};
+}
+function growText(){
+  var g=stageProg();
+  if(!g.next)return 'Dein Monster ist ganz ausgewachsen!';
+  var t=g.texts===1?'einen Text':(g.texts+' Texte');
+  return rankOf(lvl(S.xp))===0?'Lies '+t+', dann schlüpft es.':'Noch '+t+', dann wird es '+({Riese:'zum Riesen',Legende:'zur Legende'}[g.next]||'zum '+g.next)+'.';
+} /* Prototyp: wird bei jedem Start neu gewählt */
 function renderPick(){
   var h='<div class="pick"><span class="proto">Prototyp</span>'+stageHTML(rankOf(lvl(S.xp)))+'<h2>Wie liest du heute?</h2>';
   h+='<button class="mode" data-a="mode" data-v="solo"><span class="ic">'+IC_SOLO+'</span><div><b>Allein</b><span>Du hörst zu und liest dann selbst laut.</span></div></button>';
@@ -613,7 +627,7 @@ function renderHome(){
   }).join('')+'</div></section>';
   if(sg)h+='<button class="btn ghost wide" data-a="open" data-v="'+sg.t.id+'">'+(sg.from?'Rätsel lösen: '+esc(sg.t.title):'Überrasch mich')+'</button>';
   var stn=MON.STAGES[rankOf(p.L)].n;
-  h+='<section class="card week"><div class="hero" style="display:flex">'+stageHTML(rankOf(p.L))+'<div class="info"><span class="eyebrow">'+(S.name?'Dein Monster · '+esc(stn):'Dein Monster')+'</span><span class="stagename">'+esc(S.name||stn)+'</span><div class="bar" role="progressbar" aria-valuenow="'+p.pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+p.pct+'%"></i></div><span class="xptext">Level '+p.L+' · noch '+p.need+' XP</span></div></div>'+
+  h+='<section class="card week"><div class="hero" style="display:flex">'+stageHTML(rankOf(p.L))+'<div class="info"><span class="eyebrow">'+(S.name?'Dein Monster · '+esc(stn):'Dein Monster')+'</span><span class="stagename">'+esc(S.name||stn)+'</span><div class="bar" role="progressbar" aria-valuenow="'+stageProg().pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+stageProg().pct+'%"></i></div><span class="xptext">'+esc(growText())+'</span></div></div>'+
     '<div class="wk"><div class="row" style="flex-wrap:nowrap;justify-content:space-between;align-items:baseline"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></div><div class="dots">'+wk.arr.map(function(d){return '<div class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></div>';}).join('')+'</div></div></section>';
   h+='<button class="btn ghost wide" data-a="album">Wissensalbum · '+n+' von '+TEXTS.length+' Karten</button>';
   h+='<div class="foot"><div class="madeby"><span>Made with love by</span><img alt="A Simple Man’s Lab" src="'+MADEBY+'"></div></div>';
