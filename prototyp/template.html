@@ -454,7 +454,7 @@ function growText(){
   return rankOf(lvl(S.xp))===0?'Lies '+t+', dann schlüpft es.':'Noch '+t+', dann wird es '+({Riese:'zum Riesen',Legende:'zur Legende'}[g.next]||'zum '+g.next)+'.';
 } /* Prototyp: wird bei jedem Start neu gewählt */
 function renderPick(){
-  var h='<div class="pickwrap"><div class="pick"><div class="applogo"><img alt="" src="'+(document.querySelector('link[rel=apple-touch-icon]')||{}).href+'"><img class="wordmark" alt="Readster" src="readster-logo.png"><span class="proto">Prototyp</span></div><h2>Wie liest du heute?</h2>';
+  var h='<div class="pickwrap"><div class="pick"><div class="applogo"><img class="wordmark" alt="Readster" src="readster-logo.png"><span class="proto">Prototyp</span></div><h2>Wie liest du heute?</h2>';
   h+='<button class="mode" data-a="mode" data-v="solo"><span class="ic">'+IC_SOLO+'</span><div><b>Allein</b><span>Du hörst zu und liest dann selbst laut.</span></div></button>';
   h+='<button class="mode" data-a="mode" data-v="partner"><span class="ic">'+IC_DUO+'</span><div><b>Mit Partner</b><span>Ihr lest abwechselnd Satz für Satz, zum Beispiel mit Opa.</span></div></button>';
   h+='</div><div class="foot"><div class="madeby small"><span>Made with love by</span><img alt="A Simple Man’s Lab" src="'+MADEBY+'"></div></div></div>';
