@@ -232,7 +232,7 @@ details.tip summary{cursor:pointer;font-weight:500}details.tip ul{margin:8px 0 0
 .qa{display:flex;flex-direction:column;gap:8px;background:var(--bg);border-radius:16px;padding:14px 16px}
 .qa p{font-weight:500}
 .result-card{display:flex;flex-direction:column;gap:12px}.result-card .rhead{font-family:var(--f-display);font-size:1.45rem;font-weight:500;line-height:1.2}
-.flat{display:flex;flex-direction:column;gap:14px;padding-top:8px}.result-card .rhead{font-size:1.7rem}.tile .was{font-size:.75rem;color:var(--ink);opacity:.8;margin-top:4px}
+.flat{display:flex;flex-direction:column;gap:14px;padding-top:8px}#qcard .qa{background:none;padding:0;gap:12px}#qcard .qa p{font-size:1.3rem;line-height:1.35}.result-card .rhead{font-size:1.7rem}.tile .was{font-size:.75rem;color:var(--ink);opacity:.8;margin-top:4px}
 .result-card .bars{display:flex;flex-direction:column;gap:6px}
 .rec.me{background:var(--bg);border-radius:16px;padding:12px 14px}.rec.me b{font-family:var(--f-display);font-weight:500;font-size:1.1rem}
 .chk{display:flex;flex-direction:column;gap:4px;background:var(--bg);border-radius:16px;padding:12px 14px}.chk b{font-family:var(--f-display);font-weight:500;font-size:1.15rem}
@@ -938,7 +938,7 @@ function renderCtl(){
     if(!o||o.length<2)R.qs[qi]=R.qs[qi]===null?1:R.qs[qi];
     dk=!done?'<button class="btn wide" disabled>'+(last?'Karte holen':'Nächste Frage')+'</button>':
       (last?'<button class="btn wide" data-a="finish">Karte holen</button>':'<button class="btn wide" data-a="nextQ">Nächste Frage</button>');
-    h+='<div class="card" id="qcard"><span class="eyebrow">Frage '+(qi+1)+' von '+nq+'</span>';
+    h+='<div class="flat" id="qcard"><span class="eyebrow">Frage '+(qi+1)+' von '+nq+'</span>';
     if(!o||o.length<2)h+='<div class="qa"><p>'+esc(q.q)+'</p><div class="ans">'+esc(q.a)+'</div></div>';
     else h+='<div class="qa"><p>'+esc(q.q)+'</p><span class="hint">Tippe die richtige Antwort an.</span><div class="opts">'+o.map(function(a,j){
         var cl=done?(a===q.a?' right':(j===pk?' miss':' off')):'';
