@@ -70,7 +70,15 @@ button,input{font:inherit;color:inherit}
 .hero{flex-direction:row;align-items:center;gap:16px}
 .hero .info{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
 .stagename{font-family:var(--f-display);font-weight:700;font-size:1.7rem;line-height:1.05}
-.week{gap:10px}
+.week{gap:14px}
+.alt{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.alt .row>*{flex:1 1 120px}
+.selfq{display:flex;flex-direction:column;gap:8px;margin-top:6px;padding-top:12px;border-top:2px solid var(--line)}
+.selfq .row>*{flex:1 1 0;min-width:0;padding-inline:6px}
+.selfq h3{font-size:1.05rem;margin:0}
+.prev{position:sticky;top:-20px;z-index:2;box-shadow:0 8px 16px rgba(0,0,0,.4)}
+details.adult.set{border-top:2px solid var(--line);padding-top:12px}
+details.adult.set[open]>div{display:flex;flex-direction:column;gap:16px;margin-top:12px}
 .dots{display:flex;gap:8px;justify-content:space-between}
 .dot{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0}
 .dot i{width:100%;max-width:44px;aspect-ratio:1;border-radius:50%;border:3px solid var(--line);background:var(--bg);display:block}
@@ -113,7 +121,7 @@ button,input{font:inherit;color:inherit}
 @keyframes rpop{0%{transform:scale(.92);opacity:0}60%{transform:scale(1.03);opacity:1}100%{transform:scale(1)}}
 .card.riddle .rtext{padding:0}
 .rtext .w.sug{outline:2px dashed var(--xp);outline-offset:1px}
-.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tiles{display:flex;gap:10px}.tiles>.tile{flex:1 1 0;min-width:0}
 .tile{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:12px 6px;text-align:center;display:flex;flex-direction:column;gap:2px}
 .tile b{font-family:var(--f-display);font-size:1.9rem;color:var(--xp);line-height:1.1}
 .tile span{font-size:.8rem;font-weight:800;color:var(--muted)}
@@ -570,11 +578,8 @@ function closeBox(id){$(id).hidden=true;$(id).innerHTML='';}
 /* ---------- Startseite ---------- */
 function renderHome(){
   var p=lvlProg(S.xp),sg=suggest(),wk=weekInfo(),n=doneCount();
-  var h='<header class="top"><h1 class="brand">Readster</h1><div class="chips"><span class="chip lvl">Level '+p.L+'</span><button class="iconbtn" data-a="stats" aria-label="Dein Fortschritt"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="12" width="4" height="7" rx="1.5" fill="currentColor"/><rect x="9" y="7" width="4" height="12" rx="1.5" fill="currentColor"/><rect x="15" y="3" width="4" height="16" rx="1.5" fill="currentColor"/></svg></button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
+  var h='<header class="top"><h1 class="brand">Readster</h1><div class="chips"><button class="iconbtn" data-a="stats" aria-label="Dein Fortschritt"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="12" width="4" height="7" rx="1.5" fill="currentColor"/><rect x="9" y="7" width="4" height="12" rx="1.5" fill="currentColor"/><rect x="15" y="3" width="4" height="16" rx="1.5" fill="currentColor"/></svg></button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
   if(S.whNote)h+='<section class="card left whnote"><p class="fb">'+esc(S.whNote)+'</p><button class="btn ghost sm" data-a="whNoteOk">Okay</button></section>';
-  var stn=MON.STAGES[rankOf(p.L)].n;
-  h+='<section class="card hero">'+stageHTML(rankOf(p.L))+'<div class="info"><span class="eyebrow">'+(S.name?'Dein Monster · '+esc(stn):'Dein Monster')+'</span><span class="stagename">'+esc(S.name||stn)+'</span><div class="bar" role="progressbar" aria-valuenow="'+p.pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+p.pct+'%"></i></div><span class="xptext">noch '+p.need+' XP bis Level '+(p.L+1)+'</span></div></section>';
-  h+='<section class="card week"><div class="row" style="flex-wrap:nowrap;justify-content:space-between;align-items:baseline"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></div><div class="dots">'+wk.arr.map(function(d){return '<div class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></div>';}).join('')+'</div></section>';
   if(sg){
     var teaser=sg.from?'Offene Frage':(n?'Neuer Text':'Los geht’s');
     h+='<section class="card next"><span class="eyebrow">'+teaser+'</span><p class="q">'+esc(sg.from?sg.from.ask:sg.t.title)+'</p><button class="btn wide" data-a="open" data-v="'+sg.t.id+'">Lesen</button></section>';
@@ -583,6 +588,9 @@ function renderHome(){
   }
   var due=wjDue().length;
   if(due)h+='<button class="wjcta" data-a="wj"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg><div><b>Wort-Jäger</b><span>'+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' zum Üben</span></div></button>';
+  var stn=MON.STAGES[rankOf(p.L)].n;
+  h+='<section class="card week"><div class="hero" style="display:flex">'+stageHTML(rankOf(p.L))+'<div class="info"><span class="eyebrow">'+(S.name?'Dein Monster · '+esc(stn):'Dein Monster')+'</span><span class="stagename">'+esc(S.name||stn)+'</span><div class="bar" role="progressbar" aria-valuenow="'+p.pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+p.pct+'%"></i></div><span class="xptext">Level '+p.L+' · noch '+p.need+' XP</span></div></div>'+
+    '<div class="wk"><div class="row" style="flex-wrap:nowrap;justify-content:space-between;align-items:baseline"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></div><div class="dots">'+wk.arr.map(function(d){return '<div class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></div>';}).join('')+'</div></div></section>';
   var rp=repeatPick();
   if(rp)h+='<section class="card next"><span class="eyebrow">Nochmal lesen</span><p class="q" style="font-size:1.2rem">'+esc(rp.title)+'</p><span class="hint">Beim zweiten Mal geht es leichter.</span><button class="btn ghost wide" data-a="open" data-v="'+rp.id+'">Nochmal lesen</button></section>';
   h+='<section><div class="cats">'+CATS.map(function(c){
@@ -655,7 +663,7 @@ function renderCtl(){
     dk='<div class="row"><button class="btn ghost" data-a="listen" id="bL">'+btnLabel()+'</button><button class="btn" data-a="start">'+(R.round?'Nochmal lesen':'Ich lese jetzt')+'</button></div>';
     if(R.msg)h+='<p class="hint fb">'+esc(R.msg)+'</p>';
     else h+=R.sbsDone?'<p class="hint fb">Super, alle Sätze geschafft! Jetzt lies den ganzen Text am Stück.</p>':'<p class="hint fb">Erst hören, dann selbst lesen.</p>';
-    h+='<div class="row"><button class="btn ghost" data-a="solo">Satz für Satz</button><button class="btn ghost" data-a="opa">Mit Opa lesen</button></div><div id="recold"></div>';
+    h+='<div class="alt"><span class="eyebrow">Oder in kleinen Schritten</span><div class="row"><button class="btn ghost sm" data-a="solo">Satz für Satz</button><button class="btn ghost sm" data-a="opa">Mit Opa</button></div></div><div id="recold"></div>';
     h+=adult('<p>„Zuhören“ liest den Text vor, das Wort wird mitgezeigt. Tippt das Kind auf ein Wort, liest die Stimme von dort weiter. „Satz für Satz“: Die Stimme liest einen Satz, das Kind liest ihn nach. „Ich lese jetzt“ startet einen Durchgang am Stück, mit Aufnahme, falls eingeschaltet. Es läuft keine Uhr auf dem Bildschirm. Am Ende wartet ein Rätsel, das zum nächsten Text führt.</p>');
   }else if(R.phase==='opa'){
     var n=t.sents.length,lastS=R.si>=n-1,solo=R.who==='solo';
@@ -676,11 +684,11 @@ function renderCtl(){
     var w=R.rounds[R.rounds.length-1],en=R.entry;
     dk='<div class="row">'+(R.round<3?'<button class="btn ghost" data-a="again">Nochmal lesen</button>':'')+'<button class="btn" data-a="check">Zu den Fragen</button></div>';
     top='<section class="card result-card"><span class="eyebrow">Auswertung · Durchgang '+R.rounds.length+'</span><b class="rhead" id="rhead">'+esc(R.head||'')+'</b>'+
-      '<div class="tiles">'+(S.set.nums?'<div class="tile"><b>'+w+'</b><span>Wörter pro Minute</span></div>':'')+'<div class="tile"><b>'+fmtSec(R.sec)+'</b><span>Lesezeit</span></div><div class="tile" id="sugtile">'+sugTile()+'</div></div>'+
-      '<div id="chkbox"></div><p class="fb" id="cmptxt">'+esc(compareText(w))+'</p><span class="hint fb" id="fbtxt">'+esc(R.fb||'')+'</span>'+(S.set.nums&&R.rounds.length>1?'<div class="bars">'+bars()+'</div>':'')+
-      '<div id="recm"></div></section>';
-    h+='<div class="card"><h2>Wie war das für dich?</h2><div class="row selfrow">'+[[2,'Flüssig'],[1,'Ging so'],[0,'Holprig']].map(function(o){return '<button class="btn '+(en&&en.self===o[0]?'on':'ghost')+'" data-a="self" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><span class="hint">Es gibt kein Falsch.</span></div>';
-    h+='<div class="card"><h2>Welche Wörter waren schwer?</h2><p class="hint fb">Tippe sie oben im Text an. Sie kommen in den Wort-Jäger.</p><div id="sugbox"></div></div>';
+      '<div class="tiles">'+(S.set.nums?'<div class="tile"><b>'+w+'</b><span>Wörter pro Minute</span></div>':'')+'<div class="tile"><b>'+fmtSec(R.sec)+'</b><span>Lesezeit</span></div><div class="tile" id="sugtile"'+(R.sugState&&R.sugState!=='none'?'':' hidden')+'>'+sugTile()+'</div></div>'+
+      '<div id="chkbox"></div>'+(compareText(w)?'<p class="fb" id="cmptxt">'+esc(compareText(w))+'</p>':'')+'<span class="hint fb" id="fbtxt">'+esc(R.fb||'')+'</span>'+(S.set.nums&&R.rounds.length>1?'<div class="bars">'+bars()+'</div>':'')+
+      '<div id="recm"></div>'+
+      '<div class="selfq"><h3>Wie war das für dich?</h3><div class="row selfrow">'+[[2,'Flüssig'],[1,'Ging so'],[0,'Holprig']].map(function(o){return '<button class="btn sm '+(en&&en.self===o[0]?'on':'ghost')+'" data-a="self" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div>'+
+      '<span class="hint">Schwere Wörter? Tippe sie im Text an, dann kommen sie in den Wort-Jäger.</span><div id="sugbox"></div></div></section>';
   }else if(R.phase==='check'){
     var ok=R.qs[0]!==null&&R.qs[1]!==null;
     dk='<button class="btn wide" data-a="finish"'+(ok?'':' disabled')+'>Karte holen</button>';
@@ -932,7 +940,7 @@ function sugTile(){
 }
 function compareText(w){
   var p=R.prev||[];
-  if(!p.length)return R.rounds.length>1?(w>=R.rounds[R.rounds.length-2]?'Flotter als dein Durchgang eben.':'Dein zweiter Durchgang heute, stark dass du dranbleibst.'):'Das ist dein erster Durchgang mit diesem Text.';
+  if(!p.length)return R.rounds.length>1?(w>=R.rounds[R.rounds.length-2]?'Flotter als dein Durchgang eben.':'Dein zweiter Durchgang heute, stark dass du dranbleibst.'):'';
   var f=p[0].wpm,last=p[p.length-1].wpm;
   if(w>f){var pc=Math.round((w-f)/f*100);return S.set.nums?'Im Vergleich zum ersten Mal: '+pc+' % schneller.':'Schneller als beim ersten Mal.';}
   if(w>=last)return 'Mindestens so flott wie beim letzten Mal.';
@@ -940,7 +948,7 @@ function compareText(w){
 }
 function updateMarkInfo(){
   var o=document.querySelectorAll('#rtext .w.sug');for(var i=0;i<o.length;i++)o[i].classList.remove('sug');
-  var fb=$('#fbtxt');if(fb&&R.fb)fb.textContent=R.fb;var st=$('#sugtile');if(st)st.innerHTML=sugTile();
+  var fb=$('#fbtxt');if(fb&&R.fb)fb.textContent=R.fb;var st=$('#sugtile');if(st){st.innerHTML=sugTile();st.hidden=!R.sugState||R.sugState==='none';}
   var cb=$('#chkbox'),om=document.querySelectorAll('#rtext .w.srm');for(var mi=0;mi<om.length;mi++)om[mi].classList.remove('srm');
   if(cb){var c=R.chk;
     if(!c)cb.innerHTML='';
@@ -1397,23 +1405,26 @@ function renderAlbum(){
 }
 /* Lesehilfen */
 function renderSheet(){
-  var s=S.set;
+  var s=S.set,od=$('#sheet details.set'),wasOpen=!!(od&&od.open),sc=$('#sheet').scrollTop;
   function seg(key,opts){return '<div class="seg">'+opts.map(function(o){return '<button data-a="set" data-k="'+key+'" data-v="'+o[0]+'" aria-pressed="'+(String(s[key])===String(o[0]))+'">'+o[1]+'</button>';}).join('')+'</div>';}
   var h='<div class="card left"><h2>Lesehilfen</h2>';
+  h+='<div class="rtext syl-on prev" style="--rf:\''+esc(s.font)+'\';--rsize:'+[1.25,1.5,1.8][s.size]+'rem;--rline:'+[1.7,2,2.35][s.line]+';--rsp:'+[0,.04,.08][s.space]+'em;background:var(--bg);border-radius:14px;padding:12px 14px"><span class="w"><span class="sy s0">Ge</span><span class="sy s1">cko</span></span> <span class="w"><span class="sy s0">läuft</span></span> <span class="w"><span class="sy s0">an</span></span> <span class="w"><span class="sy s0">der</span></span> <span class="w"><span class="sy s0">Wand</span></span>.</div>';
   h+='<div class="setrow"><span class="eyebrow">Schrift</span>'+seg('font',[['Nunito','Rund'],['Lexend','Weit'],['Atkinson Hyperlegible','Klar']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Größe</span>'+seg('size',[[0,'Normal'],[1,'Groß'],[2,'Sehr groß']])+'</div>';
+  h+='<div class="setrow"><span class="eyebrow">Silben in zwei Farben</span>'+seg('syl',[[true,'An'],[false,'Aus']])+'</div>';
+  h+='<div class="setrow"><span class="eyebrow">Vorlese-Tempo</span>'+seg('speed',[['slow','Langsam'],['normal','Normal']])+'</div>';
+  h+='<h2 style="margin-top:8px">Dein Monster</h2>';
+  h+='<div class="setrow"><span class="eyebrow">Name</span><input class="name" id="nameIn" maxlength="16" autocomplete="off" placeholder="z. B. Krümel" value="'+esc(S.name||'')+'"></div>';
+  h+='<div class="setrow"><span class="eyebrow">Farbe</span><div class="seg">'+COLS.map(function(c){return '<button class="sw" data-a="col" data-v="'+c+'" aria-label="Farbe" aria-pressed="'+(S.col===c)+'" style="background:'+c+'"></button>';}).join('')+'</div></div>';
+  h+='<details class="adult set"'+(wasOpen?' open':'')+'><summary>Für Erwachsene</summary><div>';
   h+='<div class="setrow"><span class="eyebrow">Zeilenabstand</span>'+seg('line',[[0,'Eng'],[1,'Normal'],[2,'Weit']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Buchstabenabstand</span>'+seg('space',[[0,'Normal'],[1,'Mehr'],[2,'Viel']])+'</div>';
-  h+='<div class="setrow"><span class="eyebrow">Silben in zwei Farben</span>'+seg('syl',[[true,'An'],[false,'Aus']])+'</div>';
-  h+='<div class="setrow"><span class="eyebrow">Name deines Monsters</span><input class="name" id="nameIn" maxlength="16" autocomplete="off" placeholder="z. B. Krümel" value="'+esc(S.name||'')+'"></div>';
-  h+='<div class="setrow"><span class="eyebrow">Farbe deines Monsters</span><div class="seg">'+COLS.map(function(c){return '<button class="sw" data-a="col" data-v="'+c+'" aria-label="Farbe" aria-pressed="'+(S.col===c)+'" style="background:'+c+'"></button>';}).join('')+'</div></div>';
   h+='<div class="setrow"><span class="eyebrow">Aufnahme beim Lesen</span>'+seg('rec',[[true,'An'],[false,'Aus']])+'<span class="hint">Die Aufnahmen bleiben nur auf diesem Gerät.</span><button class="link" id="delRecsBtn" data-a="delRecs">Alle Aufnahmen löschen</button></div>';
   h+='<div class="setrow"><span class="eyebrow">Genaue Auswertung (Whisper)</span>'+seg('wh',[[true,'An'],[false,'Aus']])+'<span class="hint">Erkennt Stockstellen und ausgelassene Wörter genauer. '+(WH_SERVER?'Die Aufnahme geht dafür kurz an Cloudflare und wird dort nicht gespeichert.':'Beim ersten Einschalten werden einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB geladen, am besten im WLAN. Danach läuft alles auf diesem Gerät, der Ton verlässt es nicht.')+'</span><span class="hint fb" id="whst">'+esc(S.set.wh?whStatus():'')+'</span></div>';
-  h+='<div class="setrow"><span class="eyebrow">Vorlese-Tempo</span>'+seg('speed',[['slow','Langsam'],['normal','Normal']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Tempo-Zahlen zeigen</span>'+seg('nums',[[true,'An'],[false,'Aus']])+'<span class="hint">Aus: Es gibt nur „schneller als beim ersten Mal“, keine Wörter pro Minute.</span></div>';
-  h+='<div class="rtext syl-on" style="--rf:\''+esc(s.font)+'\';--rsize:'+[1.25,1.5,1.8][s.size]+'rem;--rline:'+[1.7,2,2.35][s.line]+';--rsp:'+[0,.04,.08][s.space]+'em;background:var(--bg);border-radius:14px;padding:12px 14px"><span class="w"><span class="sy s0">Ge</span><span class="sy s1">cko</span></span> <span class="w"><span class="sy s0">läuft</span></span> <span class="w"><span class="sy s0">an</span></span> <span class="w"><span class="sy s0">der</span></span> <span class="w"><span class="sy s0">Wand</span></span>.</div>';
-  h+='<button class="btn wide" data-a="sheetOk">Fertig</button><button class="link" data-a="backup">Fortschritt sichern oder laden</button><button class="link" data-a="reset">Fortschritt zurücksetzen</button></div>';
-  openBox('#sheet',h);
+  h+='<button class="link" data-a="backup">Fortschritt sichern oder laden</button><button class="link" data-a="reset">Fortschritt zurücksetzen</button></div></details>';
+  h+='<button class="btn wide" data-a="sheetOk">Fertig</button></div>';
+  openBox('#sheet',h);$('#sheet').scrollTop=sc;
 }
 /* Sichern und Laden: der ganze Fortschritt als Code oder Datei (ohne Aufnahmen) */
 function b64e(str){return btoa(unescape(encodeURIComponent(str)));}
