@@ -145,6 +145,7 @@ details.adult.set[open]>div{display:flex;flex-direction:column;gap:16px;margin-t
 .mode b{display:block;font-family:var(--f-display);font-size:1.45rem}
 .mode span{color:var(--muted);font-weight:600;font-size:.95rem}
 .modetag{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;border:2px solid var(--accent);color:var(--accent);border-radius:999px;padding:3px 12px 3px 8px;font-weight:600;font-size:.85rem}.modetag svg{width:18px;height:18px;flex:none}
+.alt-link{align-self:center}
 .mtog{display:inline-flex;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:3px;gap:2px}
 .mtog button{width:40px;height:34px;border:0;border-radius:999px;background:none;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .mtog button svg{width:22px;height:22px}
@@ -317,6 +318,7 @@ details.adult p{color:var(--muted);font-weight:600;font-size:.92rem;margin-top:6
 /* Wort-Jäger */
 .wjcta{display:flex;align-items:center;gap:14px;text-align:left;width:100%;background:var(--surface);border:2px solid var(--xp-edge);border-radius:22px;padding:16px 18px;cursor:pointer;box-shadow:0 5px 0 var(--xp-edge)}
 .wjcta:active{transform:translateY(4px);box-shadow:0 1px 0 var(--xp-edge)}
+.wjcta.sm{background:none;border:0;box-shadow:none;padding:6px 0 0;gap:10px;color:var(--ink)}.wjcta.sm svg{width:24px;height:24px}.wjcta.sm span{color:var(--ink);font-size:1rem}.wjcta.sm b{display:inline;font-size:1rem;color:var(--xp)}
 .wjcta svg{flex:none;width:40px;height:40px;color:var(--xp)}
 .wjcta b{font-family:var(--f-display);font-weight:600;font-size:1.3rem;display:block}
 .wjcta span{color:var(--muted);font-weight:500;font-size:.9rem}
@@ -754,8 +756,9 @@ var IC_F1='<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r
 var IC_F0='<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="currentColor" opacity=".25"/><circle cx="11" cy="13" r="2" fill="currentColor"/><circle cx="21" cy="13" r="2" fill="currentColor"/><path d="M9.5 21c2-2.5 4.5-1 6.5-2.3s4.5-.2 6.5 1.8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
 var IC_DUO='<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="11" cy="11" r="5"/><path d="M1.5 27c0-5.8 4.2-9.5 9.5-9.5s9.5 3.7 9.5 9.5z"/><circle cx="22.5" cy="9" r="4" opacity=".65"/><path d="M17.5 17.4c1.4-1 3.1-1.6 5-1.6 4.7 0 8 3.4 8 8.7h-8.7c-.7-2.9-2.2-5.3-4.3-7.1z" opacity=".65"/></svg>';
 var MODE=null;
+var IC_WJ='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg>';
 function modeTag(){return '<span class="modetag">'+(MODE==='partner'?IC_DUO+'Partner-Modus: Ihr lest zu zweit':IC_SOLO+'Solo-Modus: Du liest allein')+'</span>';}
-function setMode(m){MODE=m;document.documentElement.setAttribute('data-mode',m||'solo');var tc=document.querySelector('meta[name=theme-color]');if(tc)tc.setAttribute('content',m==='partner'?'#2a1206':'#07202b');}
+function setMode(m){MODE=m;try{if(m)localStorage.setItem('readster.mode',m);}catch(e){}document.documentElement.setAttribute('data-mode',m||'solo');var tc=document.querySelector('meta[name=theme-color]');if(tc)tc.setAttribute('content',m==='partner'?'#2a1206':'#07202b');}
 /* Monster wächst in Stufen; statt XP zeigen wir, wie viele Texte es ungefähr noch bis zur nächsten Stufe sind */
 var XP_TEXT=40;
 function stageProg(){
@@ -797,9 +800,9 @@ function renderHome(){
   h+=modeTag();
   if(S.whNote)h+='<section class="card left whnote"><p class="fb">'+esc(S.whNote)+'</p><button class="btn ghost sm" data-a="whNoteOk">Okay</button></section>';
   var due=wjDue().length;
-  if(due)h+='<button class="wjcta" data-a="wj"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg><div><b>Wort-Jäger</b><span>'+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' zum Üben</span></div></button>';
   /* Ganz oben ein klarer Startknopf, Themen danach als Alternative */
-  if(sg)h+='<section class="card nxt"><span class="eyebrow">'+(sg.from?'Rätsel lösen':(doneCount()?'Dein nächster Text':'Dein erster Text'))+' · '+esc(sg.t.cat)+'</span><h2>'+esc(sg.t.title)+'</h2><button class="btn wide" data-a="open" data-v="'+sg.t.id+'">Jetzt lesen</button></section>';
+  if(!sg&&due)h+='<button class="wjcta" data-a="wj"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg><div><b>Wort-Jäger</b><span>'+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' zum Üben</span></div></button>';
+  if(sg)h+='<section class="card nxt"><span class="eyebrow">'+(sg.from?'Rätsel lösen':(doneCount()?'Dein nächster Text':'Dein erster Text'))+' · '+esc(sg.t.cat)+'</span><h2>'+esc(sg.t.title)+'</h2><button class="btn wide" data-a="open" data-v="'+sg.t.id+'">Jetzt lesen</button>'+(due?'<button class="wjcta sm" data-a="wj">'+IC_WJ+'<span>Oder erst <b>Wort-Jäger</b>: '+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' üben</span></button>':'')+'</section>';
   h+='<section class="left"><h2 style="margin-bottom:12px">'+(sg?'Oder wähle ein Thema':'Worüber willst du lesen?')+'</h2><div class="cats">'+CATS.map(function(c){
     var tot=TEXTS.filter(function(t){return t.cat===c.id;}),d=tot.filter(function(t){return S.done[t.id];}).length;
     return '<button class="cat" data-a="cat" data-v="'+c.id+'" style="--c:'+TILE[c.id]+'"><span class="ci">'+c.ic+'</span><b>'+c.id+'</b><span>'+d+' von '+tot.length+'</span></button>';
@@ -916,8 +919,7 @@ function renderCtl(){
     dk='<div class="row"><button class="btn ghost" data-a="listen" id="bL">'+btnLabel()+'</button><button class="btn" data-a="start">'+(R.round?'Nochmal lesen':'Ich lese jetzt')+'</button></div>';
     if(R.msg)h+='<p class="hint fb">'+esc(R.msg)+'</p>';
     else h+=R.sbsDone?'<p class="hint fb">Super, alle Sätze geschafft! Jetzt lies den ganzen Text am Stück.</p>':'<p class="hint fb">Erst hören, dann selbst lesen.</p>';
-    h+='<div class="alt"><span class="eyebrow">Zu schwer am Stück?</span><div class="row"><button class="btn ghost sm" data-a="solo">Satz für Satz</button></div></div><div id="recold"></div>';
-    h+=adult('<p>„Zuhören“ liest den Text vor, das Wort wird mitgezeigt. Tippt das Kind auf ein Wort, liest die Stimme von dort weiter. „Satz für Satz“: Die Stimme liest einen Satz, das Kind liest ihn nach. „Ich lese jetzt“ startet einen Durchgang am Stück, mit Aufnahme, falls eingeschaltet. Es läuft keine Uhr auf dem Bildschirm. Am Ende wartet ein Rätsel, das zum nächsten Text führt.</p>');
+    h+='<button class="link alt-link" data-a="solo">Zu schwer am Stück? Satz für Satz</button>';
   }else if(R.phase==='opa'){
     var n=t.sents.length,lastS=R.si>=n-1,solo=R.who==='solo';
     dk='<div class="lbl '+R.turn+'"><b>'+(R.turn==='opa'?(solo?'Hör gut zu':'Partner liest vor'):(solo?'Jetzt liest du laut':'Jetzt liest du'))+'</b><span>Satz '+(R.si+1)+' von '+n+'</span></div>';
@@ -941,15 +943,15 @@ function renderCtl(){
     var w=R.rounds[R.rounds.length-1],en=R.entry,ms=R.ms||'self';
     if(ms==='self'){
       dk='<button class="btn wide" data-a="ms" data-v="nums"'+(en&&en.self!=null?'':' disabled')+'>Weiter</button>';
-      top='<div class="flat"><span class="eyebrow">Geschafft · Schritt 1 von 3</span><h2>Wie war das Lesen für dich?</h2><div class="selfq selfrow">'+[[2,'Flüssig',IC_F2],[1,'Ging so',IC_F1],[0,'Holprig',IC_F0]].map(function(o){return '<button class="btn '+(en&&en.self===o[0]?'on':'ghost')+'" data-a="self" data-v="'+o[0]+'">'+o[2]+o[1]+'</button>';}).join('')+'</div></div>';
+      top='<div class="flat"><span class="eyebrow">Geschafft!</span><h2>Wie war das Lesen für dich?</h2><div class="selfq selfrow">'+[[2,'Flüssig',IC_F2],[1,'Ging so',IC_F1],[0,'Holprig',IC_F0]].map(function(o){return '<button class="btn '+(en&&en.self===o[0]?'on':'ghost')+'" data-a="self" data-v="'+o[0]+'">'+o[2]+o[1]+'</button>';}).join('')+'</div></div>';
     }else if(ms==='nums'){
       dk='<button class="btn wide" data-a="ms" data-v="listen">Weiter</button>';
       var pv=R.prev&&R.prev.length?R.prev[0].wpm:0;
-      top='<div class="flat result-card"><span class="eyebrow">Schritt 2 von 3</span><b class="rhead" id="rhead">'+esc(R.head||'')+'</b>'+
+      top='<div class="flat result-card"><b class="rhead" id="rhead">'+esc(R.head||'')+'</b>'+
         '<div class="tiles">'+(S.set.nums?'<div class="tile"><b>'+w+'</b><span>Wörter pro Minute</span>'+(pv?'<span class="was">Beim ersten Mal: '+pv+'</span>':'')+'</div>':'')+'<div class="tile"><b>'+fmtSec(R.sec)+'</b><span>Lesezeit</span></div><div class="tile" id="sugtile"'+(R.sugState&&R.sugState!=='none'?'':' hidden')+'>'+sugTile()+'</div></div></div>';
     }else{
       dk='<div class="row">'+(R.round<3?'<button class="btn ghost" data-a="again">Nochmal lesen</button>':'')+'<button class="btn" data-a="check">Zu den Fragen</button></div>';
-      top='<div id="recm"></div><section class="card">'+(R.recOn?'':'<span class="eyebrow">Schritt 3 von 3</span>')+'<h2>Schwere Wörter</h2><p>Tippe im Text die Wörter an, die schwer waren. Sie kommen in den Wort-Jäger.</p><div id="sugbox"></div></section>';
+      top='<div id="recm"></div><section class="card"><h2>Schwere Wörter</h2><p>Tippe im Text die Wörter an, die schwer waren. Sie kommen in den Wort-Jäger.</p><div id="sugbox"></div></section>';
     }
   }else if(R.phase==='check'){
     /* Fragen einzeln nacheinander */
@@ -966,7 +968,6 @@ function renderCtl(){
     h+='</div>';
   }
   c.innerHTML=h;setDock(dk);var rt=$('#rtop');if(rt)rt.innerHTML=top;
-  if(R.phase==='read')fillRec($('#recold'),t.id,false);
   if(R.phase==='mark'){if(R.ms==='listen')fillRec($('#recm'),t.id,true);updateMarkInfo();}else{var os=document.querySelectorAll('#rtext .w.sug,#rtext .w.srm');for(var oi=0;oi<os.length;oi++)os[oi].classList.remove('sug','srm');}
 }
 /* Vorlesen */
@@ -1377,7 +1378,7 @@ function fillRec(el,id,withMark){
     var f=r[0],l=r[1];if(!l){el.innerHTML='';return;}
     freeUrls();var multi=(S.recN[id]||0)>=2&&f;REC.share={b:l,id:id};
     var sh=FRAMED?'':'<button class="link" data-a="shareRec">Aufnahme teilen</button>';
-    if(withMark){el.innerHTML='<section class="card rec"><span class="eyebrow">Schritt 3 von 3</span><h2>Hör dich selbst</h2><span class="hint">Lies beim Hören im Text mit.</span>'+audioTag(l)+'</section>';return;}
+    if(withMark){el.innerHTML='<section class="card rec"><h2>Hör dich selbst</h2><span class="hint">Lies beim Hören im Text mit.</span>'+audioTag(l)+'</section>';return;}
     el.innerHTML='<div class="card rec"><span class="eyebrow">Deine Aufnahmen</span>'+
       (multi?'<span class="hint">Erste Aufnahme</span>'+audioTag(f)+'<span class="hint">Letzte Aufnahme</span>'+audioTag(l):audioTag(l))+
       '<span class="hint">Bleibt nur auf diesem Gerät.</span>'+sh+'</div>';
@@ -1623,10 +1624,12 @@ function cardHTML(t,full){
 function showReward(t,first,gain,list){
   var p=lvlProg(S.xp),sg=suggest();
   var h='<div class="card"><span class="eyebrow">'+(first?'Text geschafft':'Nochmal gelesen')+(R&&R.withOpa?' · mit Partner':'')+'</span><h2>'+esc(t.title)+'</h2><span class="xpgain">Super gelesen!</span>';
-  h+=tankBlock();
+  /* Nur das Rätsel und ein Hauptknopf; Rennen nur bei vollem Tank */
   h+=riddleBlock(t,true);
-  if(fuelFull())h+='<button class="btn wide" data-a="race">Rennen fahren</button>';
-  h+='<div class="cfbtns">'+(sg?'<button class="btn'+(fuelFull()?' ghost':'')+'" data-a="nextread" data-v="'+sg.t.id+'">Weiterlesen</button>':'')+'<button class="btn ghost" data-a="home2">Zur Übersicht</button></div></div>';
+  var full=fuelFull();
+  if(full)h+='<div class="rwt">'+tankPips(true)+'<div><b>Dein Tank ist voll!</b></div></div><button class="btn wide" data-a="race">Rennen fahren</button>';
+  if(sg)h+='<button class="btn wide'+(full?' ghost':'')+'" data-a="nextread" data-v="'+sg.t.id+'">Weiterlesen</button>';
+  h+='<button class="link" data-a="home2">Zur Übersicht</button></div>';
   openBox('#modal',h);readStyle();burst();
   try{var A0=typeof AUDIO!=='undefined'&&AUDIO[t.id];if(A0&&((A0.n&&A0.n.b)||(A0.s&&A0.s.b))){var cx=getAC();if(cx){cx.resume();chime(cx,cx.currentTime+0.6);}}}catch(e){}
 }
@@ -1896,6 +1899,7 @@ document.addEventListener('change',function(e){
 });
 if(window.speechSynthesis){try{window.speechSynthesis.onvoiceschanged=function(){};}catch(e){}}
 whCrashCheck();
+try{var MM=localStorage.getItem('readster.mode');if(MM==='solo'||MM==='partner')setMode(MM);}catch(e){} /* zuletzt gewählter Modus */
 renderHome();show('home');
 syncStart();
 /* Link mit ?code=MOND-4821 meldet direkt mit diesem Code an */
