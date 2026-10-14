@@ -19,3 +19,7 @@ Neu aufgenommen werden nur Texte, die sich geändert haben.
 
 Einmalig nötig: unter Settings → Secrets and variables → Actions ein Secret `ELEVENLABS_API_KEY` mit dem ElevenLabs-Schlüssel anlegen.
 
+
+## Rennen
+
+Statt Monster-Stufen sammelt das Kind Autos aus dem Drag Racer Strip 402. Das Spiel liegt im Readster-Modus unter `rennen/strip402.html` (`?readster`), die Bilder unter `rennen/autos/`. Die Stufen (ab welchem Level welches Auto, welche Hilfen) stehen in `RSTAGES` in `quelle/template.html`. Neue Spielversion: Datei nach `rennen/strip402.html` kopieren. Neues Auto: eine Zeile in `RSTAGES` und ein Bild (480×320 PNG).
