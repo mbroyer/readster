@@ -21,6 +21,22 @@
     "tour2": "Zuerst hörst du dir die Geschichte an.",
     "tour3": "Dann liest du sie laut vor. Ich nehme dich dabei auf.",
     "tour4": "Danach hörst du dich selbst an und tippst auf die Wörter, die schwer waren.",
-    "tour5": "Jeder Text füllt deinen Tank. Ist er voll, fährst du ein Rennen!"
+    "tour5": "Jeder Text füllt deinen Tank. Ist er voll, fährst du ein Rennen!",
+    "rgas": "Leg deinen Finger auf das Gaspedal und schieb ihn nach oben.",
+    "rzone": "Gut! Halte die Nadel im grünen Feld.",
+    "rampel": "Bleib auf dem Gas. Wenn die Ampel grün wird, tippst du auf Los.",
+    "rlos": "Jetzt! Tippe auf Los!",
+    "rwarte": "Noch nicht! Warte, bis die Ampel grün ist.",
+    "rauto": "Lass den Finger auf dem Gas. Das Auto schaltet von allein.",
+    "rschalt": "Der Knopf leuchtet gelb. Tippe jetzt auf Schalten!",
+    "rbrems": "Im Ziel! Halte den Bremsknopf gedrückt.",
+    "rgasweg": "Finger auf dem Gas lassen!",
+    "rsieg": "Du hast gewonnen!",
+    "rverloren": "Knapp verloren. Nächstes Mal klappt es!",
+    "rzufrueh": "Zu früh gestartet. Warte auf Grün!",
+    "rtmehr": "Tipp: Gib beim Start etwas mehr Gas.",
+    "rtweniger": "Tipp: Gib beim Start etwas weniger Gas.",
+    "rtschalt": "Tipp: Schalte, wenn der Knopf gelb leuchtet.",
+    "rtbrems": "Tipp: Bremse nach dem Ziel früher."
   }
 }

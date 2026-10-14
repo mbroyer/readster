@@ -904,11 +904,8 @@ function renderGarage(){
 /* Rennen: das Spiel läuft im Vollbild-Rahmen und meldet das Ergebnis per postMessage */
 function raceOpen(){
   var c=curCar();if(!c||!fuelFull())return;
-  if(!S.raceIntro){ /* Vor dem ersten Rennen: ein Bild, zwei Sätze, die Stimme sagt sie */
-    openBox('#modal','<div class="card"><h2>Dein erstes Rennen!</h2>'+carImg(c.car,'big',c.full)+'<div class="howrace"><div><span class="hn">1</span><b>Gas halten</b></div><div><span class="hn">2</span><b>Bei Grün: Los!</b></div></div><button class="btn wide" data-a="raceGo">Los geht’s</button></div>');
-    say('rennen',300);return;
-  }
-  var p=RSTAGES[rankOf(lvl(S.xp))].r,q={car:c.car,name:c.full,auto:p.auto,brake:p.brake,night:Math.random()<p.night?1:0,wx:p.wx,diff:p.diff,rival:p.rival?1:0};
+  /* Die Anleitung macht das Spiel selbst: beim ersten Rennen jeder Steuerart zeigt und sagt es jeden Schritt */
+  var p=RSTAGES[rankOf(lvl(S.xp))].r,q={car:c.car,name:c.full,auto:p.auto,brake:p.brake,night:Math.random()<p.night?1:0,wx:p.wx,diff:p.diff,rival:p.rival?1:0,voice:S.set.voice?1:0,hv:'../audio/'};
   if(S.rbest[c.car])q.best=S.rbest[c.car].toFixed(2);
   var u='rennen/strip402.html?readster';for(var k in q)u+='&'+k+'='+encodeURIComponent(q[k]);
   var d=$('#race');d.innerHTML='<iframe title="Rennen" allow="autoplay" src="'+u+'"></iframe>';d.hidden=false;
