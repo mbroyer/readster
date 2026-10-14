@@ -436,6 +436,8 @@ function saveLocal(){try{localStorage.setItem(skey(CODE),JSON.stringify(S));}cat
 function save(){S.ts=Date.now();saveLocal();syncSoon();}
 var SYNC_URL='__WHSERVER__';if(SYNC_URL.indexOf('http')!==0)SYNC_URL='';if(window.__syncServer!==undefined)SYNC_URL=window.__syncServer;
 SYNC_URL=SYNC_URL.replace(/\/+$/,'');
+/* Mit Dienst ist Readster nur mit gültigem Code nutzbar */
+var GATE=!!SYNC_URL;
 var SY={timer:null,busy:false,again:false,dirty:false,state:''};
 function syncUrl(c){return SYNC_URL+'/fortschritt/'+encodeURIComponent(c);}
 function syncSoon(){if(!CODE||!SYNC_URL)return;SY.dirty=true;clearTimeout(SY.timer);SY.timer=setTimeout(syncPush,2500);}
@@ -460,7 +462,9 @@ function syncGet(c){
 function syncStart(){
   if(!CODE||!SYNC_URL)return;var c=CODE;
   syncGet(c).then(function(r){
-    if(c!==CODE)return;SY.state='ok';
+    if(c!==CODE)return;
+    if(r.nein){if(CUR==='home'&&!R)logout('Der Code '+c+' gilt nicht mehr. Frag nach einem neuen Code.');return;}
+    SY.state='ok';
     var st=r.state,lt=S.ts||0,rt=(st&&st.ts)||0;
     if(lt>rt){syncPush();return;}
     if(st&&rt>lt&&CUR==='home'&&!R){S=merge(st);saveLocal();if($('#modal').hidden&&$('#sheet').hidden)renderHome();readStyle();}
@@ -564,6 +568,15 @@ function growText(){
   if(r===1)return 'Noch '+t+', dann ist die Plane weg.';
   return 'Noch '+t+' bis zum nächsten Auto.';
 } /* wird bei jedem Start neu gewählt */
+function renderGate(msg,pre){
+  var h='<div class="pickwrap"><div class="pick"><div class="applogo"><img class="wordmark" alt="Readster" src="'+LOGO+'"></div><h2>Willkommen!</h2>';
+  h+='<p class="hint" style="text-align:center">Melde dich mit deinem Code an. Den Code bekommst du von der Person, die dich zu Readster eingeladen hat.</p>';
+  h+='<input class="codein" id="codeIn" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24" placeholder="Dein Code" value="'+esc(pre||'')+'">';
+  if(msg)h+='<p class="hint fb" id="codemsg" style="text-align:center">'+esc(msg)+'</p>';
+  h+='<button class="btn wide" data-a="codeGo">Anmelden</button>';
+  h+='</div><div class="foot"><div class="madeby small"><span>Made with love by</span><img alt="A Simple Man’s Lab" src="'+MADEBY+'"></div></div></div>';
+  $('#v-home').innerHTML=h;
+}
 function renderPick(){
   var h='<div class="pickwrap"><div class="pick"><div class="applogo"><img class="wordmark" alt="Readster" src="'+LOGO+'"></div><h2>Wie liest du heute?</h2>';
   h+='<button class="mode" data-a="mode" data-v="solo"><span class="ic">'+IC_SOLO+'</span><div><b>Allein</b><span>Du hörst zu und liest dann selbst laut.</span></div></button>';
@@ -573,6 +586,7 @@ function renderPick(){
   $('#v-home').innerHTML=h;
 }
 function renderHome(){
+  if(GATE&&!CODE){renderGate();return;}
   if(!MODE){renderPick();return;}
   var p=lvlProg(S.xp),sg=suggest(),wk=weekInfo(),n=doneCount();
   var h='<header class="top"><h1 class="brand"><img class="wordmark sm" alt="Readster" src="'+LOGO+'"></h1><div class="chips"><div class="mtog" role="group" aria-label="Wie liest du?"><button data-a="mode" data-v="solo" aria-pressed="'+(MODE==='solo')+'" aria-label="Allein">'+IC_SOLO+'</button><button data-a="mode" data-v="partner" aria-pressed="'+(MODE==='partner')+'" aria-label="Mit Partner">'+IC_DUO+'</button></div><button class="iconbtn" data-a="stats" aria-label="Dein Fortschritt"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="12" width="4" height="7" rx="1.5" fill="currentColor"/><rect x="9" y="7" width="4" height="12" rx="1.5" fill="currentColor"/><rect x="15" y="3" width="4" height="16" rx="1.5" fill="currentColor"/></svg></button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
@@ -1179,7 +1193,7 @@ function wavPCM16(x){
 }
 function whServer(x){
   var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ctl)ctl.abort();},120000);
-  return fetch(WH_SERVER,{method:'POST',headers:{'Content-Type':'audio/wav'},body:wavPCM16(x),signal:ctl?ctl.signal:undefined})
+  return fetch(WH_SERVER,{method:'POST',headers:{'Content-Type':'audio/wav','X-Readster-Code':CODE},body:wavPCM16(x),signal:ctl?ctl.signal:undefined})
     .then(function(r){return r.json().catch(function(){return {};}).then(function(j){if(!r.ok)throw new Error(j.fehler||('HTTP '+r.status));return j;});})
     .then(function(j){clearTimeout(tm);return {type:'done',chunks:(j.words||[]).map(function(w){return {text:' '+w.word,timestamp:[w.start,w.end]};})};},
           function(e){clearTimeout(tm);return {type:'error',msg:String(e&&e.message||e)};});
@@ -1509,23 +1523,25 @@ function useCode(c,st){
   closeBox('#sheet');renderHome();show('home');readStyle();
   syncStart();
 }
+function loginMsg(msg,pre){if(GATE&&!CODE){closeBox('#sheet');renderGate(msg,pre);show('home');}else renderLogin(msg,pre);}
 function codeGo(c){
   c=normCode(c);
-  if(c.length<4){renderLogin('Der Code ist zu kurz.',c);return;}
+  if(c.length<4){loginMsg('Der Code ist zu kurz.',c);return;}
   if(c===CODE){closeBox('#sheet');return;}
-  renderLogin('Einen Moment …',c);
+  loginMsg('Einen Moment …',c);
   syncGet(c).then(function(r){
-    if(r.nein){renderLogin('Diesen Code gibt es nicht. Prüfe, ob er richtig geschrieben ist.',c);return;}
+    if(r.nein){loginMsg('Diesen Code gibt es nicht. Prüfe, ob er richtig geschrieben ist.',c);return;}
     if(r.state){useCode(c,r.state);return;}
     if(readLocal(c)){useCode(c,null);return;}
-    var h='<div class="card left"><h2>Neuer Code</h2><p class="hint">Den Code <b>'+esc(c)+'</b> gibt es noch nicht. Soll er neu angelegt werden?</p>';
+    if(GATE&&!(S.xp>0)){codeNew(c,false);return;}
+    var h='<div class="card left">'+(GATE?'<h2>Willkommen!</h2><p class="hint">Auf diesem Gerät gibt es schon einen Lese-Fortschritt. Soll er zu deinem Code <b>'+esc(c)+'</b> mitkommen?</p>':'<h2>Neuer Code</h2><p class="hint">Den Code <b>'+esc(c)+'</b> gibt es noch nicht. Soll er neu angelegt werden?</p>');
     h+='<button class="btn wide" data-a="codeNew" data-v="'+esc(c)+'">Neu anfangen</button>';
     if(S.xp>0)h+='<button class="btn ghost wide" data-a="codeKeep" data-v="'+esc(c)+'">Fortschritt von hier mitnehmen</button>';
     h+='<button class="link" data-a="login">Anders schreiben</button></div>';
     openBox('#sheet',h);
   }).catch(function(){
     if(readLocal(c)){useCode(c,null);return;}
-    renderLogin('Gerade gibt es keine Verbindung. Versuche es gleich nochmal.',c);
+    loginMsg('Gerade gibt es keine Verbindung. Versuche es gleich nochmal.',c);
   });
 }
 function codeNew(c,keep){
@@ -1533,10 +1549,11 @@ function codeNew(c,keep){
   CODE=normCode(c);try{localStorage.setItem(CODEK,CODE);}catch(e){}
   R=null;S=d;save();syncPush();closeBox('#sheet');renderHome();show('home');readStyle();
 }
-function logout(){
+function logout(msg){
   if(SY.dirty)syncPush(true);
   CODE='';try{localStorage.removeItem(CODEK);}catch(e){}
   SY.state='';SY.dirty=false;R=null;S=load();closeBox('#sheet');renderHome();show('home');readStyle();
+  if(msg)loginMsg(msg);
 }
 function renderReset(){
   openBox('#sheet','<div class="card"><h2>Fortschritt löschen?</h2><p class="hint">Alle Karten, XP und markierten Wörter auf diesem Gerät werden gelöscht.</p><div class="cfbtns"><button class="btn ghost" data-a="sheetOk">Abbrechen</button><button class="btn" data-a="doReset">Löschen</button></div></div>');
@@ -1600,7 +1617,7 @@ document.addEventListener('click',function(e){
     case 'wjRead':wjRead();break;
     case 'wjJudge':wjJudge(v==='1');break;
     case 'backup':renderBackup();break;
-    case 'login':renderLogin();break;
+    case 'login':loginMsg('');break;
     case 'codeGo':codeGo($('#codeIn').value);break;
     case 'codeNew':codeNew(v,false);break;
     case 'codeKeep':codeNew(v,true);break;

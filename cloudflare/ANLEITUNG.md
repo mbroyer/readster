@@ -20,8 +20,13 @@ Damit sich Testpersonen mit einem Code anmelden können, braucht der Worker eine
 3. Im Worker **Einstellungen** → **Bindungen** → **Bindung hinzufügen** → **KV-Namespace**. Variablenname `FORTSCHRITT`, Namespace `readster-fortschritt` wählen, speichern.
 4. Prüfen: Die Adresse des Workers im Browser öffnen. Dort muss `"fortschritt":true` stehen.
 
-Codes verteilen: Einfach einen Code ausdenken (Buchstaben, Zahlen und Bindestrich, mindestens 4 Zeichen, z. B. `MOND-4821`) und der Testperson diesen Link schicken: `https://asimplemanslab.com/readster/?code=MOND-4821`. Beim ersten Öffnen fragt Readster, ob der Code neu angelegt werden soll. Man kann den Code auch in der App unter „Mit Code anmelden“ eintippen.
+Readster lässt sich nur noch mit einem gültigen Code benutzen. Ohne Code sieht man nur den Anmeldebildschirm.
 
-Nur bestimmte Codes erlauben (optional): Im Worker unter **Einstellungen** → **Variablen** eine Variable `CODES` anlegen, z. B. `MOND-4821, TIGER-1234`. Dann funktionieren nur diese Codes. Ohne die Variable ist jeder Code erlaubt. Wer einen Code kennt, sieht dessen Fortschritt, darum Codes nicht zu einfach wählen.
+Codes vergeben:
+1. Im Worker unter **Einstellungen** → **Variablen und Geheimnisse** eine Variable vom Typ Text anlegen: Name `CODES`, Wert z. B. `MOND-4821, TIGER-1234` (Buchstaben, Zahlen, Bindestrich, mindestens 4 Zeichen). **Bereitstellen** tippen.
+2. Der Testperson den Link schicken: `https://asimplemanslab.com/readster/?code=MOND-4821`. Sie kann den Code auch selbst auf dem Anmeldebildschirm eintippen.
+3. Neue Testperson: Code zur Liste hinzufügen. Code aus der Liste streichen: Die Person wird beim nächsten Öffnen mit Internet abgemeldet. Ihr Fortschritt bleibt gespeichert und ist wieder da, wenn der Code zurück in die Liste kommt.
+
+Die Liste gilt auch für die Whisper-Auswertung: Ohne gültigen Code nimmt der Worker keine Aufnahmen an. Ohne Variable `CODES` ist jeder Code erlaubt, dann kann sich jeder mit einem ausgedachten Code anmelden.
 
 Gespeichert werden nur Fortschritt und Einstellungen (Level, gelesene Texte, Wörter, Tempo), keine Aufnahmen. Die Aufnahmen bleiben auf dem Gerät. Im kostenlosen Tarif sind 1.000 Speichervorgänge pro Tag frei, das reicht für viele Testpersonen.

@@ -19,7 +19,7 @@ function cors(origin) {
   return {
     'Access-Control-Allow-Origin': ERLAUBT.includes(origin) ? origin : ERLAUBT[0],
     'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Readster-Code',
     'Access-Control-Max-Age': '86400',
     'Vary': 'Origin',
   };
@@ -30,7 +30,11 @@ function base64(buf) {
   for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
   return btoa(s);
 }
-// Optional: Variable CODES (z. B. "MOND-4821, TIGER-1234") erlaubt nur diese Codes. Ohne CODES ist jeder Code erlaubt.
+// Variable CODES (z. B. "MOND-4821, TIGER-1234") erlaubt nur diese Codes, für Fortschritt und Whisper-Auswertung.
+// Ohne CODES ist jeder Code erlaubt und die Auswertung offen.
+function normCode(c) {
+  return String(c || '').toUpperCase().replace(/[^A-Z0-9-]/g, '');
+}
 function codeErlaubt(code, env) {
   if (!CODE_RE.test(code)) return false;
   const liste = String(env.CODES || '').split(/[\s,;]+/).map((c) => c.trim().toUpperCase()).filter(Boolean);
@@ -71,6 +75,7 @@ export default {
     }
     if (req.method !== 'POST') return antwort({ ok: true, dienst: 'Readster Whisper', fortschritt: !!env.FORTSCHRITT }, 200, origin);
     if (!ERLAUBT.includes(origin)) return antwort({ fehler: 'nicht erlaubt' }, 403, origin);
+    if (env.CODES && !codeErlaubt(normCode(req.headers.get('X-Readster-Code')), env)) return antwort({ fehler: 'unbekannter Code' }, 403, origin);
     if (!env.AI) return antwort({ fehler: 'Workers AI ist nicht verbunden (Binding AI fehlt)' }, 500, origin);
     const buf = await req.arrayBuffer();
     if (!buf.byteLength) return antwort({ fehler: 'leer' }, 400, origin);
