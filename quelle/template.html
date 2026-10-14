@@ -109,7 +109,10 @@ button,input{font:inherit;color:inherit}
 .stagename{font-family:var(--f-display);font-weight:600;font-size:1.7rem;line-height:1.05}
 .week{gap:14px}
 .setgrp{font-size:1rem;font-weight:600;margin:6px 0 -6px;padding-top:12px;border-top:2px solid var(--line)}details.adult.set>div>.setgrp:first-child{border-top:0;padding-top:0}.setrow .link{align-self:flex-start;padding-left:0}
-.nxt{gap:8px;padding:16px}.nxt h2{font-size:1.3rem}.nxtb{display:flex;gap:10px;margin-top:4px}.nxtb .btn:first-child{flex:2}.nxtb .btn.ghost{flex:1;font-size:1rem;padding-inline:10px}
+.nxt{gap:12px;padding:16px}.nxt h2{font-size:1.3rem;margin:2px 0 0}
+.nxth{display:flex;align-items:center;gap:14px}.nxth .eyebrow{color:var(--c)}
+.nxic{flex:none;width:58px;height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:var(--c);background:var(--bg);background:color-mix(in srgb,var(--c) 18%,var(--bg))}.nxic svg{width:34px;height:34px}
+.nxtl{display:flex;align-items:center;justify-content:space-between;gap:10px}.nxtl .link{padding:4px 0}.nxtl .wjcta.sm{width:auto;padding:4px 0}.nxtb{display:flex;gap:10px;margin-top:4px}.nxtb .btn:first-child{flex:2}.nxtb .btn.ghost{flex:1;font-size:1rem;padding-inline:10px}
 #v-home .card{padding:16px;gap:10px}#v-home .tile{padding:8px 4px}#v-home .tile b{font-size:1.5rem}#v-home .dot i{max-width:30px;border-width:2px}#v-home .dot span{font-size:.75rem}
 #v-home .sechead .hint{font-size:.85rem}#v-home{gap:12px}#v-home .tile b{font-size:1.3rem}#v-home .tile span{font-size:.75rem}#v-home .rtank{min-height:0}#v-home .rtank .btn{padding:7px 14px;min-height:0}
 .sechead{display:flex;flex-direction:column;gap:4px;margin:4px 0 -6px}.sechead h2{font-size:1.2rem}
@@ -322,10 +325,10 @@ details.tip summary{cursor:pointer;font-weight:500}details.tip ul{margin:8px 0 0
 .fxs{width:14px;height:14px;background:var(--xp);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:fxs 900ms ease-out forwards}
 @keyframes fxs{0%{opacity:1;transform:translate(0,0) scale(.4) rotate(0)}70%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.6) rotate(var(--rot))}}
 @media (prefers-reduced-motion:reduce){#fx{display:none}.mbob,.eyes,.wing,.aura,.tw{animation:none!important}}
-.foot{display:flex;justify-content:center;padding:20px 0 16px}
-.madeby{display:flex;flex-direction:column;align-items:center;gap:6px;opacity:.7}
+.foot{display:flex;justify-content:center;padding:44px 0 24px}
+.madeby{display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.75}
 .madeby span{font:500 8px/1 var(--f-body);letter-spacing:.18em;text-transform:uppercase;color:#fff}
-.madeby img{width:44px;height:auto;display:block;filter:brightness(0) invert(1)}
+.madeby img{width:58px;height:auto;display:block;filter:brightness(0) invert(1)}
 </style>
 <style>
 /* Feste Leiste unten: die wichtigsten Knöpfe der Lesephase sind immer erreichbar */
@@ -720,7 +723,11 @@ function renderHome(){
   /* Dann ein klarer Startknopf, Themen dahinter */
   if(!sg)h+='<button class="btn wide" data-a="topics">Thema wählen</button>';
   if(!sg&&due)h+='<button class="wjcta" data-a="wj"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg><div><b>Wort-Jäger</b><span>'+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' zum Üben</span></div></button>';
-  if(sg)h+='<section class="card nxt"><span class="eyebrow">'+(doneCount()?'Dein nächster Text':'Dein erster Text')+' · '+esc(sg.t.cat)+'</span><h2>'+esc(sg.t.title)+'</h2><div class="nxtb"><button class="btn" data-a="open" data-v="'+sg.t.id+'">Jetzt lesen</button><button class="btn ghost" data-a="topics">Thema wählen</button></div>'+(due?'<button class="wjcta sm" data-a="wj">'+IC_WJ+'<span>Oder erst <b>Wort-Jäger</b>: '+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' üben</span></button>':'')+'</section>';
+  /* Nächster Text: Themen-Bild, Titel, ein großer Knopf. Thema wechseln und Wort-Jäger klein darunter. */
+  if(sg){var sc=CATS.filter(function(c){return c.id===sg.t.cat;})[0];
+    h+='<section class="card nxt" style="--c:'+(TILE[sg.t.cat]||'var(--accent)')+'"><div class="nxth"><span class="nxic" aria-hidden="true">'+(sc?sc.ic:'')+'</span><div><span class="eyebrow">'+esc(sg.t.cat)+'</span><h2>'+esc(sg.t.title)+'</h2></div></div>'+
+      '<button class="btn wide" data-a="open" data-v="'+sg.t.id+'">Jetzt lesen</button>'+
+      '<div class="nxtl"><button class="link" data-a="topics">Anderes Thema</button>'+(due?'<button class="wjcta sm" data-a="wj">'+IC_WJ+'<span><b>Wort-Jäger</b> · '+Math.min(due,WJ_MAX)+'</span></button>':'')+'</div></section>';}
   /* Fortschritt direkt auf der Startseite, Details per Antippen */
   /* Fortschritt ohne Karte: große Zahlen direkt auf dem Hintergrund, darunter die Woche als Punkte */
   h+='<button class="prog0" data-a="stats" aria-label="Fortschritt ansehen"><span class="phead"><span class="ph2">Dein Fortschritt</span><span class="more">Alles ansehen ›</span></span>'+
