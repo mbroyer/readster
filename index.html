@@ -107,6 +107,13 @@ button,input{font:inherit;color:inherit}
 .week{gap:14px}
 .alt{display:flex;flex-direction:column;gap:8px;margin-top:4px}
 .alt .row>*{flex:1 1 120px}
+.todo{gap:16px}.todo h2{margin:0}
+.tstep{display:flex;flex-direction:column;gap:10px}
+.tstep .th{display:flex;gap:10px;align-items:center}
+#rtop{display:flex;flex-direction:column;gap:16px}#rtop:empty{display:none}
+.tstep b{font-weight:500;font-size:1.05rem}
+.tn{flex:0 0 30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:600}
+.tstep .selfrow>*{flex:1 1 0;min-width:0;padding-inline:6px}
 .selfq{display:flex;flex-direction:column;gap:8px;margin-top:6px;padding-top:12px;border-top:2px solid var(--line)}
 .selfq .row>*{flex:1 1 0;min-width:0;padding-inline:6px}
 .selfq h3{font-size:1.05rem;margin:0}
@@ -890,12 +897,14 @@ function renderCtl(){
   }else if(R.phase==='mark'){
     var w=R.rounds[R.rounds.length-1],en=R.entry;
     dk='<div class="row">'+(R.round<3?'<button class="btn ghost" data-a="again">Nochmal lesen</button>':'')+'<button class="btn" data-a="check">Zu den Fragen</button></div>';
-    top='<section class="card result-card"><span class="eyebrow">Auswertung · Durchgang '+R.rounds.length+'</span><b class="rhead" id="rhead">'+esc(R.head||'')+'</b>'+
+    /* Auswertung: oben das Ergebnis, darunter zwei klare Aufgaben */
+    top='<section class="card result-card"><span class="eyebrow">Durchgang '+R.rounds.length+'</span><b class="rhead" id="rhead">'+esc(R.head||'')+'</b>'+
       '<div class="tiles">'+(S.set.nums?'<div class="tile"><b>'+w+'</b><span>Wörter pro Minute</span></div>':'')+'<div class="tile"><b>'+fmtSec(R.sec)+'</b><span>Lesezeit</span></div><div class="tile" id="sugtile"'+(R.sugState&&R.sugState!=='none'?'':' hidden')+'>'+sugTile()+'</div></div>'+
-      '<div id="chkbox"></div>'+(compareText(w)?'<p class="fb" id="cmptxt">'+esc(compareText(w))+'</p>':'')+'<span class="hint fb" id="fbtxt">'+esc(R.fb||'')+'</span>'+(S.set.nums&&R.rounds.length>1?'<div class="bars">'+bars()+'</div>':'')+
-      '<div id="recm"></div>'+
-      '<div class="selfq"><h3>Wie war das für dich?</h3><div class="row selfrow">'+[[2,'Flüssig'],[1,'Ging so'],[0,'Holprig']].map(function(o){return '<button class="btn sm '+(en&&en.self===o[0]?'on':'ghost')+'" data-a="self" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div>'+
-      '<span class="hint">Schwere Wörter? Tippe sie im Text an, dann kommen sie in den Wort-Jäger.</span><div id="sugbox"></div></div></section>';
+      '<div id="chkbox"></div><div id="recm"></div></section>'+
+      '<section class="card todo"><h2>Und jetzt du</h2>'+
+      '<div class="tstep"><div class="th"><span class="tn">1</span><b>Wie war das für dich?</b></div><div class="row selfrow">'+[[2,'Flüssig'],[1,'Ging so'],[0,'Holprig']].map(function(o){return '<button class="btn sm '+(en&&en.self===o[0]?'on':'ghost')+'" data-a="self" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
+      '<div class="tstep"><div class="th"><span class="tn">2</span><b>Schwere Wörter im Text antippen</b></div><span class="hint">Sie kommen in den Wort-Jäger.</span><div id="sugbox"></div></div>'+
+      '</section>';
   }else if(R.phase==='check'){
     /* Fragen einzeln nacheinander */
     var nq=t.q.length,qi=Math.min(R.qi||0,nq-1),q=t.q[qi],o=R.opts[qi],pk=R.pick[qi],done=pk!==null||!o||o.length<2,last=qi>=nq-1;
@@ -1165,13 +1174,13 @@ function updateMarkInfo(){
     else{
       c.miss.forEach(function(k){var w=$('#rtext .w[data-i="'+k+'"]');if(w)w.classList.add('srm');});
       cb.innerHTML='<div class="chk"><span class="eyebrow">Genaue Auswertung</span><b>'+c.ok+' von '+c.n+' Wörtern erkannt</b>'+
-        (c.miss.length?'<span class="hint">Blau gepunktet: Diese Wörter hat Whisper nicht sicher gehört. Lies sie ruhig noch einmal. Whisper verhört sich auch mal.</span>':'<span class="hint fb">Alle Wörter erkannt!</span>')+'</div>';
+        (c.miss.length?'<span class="hint">Blau gepunktet: Diese Wörter lies ruhig noch einmal.</span>':'<span class="hint fb">Alle Wörter erkannt!</span>')+'</div>';
     }
   }
   var sb=$('#sugbox');
   if(R.phase==='mark'&&R.sug&&R.sug.length){
     R.sug.forEach(function(k){var w=$('#rtext .w[data-i="'+k+'"]');if(w)w.classList.add('sug');});
-    if(sb)sb.innerHTML='<p class="hint">Vor den gelb gestrichelten Wörtern hast du länger überlegt. War da ein schweres Wort?</p>';
+    if(sb)sb.innerHTML='<p class="hint">Tipp: Bei den gelb gestrichelten Wörtern hast du länger überlegt.</p>';
   }else if(sb)sb.innerHTML='';
 }
 /* ---------- Fortschritt ---------- */
@@ -1308,7 +1317,7 @@ function fillRec(el,id,withMark){
     var f=r[0],l=r[1];if(!l){el.innerHTML='';return;}
     freeUrls();var multi=(S.recN[id]||0)>=2&&f;REC.share={b:l,id:id};
     var sh=FRAMED?'':'<button class="link" data-a="shareRec">Aufnahme teilen</button>';
-    if(withMark){el.innerHTML='<div class="rec me"><b>Hör dich selbst</b>'+audioTag(l)+'<span class="hint">Wo du stockst, war vielleicht ein Wort schwer. Tippe es unten im Text an.</span>'+sh+'</div>';return;}
+    if(withMark){el.innerHTML='<div class="rec me"><b>Hör dich selbst</b>'+audioTag(l)+'</div>';return;}
     el.innerHTML='<div class="card rec"><span class="eyebrow">Deine Aufnahmen</span>'+
       (multi?'<span class="hint">Erste Aufnahme</span>'+audioTag(f)+'<span class="hint">Letzte Aufnahme</span>'+audioTag(l):audioTag(l))+
       '<span class="hint">Bleibt nur auf diesem Gerät.</span>'+sh+'</div>';
