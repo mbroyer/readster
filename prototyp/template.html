@@ -331,7 +331,7 @@ TEXTS.forEach(function(t){
 });
 (function(){var ds=TEXTS.map(function(t){return t.diff;}).sort(function(a,b){return a-b;}),med=ds[Math.floor(ds.length/2)];TEXTS.forEach(function(t){t.stars=t.diff>=med?2:1;});})();
 /* ---------- Zustand ---------- */
-function defaults(){return {whNote:'',xp:0,done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Nunito',size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1}};}
+function defaults(){return {whNote:'',xp:0,done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Lexend',lx:1,size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1}};}
 function fixState(d){
   /* Ältere Stände: gesammelte Wörter in den Wort-Jäger übernehmen */
   Object.keys(d.stolper||{}).forEach(function(w){if(!d.wj[w])d.wj[w]={n:d.stolper[w],ok:[],done:false};});
@@ -341,7 +341,8 @@ function fixState(d){
 function merge(j){
   var d=defaults();
   if(j&&typeof j==='object'){for(var k in d){if(j[k]!==undefined&&k!=='set')d[k]=j[k];}
-    for(var q in d.set){if(j.set&&j.set[q]!==undefined)d.set[q]=j.set[q];}}
+    for(var q in d.set){if(j.set&&j.set[q]!==undefined)d.set[q]=j.set[q];}
+    if(!(j.set&&j.set.lx)){d.set.font='Lexend';d.set.lx=1;}} /* Lexend ist jetzt die Standard-Leseschrift */
   return fixState(d);
 }
 function load(){
@@ -1277,7 +1278,7 @@ function renderSheet(){
   function seg(key,opts){return '<div class="seg">'+opts.map(function(o){return '<button data-a="set" data-k="'+key+'" data-v="'+o[0]+'" aria-pressed="'+(String(s[key])===String(o[0]))+'">'+o[1]+'</button>';}).join('')+'</div>';}
   var h='<div class="card left"><h2>Lesehilfen</h2>';
   h+='<div class="rtext syl-on prev" style="--rf:\''+esc(s.font)+'\';--rsize:'+[1.25,1.5,1.8][s.size]+'rem;--rline:'+[1.7,2,2.35][s.line]+';--rsp:'+[0,.04,.08][s.space]+'em;background:var(--bg);border-radius:14px;padding:12px 14px"><span class="w"><span class="sy s0">Ge</span><span class="sy s1">cko</span></span> <span class="w"><span class="sy s0">läuft</span></span> <span class="w"><span class="sy s0">an</span></span> <span class="w"><span class="sy s0">der</span></span> <span class="w"><span class="sy s0">Wand</span></span>.</div>';
-  h+='<div class="setrow"><span class="eyebrow">Schrift</span>'+seg('font',[['Nunito','Rund'],['Lexend','Weit'],['Atkinson Hyperlegible','Klar']])+'</div>';
+  h+='<div class="setrow"><span class="eyebrow">Schrift</span>'+seg('font',[['Lexend','Lexend'],['Atkinson Hyperlegible','Klar'],['Nunito','Rund']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Größe</span>'+seg('size',[[0,'Normal'],[1,'Groß'],[2,'Sehr groß']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Silben in zwei Farben</span>'+seg('syl',[[true,'An'],[false,'Aus']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Vorlese-Tempo</span>'+seg('speed',[['slow','Langsam'],['normal','Normal']])+'</div>';
