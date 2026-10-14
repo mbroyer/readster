@@ -19,6 +19,7 @@
 :root{
   --bg:#07202b;--surface:#0f3342;--ink:#e8f8ff;--muted:#8fbccc;--line:#1d4d61;
   --accent:#2fd6d0;--accent-edge:#169a96;--accent-ink:#042321;
+  --cta:#ff7a59;--cta-edge:#c4492b;--cta-ink:#2b0c03;
   --xp:#ffd04d;--xp-edge:#c79500;--xp-ink:#3d2a00;
   --good:#4fd18b;--good-bg:#12392a;--bad:#ff7c82;--bad-bg:#46202a;--warn-bg:#443a14;
   --sy-a:#8be9e3;--sy-b:#ffd9a0;
@@ -43,8 +44,8 @@ button,input{font:inherit;color:inherit}
 .chip.lvl{background:var(--xp);border-color:var(--xp-edge);color:var(--xp-ink)}
 .iconbtn{cursor:pointer;background:var(--surface);border:2px solid var(--line);border-radius:50%;width:44px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center;color:var(--accent);font-family:var(--f-display);font-weight:600;font-size:1rem}
 .card{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:14px}
-.btn{font-family:var(--f-display);font-weight:600;font-size:1.2rem;padding:14px 22px;border-radius:18px;border:0;background:var(--accent);color:var(--accent-ink);box-shadow:0 5px 0 var(--accent-edge);cursor:pointer;transition:transform .08s,box-shadow .08s;text-align:center;min-height:52px}
-.btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 var(--accent-edge)}
+.btn{font-family:var(--f-display);font-weight:600;font-size:1.2rem;padding:14px 22px;border-radius:18px;border:0;background:var(--cta);color:var(--cta-ink);box-shadow:0 5px 0 var(--cta-edge);cursor:pointer;transition:transform .08s,box-shadow .08s;text-align:center;min-height:52px}
+.btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 var(--cta-edge)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.ghost{background:var(--surface);color:var(--ink);border:2px solid var(--line);box-shadow:0 5px 0 var(--line)}
 .btn.ghost:active:not(:disabled){box-shadow:0 1px 0 var(--line)}
@@ -625,8 +626,9 @@ function renderHome(){
     var tot=TEXTS.filter(function(t){return t.cat===c.id;}),d=tot.filter(function(t){return S.done[t.id];}).length;
     return '<button class="cat" data-a="cat" data-v="'+c.id+'">'+c.ic+'<b>'+c.id+'</b><span>'+d+' von '+tot.length+'</span></button>';
   }).join('')+'</div></section>';
-  if(sg)h+='<button class="btn ghost wide" data-a="open" data-v="'+sg.t.id+'">'+(sg.from?'Rätsel lösen: '+esc(sg.t.title):'Überrasch mich')+'</button>';
+  if(sg)h+='<button class="btn wide" data-a="open" data-v="'+sg.t.id+'">'+(sg.from?'Rätsel lösen: '+esc(sg.t.title):'Überrasch mich')+'</button>';
   var stn=MON.STAGES[rankOf(p.L)].n;
+  h+='<h2 style="margin:10px 0 -4px">Dein Level</h2>';
   h+='<section class="card week"><div class="hero" style="display:flex">'+stageHTML(rankOf(p.L))+'<div class="info"><span class="eyebrow">'+(S.name?'Dein Monster · '+esc(stn):'Dein Monster')+'</span><span class="stagename">'+esc(S.name||stn)+'</span><div class="bar" role="progressbar" aria-valuenow="'+stageProg().pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+stageProg().pct+'%"></i></div><span class="xptext">'+esc(growText())+'</span></div></div>'+
     '<div class="wk"><div class="row" style="flex-wrap:nowrap;justify-content:space-between;align-items:baseline"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></div><div class="dots">'+wk.arr.map(function(d){return '<div class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></div>';}).join('')+'</div></div></section>';
   h+='<button class="btn ghost wide" data-a="album">Wissensalbum · '+n+' von '+TEXTS.length+' Karten</button>';
@@ -1356,15 +1358,15 @@ function cardHTML(t,full){
 }
 function showReward(t,first,gain,list){
   var p=lvlProg(S.xp),sg=suggest();
-  var h='<div class="card"><span class="eyebrow">'+(first?'Neue Karte im Wissensalbum':'Text nochmal gelesen')+(R&&R.withOpa?' · mit Opa':'')+'</span>'+cardHTML(t,true)+'<span class="xpgain">+'+gain+' XP</span>'+'<ul class="xplist">'+list.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>';
-  h+='<div class="bar" style="width:100%"><i style="width:'+p.pct+'%"></i></div><span class="xptext">Level '+p.L+' · noch '+p.need+' XP bis zum nächsten</span>';
+  var h='<div class="card"><span class="eyebrow">'+(first?'Neue Karte im Wissensalbum':'Text nochmal gelesen')+(R&&R.withOpa?' · mit Partner':'')+'</span>'+cardHTML(t,true)+'<span class="xpgain">Dein Monster ist gewachsen!</span>'+'<ul class="xplist" hidden></ul>';
+  h+='<div class="bar" style="width:100%"><i style="width:'+stageProg().pct+'%"></i></div><span class="xptext">'+esc(growText())+'</span>';
   h+=riddleBlock(t,true);
   h+='<div class="cfbtns">'+(sg?'<button class="btn" data-a="nextread" data-v="'+sg.t.id+'">Weiterlesen</button>':'')+'<button class="btn ghost" data-a="home2">Zur Übersicht</button></div></div>';
   openBox('#modal',h);readStyle();burst();
   try{var A0=typeof AUDIO!=='undefined'&&AUDIO[t.id];if(A0&&((A0.n&&A0.n.b)||(A0.s&&A0.s.b))){var cx=getAC();if(cx){cx.resume();chime(cx,cx.currentTime+0.6);}}}catch(e){}
 }
 function showEvolve(a,b,done){
-  var h='<div class="card"><span class="eyebrow">Dein Monster entwickelt sich!</span><div class="evo">'+stageHTML(a,'evo-old')+'<span class="evo-ar">➜</span>'+stageHTML(b,'evo-new')+'</div><h2>'+esc(MON.STAGES[b].n)+'</h2><p class="hint">Level '+lvl(S.xp)+' erreicht</p><button class="btn wide" data-a="evoOk">Weiter</button></div>';
+  var h='<div class="card"><span class="eyebrow">Dein Monster entwickelt sich!</span><div class="evo">'+stageHTML(a,'evo-old')+'<span class="evo-ar">➜</span>'+stageHTML(b,'evo-new')+'</div><h2>'+esc(MON.STAGES[b].n)+'</h2><p class="hint">'+esc(growText())+'</p><button class="btn wide" data-a="evoOk">Weiter</button></div>';
   openBox('#modal',h);burst();R.afterEvo=done;
 }
 /* ---------- Wort-Jäger: schwere Wörter in Silben üben ---------- */
@@ -1414,7 +1416,7 @@ function wjEnd(){
   var done=W.res.filter(function(r){return r.done;}).length;
   function show2(){
     var p=lvlProg(S.xp);
-    var h='<div class="card"><span class="eyebrow">Wort-Jäger</span><h2>Super gejagt!</h2>'+stageHTML(rankOf(p.L),'big')+'<span class="xpgain">+'+gain+' XP</span><ul class="xplist">'+list.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>';
+    var h='<div class="card"><span class="eyebrow">Wort-Jäger</span><h2>Super gejagt!</h2>'+stageHTML(rankOf(p.L),'big')+'<span class="xpgain">Dein Monster ist gewachsen!</span><span class="xptext">'+esc(growText())+'</span>';
     h+='<div class="wj">'+W.res.map(function(r){return '<span class="'+(r.ok?'ok':'')+'">'+esc(r.w)+(r.done?' ✓':'')+'</span>';}).join('')+'</div>';
     if(done)h+='<p class="hint fb">'+done+(done===1?' Wort ist':' Wörter sind')+' jetzt ganz geschafft!</p>';
     h+='<button class="btn wide" data-a="home2">Zur Übersicht</button></div>';
