@@ -1,0 +1,42 @@
+name: Stimmen-Probe
+
+# Sucht deutsche Stimmen bei ElevenLabs, lässt jede einen Probetext sprechen
+# und legt die Vergleichsseite unter stimmprobe/ ab. Nur per Hand über "Run workflow".
+
+on:
+  workflow_dispatch:
+    inputs:
+      anzahl:
+        description: "Wie viele Stimmen (je etwa 100 Credits)"
+        default: "8"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vorlesen
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Stimmen suchen und Probe sprechen
+        working-directory: quelle
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ANZAHL: ${{ inputs.anzahl }}
+        run: python3 stimmen_probe.py ../stimmprobe
+      - name: Hochladen
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898388+github-actions[bot]@users.noreply.github.com"
+          git add -A stimmprobe
+          if git diff --cached --quiet; then echo "Nichts Neues."; exit 0; fi
+          git commit -m "Stimmen-Probe aktualisiert"
+          git pull --rebase origin main
+          git push
