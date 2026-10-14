@@ -69,6 +69,38 @@ button,input{font:inherit;color:inherit}
 .rank{display:inline-block;background:var(--xp);color:#1b1500;border-radius:999px;padding:2px 12px;font-weight:500;font-size:.85rem}
 .mon svg{width:100%;height:100%;display:block;overflow:visible}
 .mon.big{width:150px;height:156px}
+/* Rennbelohnung: Autos aus Strip 402 */
+.carimg{width:132px;height:88px;flex:none;display:block;object-fit:contain}
+.carimg.big{width:240px;height:160px;max-width:100%}
+.evo .carimg{width:150px;height:100px}
+.rgar{gap:12px}
+.rgo{display:grid;grid-template-columns:112px 1fr auto;gap:12px;align-items:center;width:100%;background:none;border:0;padding:0;text-align:left;cursor:pointer}
+.rgo .carimg{width:112px;height:75px}
+.rgo .info{display:flex;flex-direction:column;gap:6px;min-width:0}
+.rgo .stagename{font-size:1.2rem;line-height:1.2}
+.rgo .chev{font-size:1.8rem;color:var(--muted);line-height:1}
+.rtank{display:flex;align-items:center;gap:10px;min-height:44px}
+.rtank .btn{margin-left:auto;padding:9px 18px;font-size:1rem}
+.pips{display:flex;gap:6px}
+.pips i{width:16px;height:22px;border-radius:5px;border:2px solid var(--line);background:var(--bg)}
+.pips i.on{background:var(--good);border-color:#2a9a5f;box-shadow:inset 0 -4px 0 #2a9a5f}
+.pips.big i{width:30px;height:40px;border-radius:9px}
+.rwt{display:flex;align-items:center;gap:14px;background:var(--bg);border-radius:16px;padding:12px 14px;text-align:left;width:100%}
+.rwt b{display:block;font-weight:500;font-size:1.1rem}
+.cars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.rcar{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;text-align:center}
+.rcar[aria-pressed=true]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.rcar .carimg{width:100%;height:auto;aspect-ratio:3/2}
+.rcar b{font-weight:500;font-size:.95rem}
+.rcar span{font-size:.8rem;color:var(--muted)}
+.peek{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;border:2px dashed var(--line);border-radius:18px;padding:10px 14px}
+.peek .carimg{width:110px;height:73px;filter:blur(5px) brightness(.75)}
+.peek .pt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.peek b{font-weight:500}
+#race{position:fixed;inset:0;z-index:80;background:#000}
+#race[hidden]{display:none!important}
+#race iframe{width:100%;height:100%;border:0;display:block}
+@media (max-width:420px){.rgo{grid-template-columns:92px 1fr auto}.rgo .carimg{width:92px;height:61px}}
 .hero{flex-direction:row;align-items:center;gap:16px}
 .hero .info{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
 .stagename{font-family:var(--f-display);font-weight:600;font-size:1.7rem;line-height:1.05}
@@ -281,10 +313,12 @@ input.name{width:100%;font:700 1.1rem var(--f-body);color:var(--ink);background:
   <div class="view" id="v-album" hidden></div>
   <div class="view" id="v-stats" hidden></div>
   <div class="view" id="v-wj" hidden></div>
+  <div class="view" id="v-garage" hidden></div>
 </div>
 <div class="dock" id="dock" hidden><div class="in" id="dockin"></div></div>
 <div class="cfbox" id="sheet" hidden></div>
 <div class="cfbox" id="modal" hidden></div>
+<div id="race" hidden></div>
 <div id="fx" aria-hidden="true"></div>
 
 <script>
@@ -309,7 +343,33 @@ var CATS=[
 var TILE={'Tiere':'#4ade80','Weltall':'#a78bfa','Technik':'#fb923c','Körper':'#f472b6','Sport':'#facc15','Rätsel':'#2dd4bf'};
 var MNAME=['Klebo','Bunto','Trio','Halbi','Schnarch','Rasso','Sturzo','Wumm','Glühi','Kratzo','Ringo','Zisch','Hopsi','Nordo','Poch','Brrr','Knack','Blitzo','Dunko','Marat','Platsch','Nessi','Steino','Blubb'];
 var COLS=['#2fd6d0','#4ade80','#a78bfa','#fb923c','#f472b6','#facc15'];
-function rankOf(L){var r=0;MON.STAGES.forEach(function(s,i){if(L>=s.lv)r=i;});return r;}
+/* Rennbelohnung: statt Monster-Stufen gibt es Autos aus Strip 402 (Spiel unter rennen/strip402.html).
+   Level 1 Plane, Level 2 Plane halb, ab Level 3 alle zwei Level ein neues Auto. Ein neues Auto = eine Zeile hier plus Bild in rennen/autos/. */
+var XP_RACE=120; /* so viele XP füllen den Tank für genau ein Rennen (etwa drei Texte) */
+var RSTAGES=[
+ {lv:1,n:'Unter der Plane',img:'plane_voll'},
+ {lv:2,n:'Die Plane rutscht',img:'plane_halb',neu:'Man sieht schon die Räder. Lies weiter, dann ziehst du die Plane ganz weg.'},
+ {lv:3,n:'Kaido Soraline',full:'Kaido Soraline 2000 GTX',car:'skyline',kurz:'Dein erstes Rennen',neu:'Du gibst Gas und startest bei Grün. Schalten und Bremsen macht das Auto allein.',r:{auto:1,brake:1,night:0,wx:0,diff:0}},
+ {lv:5,n:'Zuffler Elfer',full:'Zuffler Elfer RS',car:'911',kurz:'Neu: selbst schalten',neu:'Jetzt schaltest du selbst. Leuchtet der Knopf gelb, tippst du auf Schalten.',r:{auto:0,brake:1,night:0,wx:0,diff:0}},
+ {lv:7,n:'Corsari Caporossa',full:'Corsari Caporossa',car:'testarossa',kurz:'Neu: Rennen bei Nacht',neu:'Manche Rennen sind jetzt nachts. Und nach dem Ziel bremst du selbst.',r:{auto:0,brake:0,night:.5,wx:0,diff:1}},
+ {lv:9,n:'Taurino Accidenti',full:'Taurino Accidenti QV',car:'countach',kurz:'Neu: Rivalen mit Namen',neu:'Gegner mit Namen und eigenen Tricks. Manchmal ist es kalt oder nass.',r:{auto:0,brake:0,night:.5,wx:'',diff:1,rival:1}},
+ {lv:11,n:'Liberty Hellhound',full:'Liberty Contender Hellhound',car:'challenger',kurz:'Das stärkste Auto',neu:'Das stärkste Auto. Die Rivalen fahren jetzt richtig schnell.',r:{auto:0,brake:0,night:.5,wx:'',diff:2,rival:1}}
+];
+var CAR0=2; /* ab diesem Index gibt es Autos */
+function rankOf(L){var r=0;RSTAGES.forEach(function(s,i){if(L>=s.lv)r=i;});return r;}
+function hasCar(){return rankOf(lvl(S.xp))>=CAR0;}
+function carStage(id){for(var i=CAR0;i<RSTAGES.length;i++)if(RSTAGES[i].car===id)return RSTAGES[i];return null;}
+function curCar(){var r=rankOf(lvl(S.xp));if(r<CAR0)return null;var c=carStage(S.rcar);return c&&RSTAGES.indexOf(c)<=r?c:RSTAGES[r];}
+/* Tank: füllt sich mit den XP, sobald ein Auto da ist. Das erste Auto kommt mit vollem Tank. */
+function addFuel(gain,wasRank){var r=rankOf(lvl(S.xp));if(r<CAR0)return;if(wasRank<CAR0)S.fuel=XP_RACE;else S.fuel=Math.min(XP_RACE,(S.fuel||0)+gain);}
+function fuelFull(){return hasCar()&&(S.fuel||0)>=XP_RACE;}
+function tankPips(big){var o='<div class="pips'+(big?' big':'')+'" aria-hidden="true">';for(var i=0;i<3;i++)o+='<i class="'+(hasCar()&&(S.fuel||0)>=(i+1)*XP_RACE/3-0.01?'on':'')+'"></i>';return o+'</div>';}
+function tankText(){var need=Math.max(1,Math.ceil((XP_RACE-(S.fuel||0))/XP_TEXT));
+  return fuelFull()?'Jetzt kannst du ein Rennen fahren.':'Noch '+(need===1?'ein Text':need+' Texte')+', dann ist der Tank voll.';}
+function tankBlock(){
+  if(!hasCar())return '<div class="bar" style="width:100%"><i style="width:'+stageProg().pct+'%"></i></div><span class="xptext">'+esc(growText())+'</span>';
+  return '<div class="rwt">'+tankPips(true)+'<div><b>'+(fuelFull()?'Dein Tank ist voll!':'Dein Tank füllt sich')+'</b><span class="xptext">'+esc(tankText())+'</span></div></div>';
+}
 var TEXTS=__DATA__;
 var TIMES=__TIMES__;
 var byId={};
@@ -341,11 +401,12 @@ TEXTS.forEach(function(t){
 });
 (function(){var ds=TEXTS.map(function(t){return t.diff;}).sort(function(a,b){return a-b;}),med=ds[Math.floor(ds.length/2)];TEXTS.forEach(function(t){t.stars=t.diff>=med?2:1;});})();
 /* ---------- Zustand ---------- */
-function defaults(){return {whNote:'',xp:0,done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Lexend',lx:1,size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1}};}
+function defaults(){return {whNote:'',xp:0,fuel:0,rcar:'',rbest:{},done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Lexend',lx:1,size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1}};}
 function fixState(d){
   /* Ältere Stände: gesammelte Wörter in den Wort-Jäger übernehmen */
   Object.keys(d.stolper||{}).forEach(function(w){if(!d.wj[w])d.wj[w]={n:d.stolper[w],ok:[],done:false};});
   if(!Array.isArray(d.log))d.log=[];
+  if(!d.rbest||typeof d.rbest!=='object')d.rbest={};
   return d;
 }
 function merge(j){
@@ -358,7 +419,9 @@ function merge(j){
 function load(){
   var j=null;
   try{j=JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){}
-  return merge(j);
+  var d=merge(j);
+  if(j&&j.fuel===undefined&&rankOf(lvl(d.xp))>=CAR0)d.fuel=XP_RACE; /* Umstieg von den Monstern: voller Tank */
+  return d;
 }
 var S=load();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
@@ -408,10 +471,11 @@ function wjAdd(w){
 function monHTML(i,tile,cls){
   var svg=(i==='lock')?'<svg viewBox="0 -10 120 134" aria-hidden="true"><text class="q" x="60" y="72" text-anchor="middle">?</text></svg>':MON.svg(i);
   return '<div class="mon '+(cls||'')+(i==='lock'?' lockm':'')+'" style="--mi:'+tile+'">'+svg+'</div>';}
-function stageHTML(n,cls){return '<div class="mon '+(cls||'')+'" style="--mi:'+S.col+'">'+MON.stage(n,null)+'</div>';}
+function carImg(id,cls,alt){return '<img class="carimg '+(cls||'')+'" src="rennen/autos/'+id+'.png" alt="'+esc(alt||'')+'">';}
+function stageHTML(n,cls){var s=RSTAGES[n];if(n>=CAR0){var c=curCar();if(c&&cls!=='evo-new'&&cls!=='evo-old')s=c;}return carImg(s.car||s.img,cls,s.car?s.full:'Ein Auto unter einer roten Plane');}
 var CUR='home',HPUSH=false;
 function show(v){
-  ['home','cat','read','album','stats','wj'].forEach(function(x){$('#v-'+x).hidden=(x!==v);});
+  ['home','cat','read','album','stats','wj','garage'].forEach(function(x){$('#v-'+x).hidden=(x!==v);});
   CUR=v;
   if(v!=='read')stopListen();
   if(v!=='read'&&v!=='wj')setDock('');
@@ -430,6 +494,7 @@ window.addEventListener('popstate',function(){
   HPUSH=false;
   if(!$('#sheet').hidden){closeBox('#sheet');}
   if(!$('#modal').hidden){closeBox('#modal');}
+  if(RACE){raceClose();return;}
   if(CUR==='home')return;
   recStop(false);stopListen();R=null;renderHome();show('home');
 });
@@ -442,16 +507,18 @@ var MODE=null;
 /* Monster wächst in Stufen; statt XP zeigen wir, wie viele Texte es ungefähr noch bis zur nächsten Stufe sind */
 var XP_TEXT=40;
 function stageProg(){
-  var r=rankOf(lvl(S.xp)),st=MON.STAGES;
+  var r=rankOf(lvl(S.xp)),st=RSTAGES;
   if(r>=st.length-1)return {pct:100,next:null,texts:0};
   var a=XPK*(st[r].lv-1)*(st[r].lv-1),b=XPK*(st[r+1].lv-1)*(st[r+1].lv-1);
   return {pct:Math.max(0,Math.min(100,Math.round((S.xp-a)/(b-a)*100))),next:st[r+1].n,texts:Math.max(1,Math.ceil((b-S.xp)/XP_TEXT))};
 }
 function growText(){
   var g=stageProg();
-  if(!g.next)return 'Dein Monster ist ganz ausgewachsen!';
-  var t=g.texts===1?'einen Text':(g.texts+' Texte');
-  return rankOf(lvl(S.xp))===0?'Lies '+t+', dann schlüpft es.':'Noch '+t+', dann wird es '+({Riese:'zum Riesen',Legende:'zur Legende'}[g.next]||'zum '+g.next)+'.';
+  if(!g.next)return 'Alle Autos sind in deiner Garage!';
+  var t=g.texts===1?'ein Text':(g.texts+' Texte'),r=rankOf(lvl(S.xp));
+  if(r===0)return 'Noch '+t+', dann rutscht die Plane.';
+  if(r===1)return 'Noch '+t+', dann ist die Plane weg.';
+  return 'Noch '+t+' bis zum nächsten Auto.';
 } /* Prototyp: wird bei jedem Start neu gewählt */
 function renderPick(){
   var h='<div class="pickwrap"><div class="pick"><div class="applogo"><img class="wordmark" alt="Readster" src="readster-logo.png"><span class="proto">Prototyp</span></div><h2>Wie liest du heute?</h2>';
@@ -472,14 +539,47 @@ function renderHome(){
     return '<button class="cat" data-a="cat" data-v="'+c.id+'" style="--c:'+TILE[c.id]+'"><span class="ci">'+c.ic+'</span><b>'+c.id+'</b><span>'+d+' von '+tot.length+'</span></button>';
   }).join('')+'</div></section>';
   if(sg)h+='<button class="btn wide" data-a="open" data-v="'+sg.t.id+'">'+(sg.from?'Rätsel lösen: '+esc(sg.t.title):'Überrasch mich')+'</button>';
-  var stn=MON.STAGES[rankOf(p.L)].n;
+  var rk=rankOf(p.L),cc=curCar();
   h+='<h2 style="margin:10px 0 -4px">Dein Level</h2>';
-  h+='<section class="card week"><div class="hero" style="display:flex">'+stageHTML(rankOf(p.L))+'<div class="info"><span class="eyebrow">'+(S.name?'Dein Monster · '+esc(stn):'Dein Monster')+'</span><span class="stagename">'+esc(S.name||stn)+'</span><div class="bar" role="progressbar" aria-valuenow="'+stageProg().pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+stageProg().pct+'%"></i></div><span class="xptext">'+esc(growText())+'</span></div></div>'+
+  h+='<section class="card week rgar"><button class="rgo" data-a="garage" aria-label="Garage öffnen">'+stageHTML(rk)+'<div class="info"><span class="eyebrow">Deine Garage</span><span class="stagename">'+esc(cc?cc.n:'Unter der Plane')+'</span><div class="bar" role="progressbar" aria-valuenow="'+stageProg().pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+stageProg().pct+'%"></i></div><span class="xptext">'+esc(growText())+'</span></div><span class="chev" aria-hidden="true">›</span></button>'+
+    (cc?'<div class="rtank"><span class="eyebrow">Tank</span>'+tankPips(false)+(fuelFull()?'<button class="btn" data-a="race">Rennen fahren</button>':'')+'</div>':'')+
     '<div class="wk"><div class="row" style="flex-wrap:nowrap;justify-content:space-between;align-items:baseline"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></div><div class="dots">'+wk.arr.map(function(d){return '<div class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></div>';}).join('')+'</div></div></section>';
   h+='<button class="btn ghost wide" data-a="album">Wissensalbum · '+n+' von '+TEXTS.length+' Karten</button>';
   h+='<div class="foot"><div class="madeby"><span>Made with love by</span><img alt="A Simple Man’s Lab" src="'+MADEBY+'"></div></div>';
   $('#v-home').innerHTML=h;
 }
+function renderGarage(){
+  var r=rankOf(lvl(S.xp)),cc=curCar();
+  var h='<div class="backrow"><button class="back" data-a="home">‹ Zurück</button></div><h2>Deine Garage</h2>';
+  if(!cc){h+='<section class="card" style="align-items:center;text-align:center">'+stageHTML(r,'big')+'<b>'+(r===0?'Was ist da drunter?':'Die Plane rutscht!')+'</b><span class="xptext">'+esc(growText())+'</span></section>';}
+  else{
+    h+='<div class="cars">'+RSTAGES.slice(CAR0,r+1).map(function(s){var b=S.rbest[s.car];
+      return '<button class="rcar" data-a="pickcar" data-v="'+s.car+'" aria-pressed="'+(cc.car===s.car)+'">'+carImg(s.car,'',s.full)+'<b>'+esc(s.full)+'</b><span>'+(b?'Bestzeit '+b.toFixed(2).replace('.',',')+' s':'Noch keine Zeit')+'</span></button>';}).join('')+'</div>';
+    h+='<section class="card"><div class="rtank"><span class="eyebrow">Tank</span>'+tankPips(false)+'<span class="xptext">'+esc(tankText())+'</span></div>'+(fuelFull()?'<button class="btn wide" data-a="race">Rennen fahren</button>':'')+'</section>';
+  }
+  var nx=RSTAGES[Math.max(r+1,CAR0)];
+  if(nx&&nx.car)h+='<div class="peek">'+carImg(nx.car,'','')+'<div class="pt"><span class="eyebrow">Als Nächstes · ab Level '+nx.lv+'</span><b>'+esc(nx.kurz)+'</b><span class="xptext">'+esc(growText().replace(' bis zum nächsten Auto',' bis dahin'))+'</span></div></div>';
+  $('#v-garage').innerHTML=h;show('garage');
+}
+/* Rennen: das Spiel läuft im Vollbild-Rahmen und meldet das Ergebnis per postMessage */
+function raceOpen(){
+  var c=curCar();if(!c||!fuelFull())return;
+  var p=RSTAGES[rankOf(lvl(S.xp))].r,q={car:c.car,name:c.full,auto:p.auto,brake:p.brake,night:Math.random()<p.night?1:0,wx:p.wx,diff:p.diff,rival:p.rival?1:0};
+  if(S.rbest[c.car])q.best=S.rbest[c.car].toFixed(2);
+  var u='rennen/strip402.html?readster';for(var k in q)u+='&'+k+'='+encodeURIComponent(q[k]);
+  var d=$('#race');d.innerHTML='<iframe title="Rennen" allow="autoplay" src="'+u+'"></iframe>';d.hidden=false;
+  if(!HPUSH){try{history.pushState({lm:1},'');HPUSH=true;}catch(e){}}
+  RACE={car:c.car};
+}
+var RACE=null;
+function raceClose(){var d=$('#race');d.hidden=true;d.innerHTML='';RACE=null;renderHome();show('home');}
+window.addEventListener('message',function(e){
+  var m=e.data;if(!m||m.source!=='strip402'||!RACE)return;
+  if(m.type==='done'){var o=m.result||{},id=RACE.car;S.fuel=0;
+    if(o.et!=null&&!o.crashed&&!o.foul&&(!S.rbest[id]||o.et<S.rbest[id]))S.rbest[id]=o.et;
+    S.rcar=id;save();raceClose();}
+  else if(m.type==='close')raceClose();
+});
 function renderCat(id){
   var items=TEXTS.filter(function(t){return t.cat===id;}).sort(function(a,b){return a.diff-b.diff;});
   var h='<div class="backrow"><button class="back" data-a="home">‹ Zurück</button></div><h2>'+esc(id)+'</h2><p class="hint">Ein Stern: leichter. Zwei Sterne: kniffliger.</p><div class="list">';
@@ -1186,7 +1286,7 @@ function finish(){
   var withOpa=R.who==='opa'&&!R.rounds.length;
   if(withOpa){S.opa.push({ts:Date.now(),id:t.id});if(S.opa.length>300)S.opa.shift();}
   R.withOpa=withOpa;
-  S.xp+=gain;S.last=t.id;S.days[dkey(new Date())]=1;save();
+  S.xp+=gain;addFuel(gain,wasRank);S.last=t.id;S.days[dkey(new Date())]=1;save();
   var nowRank=rankOf(lvl(S.xp));
   stopListen();
   function reward(){showReward(t,first,gain,list);}
@@ -1203,15 +1303,18 @@ function cardHTML(t,full){
 }
 function showReward(t,first,gain,list){
   var p=lvlProg(S.xp),sg=suggest();
-  var h='<div class="card"><span class="eyebrow">'+(first?'Neue Karte im Wissensalbum':'Text nochmal gelesen')+(R&&R.withOpa?' · mit Partner':'')+'</span>'+cardHTML(t,true)+'<span class="xpgain">Dein Monster ist gewachsen!</span>'+'<ul class="xplist" hidden></ul>';
-  h+='<div class="bar" style="width:100%"><i style="width:'+stageProg().pct+'%"></i></div><span class="xptext">'+esc(growText())+'</span>';
+  var h='<div class="card"><span class="eyebrow">'+(first?'Neue Karte im Wissensalbum':'Text nochmal gelesen')+(R&&R.withOpa?' · mit Partner':'')+'</span>'+cardHTML(t,true)+'<span class="xpgain">Super gelesen!</span>'+'<ul class="xplist" hidden></ul>';
+  h+=tankBlock();
   h+=riddleBlock(t,true);
-  h+='<div class="cfbtns">'+(sg?'<button class="btn" data-a="nextread" data-v="'+sg.t.id+'">Weiterlesen</button>':'')+'<button class="btn ghost" data-a="home2">Zur Übersicht</button></div></div>';
+  if(fuelFull())h+='<button class="btn wide" data-a="race">Rennen fahren</button>';
+  h+='<div class="cfbtns">'+(sg?'<button class="btn'+(fuelFull()?' ghost':'')+'" data-a="nextread" data-v="'+sg.t.id+'">Weiterlesen</button>':'')+'<button class="btn ghost" data-a="home2">Zur Übersicht</button></div></div>';
   openBox('#modal',h);readStyle();burst();
   try{var A0=typeof AUDIO!=='undefined'&&AUDIO[t.id];if(A0&&((A0.n&&A0.n.b)||(A0.s&&A0.s.b))){var cx=getAC();if(cx){cx.resume();chime(cx,cx.currentTime+0.6);}}}catch(e){}
 }
 function showEvolve(a,b,done){
-  var h='<div class="card"><span class="eyebrow">Dein Monster entwickelt sich!</span><div class="evo">'+stageHTML(a,'evo-old')+'<span class="evo-ar">➜</span>'+stageHTML(b,'evo-new')+'</div><h2>'+esc(MON.STAGES[b].n)+'</h2><p class="hint">'+esc(growText())+'</p><button class="btn wide" data-a="evoOk">Weiter</button></div>';
+  var s=RSTAGES[b];
+  var h='<div class="card"><span class="eyebrow">Level '+s.lv+' · '+(s.car?'Neues Auto!':'Deine Garage')+'</span><div class="evo">'+stageHTML(a,'evo-old')+'<span class="evo-ar">➜</span>'+stageHTML(b,'evo-new')+'</div><h2>'+esc(s.car?s.full:'Die Plane rutscht!')+'</h2><p class="hint">'+esc(s.neu||growText())+'</p>'+(b===CAR0?'<p class="hint">Dein Tank ist voll. Du kannst gleich losfahren!</p>':'')+'<button class="btn wide" data-a="evoOk">Weiter</button></div>';
+  if(s.car)S.rcar=s.car;save();
   openBox('#modal',h);burst();R.afterEvo=done;
 }
 /* ---------- Wort-Jäger: schwere Wörter in Silben üben ---------- */
@@ -1256,15 +1359,16 @@ function wjJudge(ok){
 }
 function wjEnd(){
   var okN=W.res.filter(function(r){return r.ok;}).length,gain=10+okN*5,wasRank=rankOf(lvl(S.xp));
-  S.xp+=gain;S.days[dkey(new Date())]=1;save();setDock('');
+  S.xp+=gain;addFuel(gain,wasRank);S.days[dkey(new Date())]=1;save();setDock('');
   var list=['Runde geschafft: 10 XP'];if(okN)list.push('Kann ich: '+okN*5+' XP');
   var done=W.res.filter(function(r){return r.done;}).length;
   function show2(){
     var p=lvlProg(S.xp);
-    var h='<div class="card"><span class="eyebrow">Wort-Jäger</span><h2>Super gejagt!</h2>'+stageHTML(rankOf(p.L),'big')+'<span class="xpgain">Dein Monster ist gewachsen!</span><span class="xptext">'+esc(growText())+'</span>';
+    var h='<div class="card"><span class="eyebrow">Wort-Jäger</span><h2>Super gejagt!</h2>'+stageHTML(rankOf(p.L),'big')+tankBlock();
     h+='<div class="wj">'+W.res.map(function(r){return '<span class="'+(r.ok?'ok':'')+'">'+esc(r.w)+(r.done?' ✓':'')+'</span>';}).join('')+'</div>';
     if(done)h+='<p class="hint fb">'+done+(done===1?' Wort ist':' Wörter sind')+' jetzt ganz geschafft!</p>';
-    h+='<button class="btn wide" data-a="home2">Zur Übersicht</button></div>';
+    if(fuelFull())h+='<button class="btn wide" data-a="race">Rennen fahren</button>';
+    h+='<button class="btn wide'+(fuelFull()?' ghost':'')+'" data-a="home2">Zur Übersicht</button></div>';
     openBox('#modal',h);burst();
   }
   var nowRank=rankOf(lvl(S.xp));
@@ -1292,9 +1396,6 @@ function renderSheet(){
   h+='<div class="setrow"><span class="eyebrow">Größe</span>'+seg('size',[[0,'Normal'],[1,'Groß'],[2,'Sehr groß']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Silben in zwei Farben</span>'+seg('syl',[[true,'An'],[false,'Aus']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Vorlese-Tempo</span>'+seg('speed',[['slow','Langsam'],['normal','Normal']])+'</div>';
-  h+='<h2 style="margin-top:8px">Dein Monster</h2>';
-  h+='<div class="setrow"><span class="eyebrow">Name</span><input class="name" id="nameIn" maxlength="16" autocomplete="off" placeholder="z. B. Krümel" value="'+esc(S.name||'')+'"></div>';
-  h+='<div class="setrow"><span class="eyebrow">Farbe</span><div class="seg">'+COLS.map(function(c){return '<button class="sw" data-a="col" data-v="'+c+'" aria-label="Farbe" aria-pressed="'+(S.col===c)+'" style="background:'+c+'"></button>';}).join('')+'</div></div>';
   h+='<details class="adult set"'+(wasOpen?' open':'')+'><summary>Für Erwachsene</summary><div>';
   h+='<div class="setrow"><span class="eyebrow">Zeilenabstand</span>'+seg('line',[[0,'Eng'],[1,'Normal'],[2,'Weit']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Buchstabenabstand</span>'+seg('space',[[0,'Normal'],[1,'Mehr'],[2,'Viel']])+'</div>';
@@ -1376,6 +1477,9 @@ document.addEventListener('click',function(e){
     case 'check':R.phase='check';renderCtl();try{$('#qcard').scrollIntoView({block:'start',behavior:'smooth'});}catch(er){}break;
     case 'pick':var pq=v.split('-'),qi=+pq[0],oj=+pq[1];if(R.pick[qi]===null){R.pick[qi]=oj;R.qs[qi]=R.opts[qi][oj]===R.t.q[qi].a?1:0;renderCtl();}break;
     case 'finish':finish();break;
+    case 'garage':renderGarage();break;
+    case 'pickcar':S.rcar=v;save();renderGarage();break;
+    case 'race':stopListen();closeBox('#modal');raceOpen();break;
     case 'evoOk':closeBox('#modal');if(R&&R.afterEvo){var f=R.afterEvo;R.afterEvo=null;f();}break;
     case 'col':S.col=v;save();renderSheet();if(!$('#v-home').hidden)renderHome();break;
     case 'album':renderAlbum();break;
