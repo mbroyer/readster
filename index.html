@@ -18,7 +18,7 @@
 /* Layout: eine schmale Spalte fürs Tablet. Start = Monster, Wochenziel, nächster Text, Themen. Lesen = ein Text pro Bildschirm. Stil und Farben wie Vokamon. */
 :root{
   --bg:#07202b;--surface:#0f3342;--ink:#e8f8ff;--muted:#8fbccc;--line:#1d4d61;
-  --accent:#2fd6d0;--accent-edge:#169a96;--accent-ink:#042321;
+  --deep:#041820;--accent:#2fd6d0;--accent-edge:#169a96;--accent-ink:#042321;
   --cta:#ff7a59;--cta-edge:#c4492b;--cta-ink:#2b0c03;
   --xp:#ffd04d;--xp-edge:#c79500;--xp-ink:#3d2a00;
   --good:#4fd18b;--good-bg:#12392a;--bad:#ff7c82;--bad-bg:#46202a;--warn-bg:#443a14;
@@ -28,7 +28,7 @@
   color-scheme:dark;
 }
 /* Partner-Modus: eigener Farbton, damit man sofort sieht, wer liest */
-html[data-mode="partner"]{--bg:#2a1206;--surface:#45210d;--line:#6e3a1a;--muted:#e3b896;--warn-bg:#5a3512}
+html[data-mode="partner"]{--deep:#1d0b03;--bg:#2a1206;--surface:#45210d;--line:#6e3a1a;--muted:#e3b896;--warn-bg:#5a3512}
 html{background:var(--bg);transition:background .3s}
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -117,6 +117,7 @@ button,input{font:inherit;color:inherit}
 #v-home .sechead .hint{font-size:.85rem}#v-home{gap:12px}#v-home .tile b{font-size:1.3rem}#v-home .tile span{font-size:.75rem}#v-home .rtank{min-height:0}#v-home .rtank .btn{padding:7px 14px;min-height:0}
 .sechead{display:flex;flex-direction:column;gap:4px;margin:4px 0 -6px}.sechead h2{font-size:1.2rem}
 .lvchip{align-self:flex-start;background:var(--xp);color:var(--xp-ink);border-radius:999px;padding:2px 12px;font-weight:600;font-size:.9rem}
+.prgbtn{position:relative}.prgbtn svg{width:24px;height:24px}.prgbtn .badge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--xp);color:#3a2a00;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
 .prog0{all:unset;box-sizing:border-box;width:100%;display:flex;flex-direction:column;gap:14px;padding:6px 4px 2px;cursor:pointer;color:var(--ink)}
 .prog0:focus-visible{outline:3px solid var(--accent);outline-offset:4px;border-radius:12px}
 .prog0 .phead{display:flex;justify-content:space-between;align-items:baseline}.prog0 .ph2{font-family:var(--f-display);font-size:1.25rem;font-weight:500}.prog0 .more{color:var(--accent);font-weight:500;font-size:.95rem}
@@ -165,7 +166,7 @@ details.adult.set[open]>div{display:flex;flex-direction:column;gap:16px;margin-t
 .ticon{width:48px;height:48px;border-radius:50%;background:var(--bg);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;flex:none}.ticon svg{width:28px;height:28px}
 .tapword{flex-direction:row;align-items:center;gap:12px}.tapword h2{font-size:1.3rem}
 .rec.hear{flex-direction:row;align-items:center;gap:12px;padding:14px}.rec.hear .plr{flex:1}.rec.hear .plb{width:68px;height:68px}.rec.hear .plb svg{width:30px;height:30px}
-.garage{gap:10px;padding:14px 16px 16px;overflow:hidden}
+.garage{background:var(--deep);border-color:var(--line);gap:10px;padding:14px 16px 16px;overflow:hidden}
 .ghead{all:unset;display:flex;justify-content:space-between;align-items:baseline;cursor:pointer}.gname{color:var(--accent);font-weight:500;font-size:.95rem}
 .gstage{all:unset;cursor:pointer;display:flex;justify-content:center;align-items:center;height:108px;margin:0 -16px;position:relative;
   background:repeating-linear-gradient(90deg,rgba(255,255,255,.22) 0 18px,transparent 18px 36px) center/100% 4px no-repeat,linear-gradient(#1c2c34,#142127)}
@@ -194,7 +195,7 @@ details.adult.set[open]>div{display:flex;flex-direction:column;gap:16px;margin-t
 .hn{flex:none;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:1.1rem}
 ul.howto{margin:0;padding-left:1.2em;color:var(--muted);font-weight:500;font-size:.95rem;display:flex;flex-direction:column;gap:6px}
 @media (prefers-reduced-motion:reduce){.btn.race-go,.pips i.new{animation:none}}
-.mseg{display:flex;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:4px;gap:4px}
+.mseg{display:flex;background:var(--deep);border:2px solid var(--line);border-radius:999px;padding:4px;gap:4px}
 .mseg button{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border:0;border-radius:999px;background:none;color:var(--muted);font:inherit;font-weight:500;font-size:.95rem;cursor:pointer;padding:0 10px}
 .mseg button svg{width:22px;height:22px;flex:none}
 .mseg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
@@ -853,6 +854,7 @@ function tourOpen(i){TI=i||0;var x=TOUR[TI],last=TI===TOUR.length-1,vis;
   openBox('#modal','<div class="card tour">'+d+vis+'<h2>'+x.h+'</h2><button class="tsay" data-a="tourSay" aria-label="Nochmal hören">'+IC_SPK+'</button><button class="btn wide" data-a="'+(last?'tourEnd':'tourNext')+'">'+(last?'Los geht’s':'Weiter')+'</button>'+(last?'':'<button class="link" data-a="tourEnd">Überspringen</button>')+'</div>');
   say(x.s,250);}
 function tourEnd(){sayStop();S.tour=1;save();closeBox('#modal');}
+var IC_STATS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 20v-6M12 20V9M19 20V4"/></svg>';
 var IC_PUMP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M3 21h13M7 7h5v4H7z"/><path d="M15 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3"/></svg>';
 var IC_FLAG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 3v18h2v-7h10l-2-4 2-4H7V3z"/></svg>';
 var IC_WJ='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg>';
@@ -896,7 +898,7 @@ function renderHome(){
   if(!MODE){renderPick();return;}
   if(!S.tour&&$('#modal').hidden)setTimeout(function(){if(!S.tour&&$('#modal').hidden&&CUR==='home')tourOpen(0);},0);
   var p=lvlProg(S.xp),sg=suggest(),wk=weekInfo(),n=doneCount();
-  var h='<header class="top"><h1 class="brand"><img class="wordmark sm" alt="Readster" src="'+LOGO+'"></h1><div class="chips"><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
+  var h='<header class="top"><h1 class="brand"><img class="wordmark sm" alt="Readster" src="'+LOGO+'"></h1><div class="chips"><button class="iconbtn prgbtn" data-a="stats" aria-label="Dein Fortschritt">'+IC_STATS+(n?'<span class="badge">'+n+'</span>':'')+'</button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
   /* Modus: ein Schalter mit Wörtern, zeigt zugleich, welcher Modus gerade gilt */
   h+='<div class="mseg" role="group" aria-label="Wie liest du?"><button data-a="mode" data-v="solo" aria-pressed="'+(MODE==='solo')+'">'+IC_SOLO+'<span>Allein lesen</span></button><button data-a="mode" data-v="partner" aria-pressed="'+(MODE==='partner')+'">'+IC_DUO+'<span>Zu zweit lesen</span></button></div>';
   if(S.whNote)h+='<section class="card left whnote"><p class="fb">'+esc(S.whNote)+'</p><button class="btn ghost sm" data-a="whNoteOk">Okay</button></section>';
@@ -905,7 +907,7 @@ function renderHome(){
   var cc=curCar(),rk=rankOf(p.L);
   /* Garage: Auto groß auf der Startlinie, darunter die Tankanzeige mit Zapfsäule; Antippen öffnet die Garage */
   var lit=cc?litPips():0,fsg='';for(var fi=0;fi<3;fi++)fsg+='<i class="'+(fi<lit?'on':'')+'"></i>';
-  h+='<section class="card garage'+(fuelFull()?' full':'')+'"><button class="ghead" data-a="garage" aria-label="Garage öffnen"><span class="eyebrow">Deine Garage</span><span class="gname">'+esc(cc?cc.n:'Geheimes Auto')+' ›</span></button>'+
+  var gar='<section class="card garage'+(fuelFull()?' full':'')+'"><button class="ghead" data-a="garage" aria-label="Garage öffnen"><span class="eyebrow">Deine Garage</span><span class="gname">'+esc(cc?cc.n:'Geheimes Auto')+' ›</span></button>'+
     '<button class="gstage" data-a="garage" aria-label="Garage öffnen">'+stageHTML(rk)+'</button>'+
     '<div class="fuel"><span class="pump" aria-hidden="true">'+IC_PUMP+'</span>'+(cc?'<span class="fseg">'+fsg+'</span>':'<span class="fbar"><i style="width:'+stageProg().pct+'%"></i></span>')+'</div>'+
     (fuelFull()?'<button class="btn wide race-go" data-a="race">'+IC_FLAG+'Rennen fahren</button>':'<p class="gline">'+IC_FLAG+'<span>'+esc(tankLine())+'</span></p>')+'</section>';
@@ -917,11 +919,10 @@ function renderHome(){
     h+='<section class="card nxt" style="--c:'+(TILE[sg.t.cat]||'var(--accent)')+'"><div class="nxth"><span class="nxic" aria-hidden="true">'+(sc?sc.ic:'')+'</span><div><span class="eyebrow">'+esc(sg.t.cat)+'</span><h2>'+esc(sg.t.title)+'</h2></div></div>'+
       '<button class="btn wide" data-a="open" data-v="'+sg.t.id+'">Jetzt lesen</button>'+
       '<div class="nxtl"><button class="link" data-a="topics">Anderes Thema</button>'+(due?'<button class="wjcta sm" data-a="wj">'+IC_WJ+'<span><b>Wort-Jäger</b> · '+Math.min(due,WJ_MAX)+'</span></button>':'')+'</div></section>';}
+  /* Garage unter dem Lesen: dunkler, damit „Jetzt lesen“ die Hauptsache bleibt */
+  h+=gar;
   /* Fortschritt direkt auf der Startseite, Details per Antippen */
   /* Fortschritt ohne Karte: große Zahlen direkt auf dem Hintergrund, darunter die Woche als Punkte */
-  h+='<button class="prog0" data-a="stats" aria-label="Fortschritt ansehen"><span class="phead"><span class="ph2">Dein Fortschritt</span><span class="more">Alles ansehen ›</span></span>'+
-    '<span class="prow"><span class="pnum"><b>'+n+'</b><i>'+(n===1?'Text':'Texte')+'<br>gelesen</i></span>'+
-    '<span class="dots">'+wk.arr.map(function(d){return '<span class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></span>';}).join('')+'</span></span></button>';
   h+='<div class="foot"><div class="madeby"><span>Made with love by</span><img alt="A Simple Man’s Lab" src="'+MADEBY+'"></div></div>';
   $('#v-home').innerHTML=h;
 }
@@ -1362,6 +1363,7 @@ function renderStats(){
   var L=S.log.filter(function(x){return x.wpm;}),days=Object.keys(S.days).length;
   var h='<div class="backrow"><button class="back" data-a="home">‹ Zurück</button></div><h2>Dein Fortschritt</h2>';
   h+='<div class="tiles"><div class="tile"><b>'+days+'</b><span>Tage geübt</span></div><div class="tile"><b>'+doneCount()+'</b><span>Texte gelesen</span></div></div>';
+  var wk=weekInfo();h+='<section class="card wkcard"><div class="row" style="flex-wrap:nowrap;justify-content:space-between;align-items:baseline"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></div><div class="dots">'+wk.arr.map(function(d){return '<div class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></div>';}).join('')+'</div></section>';
   if(S.opa.length){
     var ot={};S.opa.forEach(function(x){ot[x.id]=1;});
     h+='<section class="card left"><h2>Mit Partner gelesen</h2><p class="fb">'+S.opa.length+(S.opa.length===1?' Mal':' Mal')+', '+Object.keys(ot).length+(Object.keys(ot).length===1?' Text':' verschiedene Texte')+'.</p><span class="hint">Zuletzt: '+esc(byId[S.opa[S.opa.length-1].id]?byId[S.opa[S.opa.length-1].id].title:'')+' am '+fmtDate(S.opa[S.opa.length-1].ts)+'</span></section>';
@@ -1369,7 +1371,7 @@ function renderStats(){
   if(!S.set.nums){
     h+='<section class="card left"><p class="hint">Die Tempo-Zahlen sind ausgeschaltet. Einschalten kannst du sie unter „Aa“.</p></section>';
   }else if(!L.length){
-    h+='<section class="card"><p class="q">Hier siehst du bald deinen Weg. Lies einen Text mit „Ich lese jetzt“, dann erscheint dein erster Punkt.</p></section>';
+    h+='<section class="card"><p class="q">Hier siehst du bald deinen Weg. Lies einen Text mit „Jetzt lesen“, dann erscheint dein erster Punkt.</p></section>';
   }else{
     var pts=L.slice(-30),w=L.map(function(x){return x.wpm;});
     h+='<section class="card left"><h2>Dein Tempo</h2><span class="hint">Wörter pro Minute, jeder Punkt ist ein Durchgang.</span>'+chartSVG(pts)+'<p class="hint fb" id="chartread" aria-live="polite">Tippe auf einen Punkt.</p>';
