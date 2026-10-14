@@ -757,6 +757,7 @@ function show(v){
   ['home','cat','read','album','stats','wj','garage'].forEach(function(x){$('#v-'+x).hidden=(x!==v);});
   CUR=v;
   if(v!=='read')stopListen();
+  plStop();
   if(v!=='read'&&v!=='wj')setDock('');
   /* Zurück-Geste von iOS und Browser-Zurück führen zur Übersicht statt aus der App */
   if(v!=='home'&&!HPUSH){try{history.pushState({lm:1},'');HPUSH=true;}catch(e){}}
@@ -963,6 +964,7 @@ function bars(){
 function adult(txt){return '<details class="adult"><summary>Für Erwachsene</summary>'+txt+'</details>';}
 function renderCtl(){
   var c=$('#rctl'),t=R.t,h='',dk='',top='';
+  plStop(); /* Wiedergabe der eigenen Aufnahme endet mit jedem Schrittwechsel */
   $('#rsteps').innerHTML=stepsHTML();
   var bk=$('#v-read .back');if(bk)bk.style.visibility=(R.phase==='timing'||R.phase==='count')?'hidden':'';
   if(R.phase!=='count'&&R.phase!=='timing')cdHide();
