@@ -674,7 +674,7 @@ function readStyle(){
 function openText(id){
   var t=byId[id];
   recStop(false);if(S.set.wh)whPreload();
-  R={t:t,phase:'read',round:0,rounds:[],marks:{},all:{},qs:[null,null],pick:[null,null],opts:t.q.map(function(q){return shuffle([q.a].concat(q.f||[]));}),t0:0};
+  R={t:t,phase:'read',qi:0,round:0,rounds:[],marks:{},all:{},qs:[null,null],pick:[null,null],opts:t.q.map(function(q){return shuffle([q.a].concat(q.f||[]));}),t0:0};
   var h='<div class="backrow"><button class="back" data-a="leave">‹ Zurück</button><div class="steps" id="rsteps"></div></div>';
   h+='<div><span class="eyebrow">'+esc(t.cat)+'</span><h2>'+esc(t.title)+'</h2></div>';
   h+='<div id="rtop"></div><section class="card"><div class="rtext" id="rtext">'+textHTML(t)+'</div></section><div id="rctl" class="view"></div>';
@@ -696,6 +696,7 @@ function renderCtl(){
   var bk=$('#v-read .back');if(bk)bk.style.visibility=R.phase==='timing'?'hidden':'';
   var tx=$('#rtext');
   if(R.opaView&&R.phase!=='opa'){tx.innerHTML=textHTML(t);R.opaView=false;}
+  var tcard=tx.closest('section');if(tcard)tcard.hidden=R.phase==='check'; /* Fragen ohne Text darüber */
   tx.classList.toggle('marking',R.phase==='mark');tx.classList.toggle('seek',R.phase==='read');tx.classList.toggle('opa',R.phase==='opa');
   if(R.phase==='read'){
     dk='<div class="row"><button class="btn ghost" data-a="listen" id="bL">'+btnLabel()+'</button><button class="btn" data-a="start">'+(R.round?'Nochmal lesen':'Ich lese jetzt')+'</button></div>';
@@ -728,17 +729,18 @@ function renderCtl(){
       '<div class="selfq"><h3>Wie war das für dich?</h3><div class="row selfrow">'+[[2,'Flüssig'],[1,'Ging so'],[0,'Holprig']].map(function(o){return '<button class="btn sm '+(en&&en.self===o[0]?'on':'ghost')+'" data-a="self" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div>'+
       '<span class="hint">Schwere Wörter? Tippe sie im Text an, dann kommen sie in den Wort-Jäger.</span><div id="sugbox"></div></div></section>';
   }else if(R.phase==='check'){
-    var ok=R.qs[0]!==null&&R.qs[1]!==null;
-    dk='<button class="btn wide" data-a="finish"'+(ok?'':' disabled')+'>Karte holen</button>';
-    h+='<div class="card" id="qcard"><span class="eyebrow">Zwei Fragen</span><span class="hint">Tippe die richtige Antwort an.</span>';
-    h+=t.q.map(function(q,i){
-      var o=R.opts[i],pk=R.pick[i],done=pk!==null;
-      if(!o||o.length<2)return '<div class="qa"><p>'+esc(q.q)+'</p><div class="ans">'+esc(q.a)+'</div></div>';
-      return '<div class="qa"><p>'+esc(q.q)+'</p><div class="opts">'+o.map(function(a,j){
+    /* Fragen einzeln nacheinander */
+    var nq=t.q.length,qi=Math.min(R.qi||0,nq-1),q=t.q[qi],o=R.opts[qi],pk=R.pick[qi],done=pk!==null||!o||o.length<2,last=qi>=nq-1;
+    if(!o||o.length<2)R.qs[qi]=R.qs[qi]===null?1:R.qs[qi];
+    dk=!done?'<button class="btn wide" disabled>'+(last?'Karte holen':'Nächste Frage')+'</button>':
+      (last?'<button class="btn wide" data-a="finish">Karte holen</button>':'<button class="btn wide" data-a="nextQ">Nächste Frage</button>');
+    h+='<div class="card" id="qcard"><span class="eyebrow">Frage '+(qi+1)+' von '+nq+'</span>';
+    if(!o||o.length<2)h+='<div class="qa"><p>'+esc(q.q)+'</p><div class="ans">'+esc(q.a)+'</div></div>';
+    else h+='<div class="qa"><p>'+esc(q.q)+'</p><span class="hint">Tippe die richtige Antwort an.</span><div class="opts">'+o.map(function(a,j){
         var cl=done?(a===q.a?' right':(j===pk?' miss':' off')):'';
-        return '<button class="opt'+cl+'" data-a="pick" data-v="'+i+'-'+j+'"'+(done?' disabled':'')+'>'+esc(a)+'</button>';
-      }).join('')+'</div>'+(done?'<p class="qfb '+(R.qs[i]?'ok':'')+'">'+(R.qs[i]?'Richtig!':'Fast! Die richtige Antwort ist grün. Lies die Stelle im Text ruhig noch einmal.')+'</p>':'')+'</div>';
-    }).join('')+'</div>';
+        return '<button class="opt'+cl+'" data-a="pick" data-v="'+qi+'-'+j+'"'+(done?' disabled':'')+'>'+esc(a)+'</button>';
+      }).join('')+'</div>'+(done?'<p class="qfb '+(R.qs[qi]?'ok':'')+'">'+(R.qs[qi]?'Richtig!':'Fast! Die richtige Antwort ist grün.')+'</p>':'')+'</div>';
+    h+='</div>';
   }
   c.innerHTML=h;setDock(dk);var rt=$('#rtop');if(rt)rt.innerHTML=top;
   if(R.phase==='read')fillRec($('#recold'),t.id,false);
@@ -1595,9 +1597,10 @@ document.addEventListener('click',function(e){
     case 'cancel':recStop(false);if(MODE==='partner'&&R.phase==='opa'){stopListen();renderHome();show('home');break;}R.phase='read';renderCtl();break;
     case 'mode':MODE=v||null;renderHome();show('home');break;
     case 'again':R.phase='read';renderCtl();window.scrollTo(0,0);break;
-    case 'check':R.phase='check';renderCtl();try{$('#qcard').scrollIntoView({block:'start',behavior:'smooth'});}catch(er){}break;
+    case 'check':R.phase='check';R.qi=0;renderCtl();window.scrollTo(0,0);break;
     case 'pick':var pq=v.split('-'),qi=+pq[0],oj=+pq[1];if(R.pick[qi]===null){R.pick[qi]=oj;R.qs[qi]=R.opts[qi][oj]===R.t.q[qi].a?1:0;renderCtl();}break;
     case 'finish':finish();break;
+    case 'nextQ':R.qi=(R.qi||0)+1;renderCtl();window.scrollTo(0,0);break;
     case 'garage':renderGarage();break;
     case 'pickcar':S.rcar=v;save();renderGarage();break;
     case 'race':stopListen();closeBox('#modal');raceOpen();break;
