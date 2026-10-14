@@ -1,0 +1,26 @@
+{
+ "gefunden": 0,
+ "auswahl": [],
+ "roh": [
+  {
+   "fehler": 401,
+   "suche": "narrative_story",
+   "text": "{\"detail\":{\"type\":\"authentication_error\",\"code\":\"unauthorized\",\"message\":\"The API key you used is missing the permission voices_read to execute this operation.\",\"status\":\"missing_permissions\",\"request_id\":\"8100296f414e3e9d32960c7460f34f03\"}}"
+  },
+  {
+   "fehler": 401,
+   "suche": "informative_educational",
+   "text": "{\"detail\":{\"type\":\"authentication_error\",\"code\":\"unauthorized\",\"message\":\"The API key you used is missing the permission voices_read to execute this operation.\",\"status\":\"missing_permissions\",\"request_id\":\"0dec3790e08624cbc00e2e2320696bd8\"}}"
+  },
+  {
+   "fehler": 401,
+   "suche": "conversational",
+   "text": "{\"detail\":{\"type\":\"authentication_error\",\"code\":\"unauthorized\",\"message\":\"The API key you used is missing the permission voices_read to execute this operation.\",\"status\":\"missing_permissions\",\"request_id\":\"f0b6b429518f7fc006f206f4ff7c8caf\"}}"
+  },
+  {
+   "fehler": 401,
+   "suche": "",
+   "text": "{\"detail\":{\"type\":\"authentication_error\",\"code\":\"unauthorized\",\"message\":\"The API key you used is missing the permission voices_read to execute this operation.\",\"status\":\"missing_permissions\",\"request_id\":\"edeb0524bd220e8a2707248014232a7c\"}}"
+  }
+ ]
+}
