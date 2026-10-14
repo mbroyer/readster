@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Strip 402</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -411,6 +412,32 @@ button:focus-visible{outline:2px solid #fff;outline-offset:2px}
 #emb .ebtn:focus-visible{outline:3px solid #2fd6d0;outline-offset:3px}
 #embBack{position:absolute;z-index:45;right:calc(10px + env(safe-area-inset-right,0px));top:calc(70px + env(safe-area-inset-top,0px));font:500 .85rem 'Lexend',system-ui,sans-serif;background:rgba(7,32,43,.85);color:#e8f8ff;border:2px solid #1d4d61;border-radius:999px;padding:6px 12px;cursor:pointer}
 body:not(.emb) #embBack{display:none!important}
+
+/* Kindermodus (Version 46): schlichte Anzeige, Mitmach-Anleitung mit Ring und Sprechblase */
+body.emb .top{display:none!important}
+body.emb .dash .box{visibility:hidden}
+body.emb.kc #msg{opacity:0}
+#embBack{top:calc(12px + env(safe-area-inset-top,0px))}
+#emb .ebox{align-items:stretch}
+#emb .ecar{display:block;width:100%;height:180px}
+#emb .ebtn{text-transform:none;letter-spacing:normal}
+#emb .ebtn.go{display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.5rem;padding:18px}
+#emb .ebtn.go svg{width:30px;height:30px}
+#emb .etitle{font-size:2rem;text-align:center}
+#emb .estars.big{justify-content:center;gap:10px}
+#emb .estars.big i{width:52px;height:52px}
+#emb .ebig{text-align:center}
+#emb .erec,#emb .etip{text-align:center}
+.kring{position:absolute;z-index:44;border:4px solid #ffd04d;border-radius:22px;pointer-events:none;box-shadow:0 0 0 4px rgba(255,208,77,.25),0 0 24px rgba(255,208,77,.6);animation:kPulse 1.1s ease-in-out infinite}
+.kring.tap{animation:kTap .8s ease-in-out infinite}
+.kring[hidden],.ktip[hidden]{display:none!important}
+@keyframes kPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.75}}
+@keyframes kTap{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.ktip{position:absolute;z-index:46;max-width:min(300px,calc(100% - 20px));background:#ffd04d;color:#2b1d00;border-radius:18px;padding:10px 16px;font:600 1.2rem/1.25 'Lexend',system-ui,sans-serif;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.35);animation:embIn .25s ease-out}
+.ktip::after{content:'';position:absolute;left:var(--ax,50%);width:16px;height:16px;background:#ffd04d;transform:translateX(-50%) rotate(45deg)}
+.ktip.up::after{bottom:-7px}
+.ktip.down::after{top:-7px}
+@media (prefers-reduced-motion:reduce){.kring,.kring.tap,.ktip{animation:none}}
 </style>
 
 <div id="stage">
@@ -457,7 +484,7 @@ body:not(.emb) #embBack{display:none!important}
     <div class="mfoot one" id="mfoot"><button class="alt" id="mBack" type="button">‹ Zurück</button><button class="go" id="mNext" type="button">Weiter</button></div>
   </div>
   <div class="slip" id="slip" hidden></div>
-  <div id="emb" hidden></div><button id="embBack" type="button">‹ Zurück</button>
+  <div id="emb" hidden></div><div class="kring" id="kRing" hidden></div><div class="ktip" id="kTip" hidden></div><button id="embBack" type="button">‹ Zurück</button>
   <div class="home" id="home">
     <section class="h-scr" id="hSplash" aria-label="Splash" tabindex="0">
       <div class="h-neo" aria-hidden="true"><div class="h-road"><i></i></div><div class="h-haze"></div></div>
@@ -1536,7 +1563,7 @@ function treeColor(){
 function setMsg(t,cls){
   var key=t+'|'+(cls||'');
   if(key===curMsg)return;
-  curMsg=key;msgEl.textContent=t;msgEl.className='msg'+(cls?' '+cls:'');
+  curMsg=key;msgEl.textContent=EMB?kidMsg(t):t;msgEl.className='msg'+(cls?' '+cls:'');
 }
 function updateMsg(){
   if(state!=='run'){setMsg('');return;}
@@ -2130,9 +2157,10 @@ function preStep(c,dt){
 }
 
 var fbTxt='',fbCls='',fbT=-9;
-function say(t,cls){fbTxt=t;fbCls=cls||'';fbT=T;}
+function say(t,cls){if(EMB)t=kidMsg(t);fbTxt=t;fbCls=cls||'';fbT=T;}
 function tap(){
   if(state!=='run')return;
+  if(EMB&&kidTap())return;
   if(!player.launched){
     if(T<seq.stg)return;
     if(T<seq.g){player.foul=true;player.rt=T-seq.g;launch(player);say('Rotlicht! Disqualifiziert – fahr trotzdem durch','bad');vib([90,50,90]);return;}
@@ -2157,7 +2185,7 @@ function tap(){
   }
 }
 function simStep(dt){
-  T+=dt;
+  T+=dt;if(EMB)kidTick(dt);
   if(gasLvl<0.5)liftT=T;
   if(player.launched)player.thrIn=(T-player.launchT<0.4)?1:gasLvl;
   player.brakeIn=brakeTouch||kDown||kSpace||(player.autoBrake&&player.over);
@@ -2875,6 +2903,7 @@ function updateCtl(){
     if(player.auto){t='Automatik';bb='Gas halten';cls='pedal sh dead';led=0;}
   }
   else{t='Letzter Gang';bb='';cls='pedal sh dead';}
+  if(EMB&&t.indexOf('›')>0){t='Schalten';bb='';}
   if(!shBtn._i){shBtn.innerHTML='<i class="led"></i><span class="gt"></span><b></b>';shBtn._i=1;}
   if(t+bb+cls!==shTxt){shTxt=t+bb+cls;shBtn.children[1].textContent=t;shBtn.children[2].textContent=bb;shBtn.className=cls;}
   var lw=Math.round(led*80);if(lw!==shBtn._l){shBtn._l=lw;shBtn.children[0].style.width=lw+'%';}
@@ -2933,7 +2962,7 @@ shBtn.addEventListener('pointerdown',function(e){e.preventDefault();if(player.ov
 ['pointerup','pointercancel'].forEach(function(ev){window.addEventListener(ev,function(){brakeTouch=false;});});
 function frame(now){
   var dt=Math.min(0.05,(now-last)/1000);last=now;acc+=dt;
-  var sl=1;
+  var sl=(EMB&&KT&&KT.slow)?0.35:1;
   if(state==='run'&&player.launched&&opp.launched&&!(player.done&&opp.done)){var ld=Math.max(player.y,opp.y),tr=Math.min(player.y,opp.y);if(ld>FIN-16&&tr<FIN&&ld-tr<4)sl=0.3;}
   slow+=(sl-slow)*Math.min(1,dt*10);acc+=dt*(slow-1);
   while(acc>=STEP){simStep(STEP);acc-=STEP;}
@@ -3265,10 +3294,13 @@ window.addEventListener('resize',fitAllWb);
    Nur aktiv mit ?readster in der Adresse. Ohne bleibt alles wie in der Vollversion.
    Parameter: car (Fahrzeug-ID), name (Anzeigename), auto (1 = Automatik), brake (1 = bremst selbst),
    easy (1 = Schalten ohne Gas weg, Standard), night (1), wx (0 trocken, 1 kalt, 2 nass, leer = zufällig),
-   diff (0 bis 2), rival (1 = Gegner aus der Rennserie mit Spruch), best (bisherige Bestzeit in s), help (0 = ohne Erklärung),
-   color (Lackfarbe des Gegners, Standard Blau).
+   diff (0 bis 2), rival (1 = Gegner aus der Rennserie mit Spruch), best (bisherige Bestzeit in s),
+   color (Lackfarbe des Gegners, Standard Blau), voice (0 = ohne Stimme), hv (Ordner der Sprach-Aufnahmen,
+   z. B. ../audio/, Dateien hinweis-<id>.mp3, sonst Gerätestimme), tut (1 = Mitmach-Anleitung erzwingen, 0 = nie).
+   Kindermodus (Version 46): kein Burnout, schlichte Anzeige, beim ersten Rennen jeder Steuerart eine
+   gesprochene Mitmach-Anleitung, die wartet, bis das Kind den Schritt gemacht hat.
    Meldungen an die einbettende Seite (postMessage): {source:'strip402',type:'done',result:{...}} und {source:'strip402',type:'close'}. */
-var EMB=null,EMB_AI=null,embCur=null;
+var EMB=null,EMB_AI=null,embCur=null,KT=null;
 function embQ(){
   var q={},s=(location.search||'').replace(/^\?/,'').split('&');
   s.forEach(function(p){if(!p)return;var i=p.indexOf('='),k=decodeURIComponent(i<0?p:p.slice(0,i)),v=i<0?'1':decodeURIComponent(p.slice(i+1).replace(/\+/g,' '));q[k]=v;});
@@ -3278,30 +3310,122 @@ function embOn(){var q=embQ();return 'readster' in q;}
 function embPost(m){m.source='strip402';try{if(window.parent&&window.parent!==window)window.parent.postMessage(m,'*');}catch(e){}}
 function embEsc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function embF2(n){return n.toFixed(2).replace('.',',');}
-var EMB_IC={
-  gas:'<svg viewBox="0 0 28 28" fill="none" stroke="#ffd04d" stroke-width="2.6" stroke-linecap="round"><rect x="8" y="3" width="12" height="22" rx="4"/><path d="M14 19V9M10.5 12.5L14 9l3.5 3.5"/></svg>',
-  go:'<svg viewBox="0 0 28 28"><circle cx="14" cy="7" r="4" fill="#1d4d61"/><circle cx="14" cy="21" r="5" fill="#4fd18b"/></svg>',
-  sh:'<svg viewBox="0 0 28 28" fill="none" stroke="#ffd04d" stroke-width="2.6" stroke-linecap="round"><path d="M8 5v18M20 5v9H8M14 5v9"/></svg>',
-  br:'<svg viewBox="0 0 28 28" fill="none" stroke="#ff7c82" stroke-width="2.6" stroke-linecap="round"><path d="M14 4v14M8 12l6 6 6-6M6 24h16"/></svg>',
-  auto:'<svg viewBox="0 0 28 28" fill="none" stroke="#2fd6d0" stroke-width="2.6" stroke-linecap="round"><circle cx="14" cy="14" r="9"/><path d="M14 9v5l3 3"/></svg>'
-};
 function embCard(h){var m=$('emb');m.innerHTML='<div class="ebox" role="dialog" aria-modal="true">'+h+'</div>';m.hidden=false;var b=m.querySelector('.ebtn');if(b)b.focus();}
 function embHide(){$('emb').hidden=true;$('emb').innerHTML='';}
+
+/* ---------- Stimme: Aufnahme aus Readster (hinweis-<id>.mp3), sonst Gerätestimme ---------- */
+var KTXT={
+  rgas:'Leg deinen Finger auf das Gaspedal und schieb ihn nach oben.',
+  rzone:'Gut! Halte die Nadel im grünen Feld.',
+  rampel:'Bleib auf dem Gas. Wenn die Ampel grün wird, tippst du auf Los.',
+  rlos:'Jetzt! Tippe auf Los!',
+  rwarte:'Noch nicht! Warte, bis die Ampel grün ist.',
+  rauto:'Lass den Finger auf dem Gas. Das Auto schaltet von allein.',
+  rschalt:'Der Knopf leuchtet gelb. Tippe jetzt auf Schalten!',
+  rbrems:'Im Ziel! Halte den Bremsknopf gedrückt.',
+  rgasweg:'Finger auf dem Gas lassen!',
+  rsieg:'Du hast gewonnen!',
+  rverloren:'Knapp verloren. Nächstes Mal klappt es!',
+  rzufrueh:'Zu früh gestartet. Warte auf Grün!',
+  rtmehr:'Tipp: Gib beim Start etwas mehr Gas.',
+  rtweniger:'Tipp: Gib beim Start etwas weniger Gas.',
+  rtschalt:'Tipp: Schalte, wenn der Knopf gelb leuchtet.',
+  rtbrems:'Tipp: Bremse nach dem Ziel früher.'
+};
+var KV={el:null,tok:0};
+function kvStop(){KV.tok++;if(KV.el){try{KV.el.pause();}catch(e){}KV.el=null;}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
+function kvTts(t,done){
+  try{if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){if(done)done();return;}
+    var u=new SpeechSynthesisUtterance(t);u.lang='de-DE';u.rate=0.95;
+    var vs=window.speechSynthesis.getVoices().filter(function(v){return /^de/i.test(v.lang);});if(vs.length)u.voice=vs[0];
+    if(done)u.onend=done;window.speechSynthesis.speak(u);}catch(e){if(done)done();}
+}
+/* ids: ein Hinweis oder eine Liste, die nacheinander gesprochen wird */
+function kidVoice(ids){
+  ids=[].concat(ids);if(KT){KT.lastSay=T;KT.vid=ids[0];}
+  if(!EMB||!EMB.voice)return;
+  kvStop();var tok=KV.tok;
+  (function one(i){
+    if(i>=ids.length||tok!==KV.tok)return;
+    var id=ids[i],next=function(){if(tok===KV.tok)setTimeout(function(){one(i+1);},250);};
+    if(!EMB.hv){kvTts(KTXT[id],next);return;}
+    var a=new Audio(EMB.hv+'hinweis-'+id+'.mp3'),fell=false,fb=function(){if(fell||tok!==KV.tok)return;fell=true;kvTts(KTXT[id],next);};
+    KV.el=a;a.onended=next;a.onerror=fb;
+    var p=a.play();if(p&&p.catch)p.catch(function(e){if(!(e&&e.name==='NotAllowedError'))fb();});
+  })(0);
+}
+
+/* ---------- Mitmach-Anleitung: Ring um das Bedienelement, kurzer Satz, Stimme ---------- */
+function kidStore(k,set){try{var o=JSON.parse(localStorage.getItem('strip402.kid')||'{}');if(set){o[k]=1;localStorage.setItem('strip402.kid',JSON.stringify(o));}return !!o[k];}catch(e){return false;}}
+function kidKey(){return EMB.auto?'a':(EMB.brake?'m':'mb');}
+function kidCoach(id,txt,voice,dur){
+  var ring=$('kRing'),tip=$('kTip');
+  clearTimeout(kidCoach._t);
+  if(!id){ring.hidden=true;tip.hidden=true;document.body.classList.remove('kc');return;}
+  var st=$('stage').getBoundingClientRect(),r=$(id).getBoundingClientRect(),pad=8;
+  if(id==='gasZone'){var p=$('pdl').getBoundingClientRect();r=p;}
+  ring.style.left=(r.left-st.left-pad)+'px';ring.style.top=(r.top-st.top-pad)+'px';ring.style.width=(r.width+pad*2)+'px';ring.style.height=(r.height+pad*2)+'px';
+  ring.className='kring'+(id==='shBtn'||id==='tree'?' tap':'');ring.hidden=false;
+  tip.innerHTML='<span>'+embEsc(txt)+'</span>';tip.hidden=false;
+  var tw=tip.offsetWidth,th=tip.offsetHeight,cx=r.left-st.left+r.width/2,x=Math.max(10,Math.min(st.width-tw-10,cx-tw/2)),y;
+  if(r.top-st.top>st.height*0.45){y=r.top-st.top-pad-th-14;tip.className='ktip up';}else{y=r.bottom-st.top+pad+14;tip.className='ktip down';}
+  tip.style.left=x+'px';tip.style.top=Math.max(10,y)+'px';tip.style.setProperty('--ax',Math.max(18,Math.min(tw-18,cx-x))+'px');
+  document.body.classList.add('kc');
+  if(voice)kidVoice(voice);
+  if(dur)kidCoach._t=setTimeout(function(){kidCoach(null);},dur*1000);
+}
+/* Ampel anhalten, solange die Anleitung wartet: alle kommenden Zeitpunkte rutschen mit */
+function kidShift(dt){
+  for(var k in seq)if(seq[k]>T)seq[k]+=dt;
+  if(opp.launchAt>T)opp.launchAt+=dt;
+  if(opp.bluffT)opp.bluffT=opp.bluffT.map(function(t){return t>T?t+dt:t;});
+}
+function kidTap(){
+  if(!KT||!KT.tut||state!=='run'||player.launched||!seq||T>=seq.g)return false;
+  if(T>=seq.arrive-0.3&&T-KT.lastSay>1.2)kidVoice('rwarte');
+  return true;
+}
+function kidTick(dt){
+  if(!KT||state!=='run'||!seq)return;
+  var c=player;
+  if(KT.tut){
+    if(KT.step===0&&T>=seq.arrive-0.3){KT.step=1;KT.hold=true;kidCoach('gasZone','Finger aufs Gas und hochschieben','rgas');}
+    if(KT.step===1&&gasLvl>0.25){KT.step=2;KT.inz=0;kidCoach('tach','Nadel ins grüne Feld','rzone');}
+    if(KT.step===2){var inz=c.rpm>=c.zone[0]&&c.rpm<=c.zone[1];KT.inz=inz?KT.inz+dt:Math.max(0,KT.inz-dt*0.5);
+      if(KT.inz>1.2){KT.step=3;KT.hold=false;kidCoach('tree','Bei Grün: Los tippen!','rampel');}}
+    if(KT.step===3&&T>=seq.g&&!c.launched){KT.step=4;kidCoach('shBtn','Jetzt Los!','rlos');}
+    if(KT.step>=1&&KT.step<=4&&c.launched){KT.step=5;if(EMB.auto)kidCoach('gasZone','Gas unten lassen','rauto',3);else kidCoach(null);}
+    if(KT.step===5&&!EMB.auto&&!c.over&&c.shiftT<=0&&c.gear<c.ng-1&&c.er-c.opt[c.gear]>=-130){KT.step=6;KT.slow=true;KT.t6=T;KT.ns=c.shifts.length;kidCoach('shBtn','Jetzt schalten!','rschalt');}
+    if(KT.step===6&&(c.shifts.length>KT.ns||T-KT.t6>2.5||c.over)){KT.slow=false;KT.step=7;kidCoach(null);}
+    if(!EMB.brake&&c.over&&c.v>3&&!KT.br){KT.br=true;KT.slow=false;kidCoach('shBtn','Bremse gedrückt halten','rbrems',3);}
+    if(KT.hold&&T-KT.lastSay>7)kidVoice(KT.vid);
+    if((KT.step===2||KT.step===3)&&gasLvl<0.05&&T-KT.lastSay>3)kidVoice('rgas');
+    if(KT.hold&&T>=seq.stg-0.1)kidShift(dt);
+  }
+  if(c.launched&&!c.foul&&!c.over&&!c.done&&c.shiftT<=0&&gasLvl<0.5&&T-c.launchT>0.6&&T-KT.lastGas>6&&KT.nGas<2&&!KT.slow){KT.lastGas=T;KT.nGas++;kidVoice('rgasweg');}
+}
+/* Meldungen des Spiels in Kindersprache, technische weglassen */
+var KMSG=[[/^Burnout|^Reifen heiß/,''],[/^Rollt zur Startlinie/,'Gleich geht’s los'],[/^Staging/,'Gas geben'],[/^Gas halten · grüne Zone/,'Nadel ins Grüne'],[/^Jetzt LOS/,'Jetzt Los!'],
+  [/Perfekter Start/,'Super Start!'],[/Start zu niedrig/,'Start: mehr Gas'],[/Start zu hoch/,'Start: weniger Gas'],[/^Rotlicht/,'Zu früh!'],[/^BOOST|^Perfekt geschaltet/,'Super geschaltet!'],
+  [/^Zu früh geschaltet/,'Etwas zu früh'],[/^Etwas spät/,'Etwas spät'],[/^Begrenzer/,'Zu spät geschaltet'],[/^Gas nicht losgelassen|^Krach/,''],[/^Gas durchtreten/,'Gas halten!'],
+  [/^Bremst automatisch/,'Bremst von allein'],[/^BREMSEN/,'Bremsen!'],[/^CRASH/,'Crash!']];
+function kidMsg(t){if(!t)return t;for(var i=0;i<KMSG.length;i++)if(KMSG[i][0].test(t))return KMSG[i][1];return t;}
+
+/* ---------- Startbild: großes Auto, ein Knopf ---------- */
+var EMB_PLAY='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>';
 function embIntro(){
   var q=embQ(),o={car:SPECS[carIdx(q.car||'skyline')].id,auto:q.auto==='1',brake:q.brake!=='0'&&(q.brake==='1'||q.auto==='1'),easy:q.easy!=='0',night:q.night==='1',
     wx:(q.wx===''||q.wx==null)?null:Math.max(0,Math.min(2,+q.wx||0)),diff:Math.max(0,Math.min(2,+q.diff||0)),rival:q.rival==='1',best:q.best?parseFloat(String(q.best).replace(',','.')):null,
-    name:q.name||SPECS[carIdx(q.car||'skyline')].name,help:q.help!=='0',color:q.color||'#2563c9',ai:null,rv:null};
+    name:q.name||SPECS[carIdx(q.car||'skyline')].name,color:q.color||'#2563c9',voice:q.voice!=='0',hv:q.hv||'',tut:q.tut==null?null:q.tut==='1',ai:null,rv:null};
   if(o.rival){var rv=CHARS[Math.floor(Math.random()*CHARS.length)],a={};for(var k in rv)a[k]=rv[k];
     if(o.diff>=2){a.pw=Math.max(a.pw,1);a.rt=[Math.max(0.1,a.rt[0]-0.05),Math.max(0.2,a.rt[1]-0.08)];}o.ai=a;o.rv=rv;}
   EMB=o;
-  var steps=[['gas','<b>Gas:</b> Finger aufs Pedal und hochschieben. Die Nadel soll im grünen Feld bleiben.'],['go','<b>Grün:</b> Tippe auf <b>Los</b>. Nicht vorher!']];
-  if(o.auto)steps.push(['auto','<b>Schalten</b> und <b>Bremsen</b> macht das Auto allein.']);
-  else{steps.push(['sh',o.easy?'<b>Gelb:</b> Tippe auf <b>Schalten</b>. Gas bleibt unten.':'<b>Gelb:</b> Gas los, dann <b>Schalten</b> tippen.']);steps.push(o.brake?['auto','<b>Bremsen</b> macht das Auto allein.']:['br','<b>Nach dem Ziel:</b> Bremsen halten, sonst Mauer!']);}
-  var h='<span class="eeb">'+embEsc(o.name)+(o.night?' · Nachtrennen':'')+'</span>';
-  if(o.rv)h+='<div class="equote"><small>'+embEsc(o.rv.who)+' sagt:</small>'+embEsc(o.rv.quote.replace(/[„“]/g,''))+'</div><p class="etip">'+embEsc(o.rv.tip)+'</p>';
-  if(o.help||!o.rv){h+='<h2>'+(o.help?'So geht das Rennen':'Bereit?')+'</h2>';if(o.help)h+='<ul class="esteps">'+steps.map(function(s){return '<li><span class="eic">'+EMB_IC[s[0]]+'</span><span>'+s[1]+'</span></li>';}).join('')+'</ul>';}
-  h+='<button class="ebtn" type="button" data-e="race">Los geht’s</button><button class="ebtn ghost" type="button" data-e="close">Zurück</button>';
+  var h='<canvas class="ecar" aria-hidden="true"></canvas><h2>'+embEsc(o.name)+'</h2>';
+  if(o.night)h+='<p class="etip">Heute fährst du in der Nacht.</p>';
+  if(o.rv)h+='<div class="equote"><small>'+embEsc(o.rv.who)+' sagt:</small>'+embEsc(o.rv.quote.replace(/[„“]/g,''))+'</div>';
+  h+='<button class="ebtn go" type="button" data-e="race">'+EMB_PLAY+'Start</button><button class="ebtn ghost" type="button" data-e="close">Zurück</button>';
   embCard(h);
+  var cv=$('emb').querySelector('.ecar');if(cv)drawPv(cv,SPECS[carIdx(o.car)],true);
 }
 function embRace(){
   var o=EMB;embHide();
@@ -3310,40 +3434,45 @@ function embRace(){
   var sh=CarLab.shade;opp.lab=Object.assign({},opp.lab,{body:o.color,roof:sh(o.color,0.12),dark:sh(o.color,-0.45)});opp.body=o.color;
   if(o.wx!=null){WX=WXS[o.wx];wxInfo();}ghostUse=GH[ghKey()]||null;
   player.auto=o.auto;player.easy=o.easy;player.autoBrake=o.brake;homeEl.hidden=true;start();
+  /* Kein Burnout: die Autos rollen gleich zur Linie, Reifen sind schon warm */
+  var d=seq.roll-(T+0.4);for(var k in seq)seq[k]-=d;opp.launchAt-=d;if(opp.bluffT)opp.bluffT=opp.bluffT.map(function(t){return t-d;});
+  player.heat=opp.heat=0.8;
+  var tut=o.tut!=null?o.tut:!kidStore(kidKey());
+  KT={tut:tut,step:0,hold:false,inz:0,slow:false,lastSay:-9,vid:null,lastGas:-9,nGas:0,br:false};
 }
+
+/* ---------- Ergebnis: Sterne, Zeit, ein Tipp ---------- */
 function embFinish(r){
-  var o=EMB,title,sub='',et=r.et,rec=false,stars=0,tip='';
-  function gs(g){return g?g.replace(/0+$/,'').replace(/,$/,''):'';}
+  var o=EMB,title,et=r.et,rec=false,stars=0,tip='',tv=null,v;
+  kidCoach(null);if(KT){if(KT.tut&&r.done)kidStore(kidKey(),true);KT=null;}
   if(et!=null&&!r.crashed&&(o.best==null||et<o.best))rec=true;
-  if(r.foul){title='Zu früh gestartet';sub='Warte, bis die Ampel grün ist. Dann tippen.';}
-  else if(!r.done){title='Nicht gestartet';sub='Bei Grün auf Los tippen.';}
-  else if(r.won){title='Du gewinnst!';sub=r.oppFoul?r.who+' ist zu früh gestartet.':(r.gap?'Du warst '+gs(r.gap)+' s schneller.':'');}
-  else{title=r.who==='Computer'?'Knapp verloren':r.who+' gewinnt';sub=r.gap?'Nur '+gs(r.gap)+' s langsamer.':'';}
+  if(r.foul){title='Zu früh gestartet';v='rzufrueh';}
+  else if(!r.done){title='Nicht gestartet';v='rzufrueh';}
+  else if(r.won){title='Gewonnen!';v='rsieg';}
+  else{title=o.rv?r.who+' war schneller':'Knapp verloren';v='rverloren';}
   if(r.done&&!r.foul){stars=1;if(r.rt!=null&&r.rt<0.5)stars++;if(r.won)stars++;
-    if(r.launch<0)tip='Tipp: Beim Start etwas mehr Gas, die Nadel ins Grüne.';
-    else if(r.launch>0)tip='Tipp: Beim Start etwas weniger Gas, sonst drehen die Reifen durch.';
-    else if(r.shifts&&r.good<r.shifts&&!o.auto)tip='Tipp: Schalte, wenn der Knopf gelb leuchtet.';
-    else if(r.crashed)tip='Tipp: Nach dem Ziel früher bremsen.';}
+    if(r.launch<0){tip='Beim Start etwas mehr Gas.';tv='rtmehr';}
+    else if(r.launch>0){tip='Beim Start etwas weniger Gas.';tv='rtweniger';}
+    else if(r.shifts&&r.good<r.shifts&&!o.auto){tip='Schalte, wenn der Knopf gelb leuchtet.';tv='rtschalt';}
+    else if(r.crashed){tip='Nach dem Ziel früher bremsen.';tv='rtbrems';}}
   r.stars=stars;r.record=rec;r.car=o.car;
-  var h='<span class="eeb">'+embEsc(o.name)+'</span><h2>'+embEsc(title)+'</h2>';
-  if(stars)h+='<div class="estars" aria-label="'+stars+' von 3 Sternen">'+[0,1,2].map(function(i){return '<i class="'+(i<stars?'on':'')+'"></i>';}).join('')+'</div>';
+  var h='<h2 class="etitle">'+embEsc(title)+'</h2>';
+  h+='<div class="estars big" aria-label="'+stars+' von 3 Sternen">'+[0,1,2].map(function(i){return '<i class="'+(i<stars?'on':'')+'"></i>';}).join('')+'</div>';
   if(et!=null)h+='<div class="ebig">'+embF2(et+(r.crashed?0.5:0))+'<small>Sekunden</small></div>';
-  if(sub)h+='<p>'+embEsc(sub)+'</p>';
-  if(rec)h+='<p class="erec">'+(o.best!=null?'Neue Bestzeit mit diesem Auto!':'Deine erste Zeit mit diesem Auto.')+'</p>';
-  if(r.done&&!r.foul)h+='<div class="estats"><div><span>Start</span><b>'+(r.rt!=null?embF2(r.rt)+' s':'–')+'</b></div><div><span>Schalten</span><b>'+(o.auto?'Auto':r.good+' von '+r.shifts)+'</b></div><div><span>Tempo</span><b>'+(r.v?Math.round(r.v)+' km/h':'–')+'</b></div></div>';
+  if(rec)h+='<p class="erec">'+(o.best!=null?'Neue Bestzeit!':'Deine erste Zeit mit diesem Auto!')+'</p>';
   if(tip)h+='<p class="etip">'+embEsc(tip)+'</p>';
   h+='<button class="ebtn" type="button" data-e="done">Weiter</button>';
-  embCur=r;setTimeout(function(){embCard(h);},350);
+  embCur=r;setTimeout(function(){embCard(h);kidVoice(tv?[v,tv]:v);},350);
 }
 function embBoot(){
   document.body.classList.add('emb');homeEl.hidden=true;sheetEl.hidden=true;$('menu').hidden=true;
   $('emb').addEventListener('click',function(e){
     var b=e.target.closest('[data-e]');if(!b)return;var a=b.getAttribute('data-e');
     if(a==='race')embRace();
-    else if(a==='close'){embPost({type:'close'});if(window.parent===window)embIntro();}
-    else if(a==='done'){var r=embCur;embCur=null;embPost({type:'done',result:r});if(window.parent===window){if(r&&r.record&&r.et!=null)EMB.best=r.et;embIntro();}}
+    else if(a==='close'){kvStop();embPost({type:'close'});if(window.parent===window)embIntro();}
+    else if(a==='done'){kvStop();var r=embCur;embCur=null;embPost({type:'done',result:r});if(window.parent===window){if(r&&r.record&&r.et!=null)EMB.best=r.et;embIntro();}}
   });
-  $('embBack').onclick=function(){embHide();if(state!=='ready'){mstep='race';reset();}sheetEl.hidden=true;slipEl.hidden=true;embPost({type:'close'});if(window.parent===window)embIntro();};
+  $('embBack').onclick=function(){kvStop();kidCoach(null);KT=null;embHide();if(state!=='ready'){mstep='race';reset();}sheetEl.hidden=true;slipEl.hidden=true;embPost({type:'close'});if(window.parent===window)embIntro();};
   embIntro();
 }
 
