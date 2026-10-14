@@ -109,8 +109,10 @@ button,input{font:inherit;color:inherit}
 .stagename{font-family:var(--f-display);font-weight:600;font-size:1.7rem;line-height:1.05}
 .week{gap:14px}
 .setgrp{font-size:1rem;font-weight:600;margin:6px 0 -6px;padding-top:12px;border-top:2px solid var(--line)}details.adult.set>div>.setgrp:first-child{border-top:0;padding-top:0}.setrow .link{align-self:flex-start;padding-left:0}
-.nxt{gap:10px}.nxt h2{font-size:1.6rem}.nxt .btn{margin-top:6px}
-.sechead{display:flex;flex-direction:column;gap:6px;margin:10px 0 -4px}
+.nxt{gap:8px;padding:16px}.nxt h2{font-size:1.3rem}.nxtb{display:flex;gap:10px;margin-top:4px}.nxtb .btn:first-child{flex:2}.nxtb .btn.ghost{flex:1;font-size:1rem;padding-inline:10px}
+#v-home .card{padding:16px;gap:10px}#v-home .tile{padding:8px 4px}#v-home .tile b{font-size:1.5rem}#v-home .dot i{max-width:30px;border-width:2px}#v-home .dot span{font-size:.75rem}
+#v-home .sechead .hint{font-size:.85rem}#v-home{gap:12px}#v-home .tile b{font-size:1.3rem}#v-home .tile span{font-size:.75rem}#v-home .rtank{min-height:0}#v-home .rtank .btn{padding:7px 14px;min-height:0}
+.sechead{display:flex;flex-direction:column;gap:4px;margin:4px 0 -6px}.sechead h2{font-size:1.2rem}
 .lvchip{align-self:flex-start;background:var(--xp);color:var(--xp-ink);border-radius:999px;padding:2px 12px;font-weight:600;font-size:.9rem}
 .card.prog{width:100%;font:inherit;color:var(--ink);text-align:left;cursor:pointer;box-shadow:0 5px 0 var(--line)}.card.prog .more{align-self:flex-end;color:var(--accent);font-weight:500}
 .alt{display:flex;flex-direction:column;gap:8px;margin-top:4px}
@@ -635,14 +637,11 @@ function renderHome(){
   if(S.whNote)h+='<section class="card left whnote"><p class="fb">'+esc(S.whNote)+'</p><button class="btn ghost sm" data-a="whNoteOk">Okay</button></section>';
   var due=wjDue().length;
   /* Ganz oben ein klarer Startknopf, Themen danach als Alternative */
+  if(!sg)h+='<button class="btn wide" data-a="topics">Thema wählen</button>';
   if(!sg&&due)h+='<button class="wjcta" data-a="wj"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg><div><b>Wort-Jäger</b><span>'+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' zum Üben</span></div></button>';
-  if(sg)h+='<section class="card nxt"><span class="eyebrow">'+(sg.from?'Rätsel lösen':(doneCount()?'Dein nächster Text':'Dein erster Text'))+' · '+esc(sg.t.cat)+'</span><h2>'+esc(sg.t.title)+'</h2><button class="btn wide" data-a="open" data-v="'+sg.t.id+'">Jetzt lesen</button>'+(due?'<button class="wjcta sm" data-a="wj">'+IC_WJ+'<span>Oder erst <b>Wort-Jäger</b>: '+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' üben</span></button>':'')+'</section>';
-  h+='<section class="left"><h2 style="margin-bottom:12px">'+(sg?'Oder wähle ein Thema':'Worüber willst du lesen?')+'</h2><div class="cats">'+CATS.map(function(c){
-    var tot=TEXTS.filter(function(t){return t.cat===c.id;}),d=tot.filter(function(t){return S.done[t.id];}).length;
-    return '<button class="cat" data-a="cat" data-v="'+c.id+'" style="--c:'+TILE[c.id]+'"><span class="ci">'+c.ic+'</span><b>'+c.id+'</b><span>'+d+' von '+tot.length+'</span></button>';
-  }).join('')+'</div></section>';
+  if(sg)h+='<section class="card nxt"><span class="eyebrow">'+(sg.from?'Rätsel lösen':(doneCount()?'Dein nächster Text':'Dein erster Text'))+' · '+esc(sg.t.cat)+'</span><h2>'+esc(sg.t.title)+'</h2><div class="nxtb"><button class="btn" data-a="open" data-v="'+sg.t.id+'">Jetzt lesen</button><button class="btn ghost" data-a="topics">Thema wählen</button></div>'+(due?'<button class="wjcta sm" data-a="wj">'+IC_WJ+'<span>Oder erst <b>Wort-Jäger</b>: '+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' üben</span></button>':'')+'</section>';
   var rk=rankOf(p.L),cc=curCar();
-  h+='<div class="sechead"><h2>Deine Garage</h2><p class="hint">Jeder gelesene Text bringt dich ein Level weiter. Neue Level schalten neue Autos frei. Lesen füllt auch den Tank: Ist er voll, fährst du ein Rennen.</p></div>';
+  h+='<div class="sechead"><h2>Deine Garage</h2><p class="hint">Jeder Text bringt dich ein Level weiter, neue Level bringen neue Autos.</p></div>';
   h+='<section class="card week rgar"><button class="rgo" data-a="garage" aria-label="Garage öffnen">'+stageHTML(rk)+'<div class="info"><span class="lvchip">Level '+p.L+'</span><span class="stagename">'+esc(cc?cc.n:'Unter der Plane')+'</span><div class="bar" role="progressbar" aria-valuenow="'+stageProg().pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+stageProg().pct+'%"></i></div><span class="xptext">'+esc(growText())+'</span></div><span class="chev" aria-hidden="true">›</span></button>'+
     (cc?'<div class="rtank"><span class="eyebrow">Tank</span>'+tankPips(false)+(fuelFull()?'<button class="btn" data-a="race">Rennen fahren</button>':'<span class="xptext">'+esc(tankText())+'</span>')+'</div>':'')+
     '</section>';
@@ -688,9 +687,16 @@ window.addEventListener('message',function(e){
     S.rcar=id;save();raceClose();}
   else if(m.type==='close')raceClose();
 });
+function renderTopics(){
+  var h='<div class="backrow"><button class="back" data-a="home">‹ Zurück</button></div><h2>Worüber willst du lesen?</h2><div class="cats">'+CATS.map(function(c){
+    var tot=TEXTS.filter(function(t){return t.cat===c.id;}),d=tot.filter(function(t){return S.done[t.id];}).length;
+    return '<button class="cat" data-a="cat" data-v="'+c.id+'" style="--c:'+TILE[c.id]+'"><span class="ci">'+c.ic+'</span><b>'+c.id+'</b><span>'+d+' von '+tot.length+'</span></button>';
+  }).join('')+'</div>';
+  $('#v-cat').innerHTML=h;show('cat');
+}
 function renderCat(id){
   var items=TEXTS.filter(function(t){return t.cat===id;}).sort(function(a,b){return a.diff-b.diff;});
-  var h='<div class="backrow"><button class="back" data-a="home">‹ Zurück</button></div><h2>'+esc(id)+'</h2><p class="hint">Ein Stern: leichter. Zwei Sterne: kniffliger.</p><div class="list">';
+  var h='<div class="backrow"><button class="back" data-a="topics">‹ Zurück</button></div><h2>'+esc(id)+'</h2><p class="hint">Ein Stern: leichter. Zwei Sterne: kniffliger.</p><div class="list">';
   h+=items.map(function(t){
     var d=S.done[t.id],b=d?'<span class="badge done">'+(d.best&&S.set.nums?d.best+' W/min':'gelesen')+'</span>':'<span class="badge star" aria-label="'+(t.stars>1?'kniffliger':'leichter')+'">'+(t.stars>1?'★★':'★')+'</span>';
     return '<button class="trow" data-a="open" data-v="'+t.id+'"><b>'+esc(t.title)+'</b>'+b+'</button>';
@@ -1462,8 +1468,9 @@ function showReward(t,first,gain,list){
   h+=riddleBlock(t,true);
   var full=fuelFull();
   if(full)h+='<div class="rwt">'+tankPips(true)+'<div><b>Dein Tank ist voll!</b></div></div><button class="btn wide" data-a="race">Rennen fahren</button>';
-  if(sg)h+='<button class="btn wide'+(full?' ghost':'')+'" data-a="nextread" data-v="'+sg.t.id+'">Weiterlesen</button>';
-  h+='<button class="link" data-a="home2">Zur Übersicht</button></div>';
+  h+='<button class="btn wide'+(full?' ghost':'')+'" data-a="home2">Zur Übersicht</button>';
+  if(sg)h+='<button class="link" data-a="nextread" data-v="'+sg.t.id+'">Gleich den nächsten Text lesen</button>';
+  h+='</div>';
   openBox('#modal',h);readStyle();burst();
   try{var A0=typeof AUDIO!=='undefined'&&AUDIO[t.id];if(A0&&((A0.n&&A0.n.b)||(A0.s&&A0.s.b))){var cx=getAC();if(cx){cx.resume();chime(cx,cx.currentTime+0.6);}}}catch(e){}
 }
@@ -1668,6 +1675,7 @@ document.addEventListener('click',function(e){
   switch(a){
     case 'home':case 'home2':stopListen();closeBox('#modal');renderHome();show('home');break;
     case 'cat':renderCat(v);break;
+    case 'topics':renderTopics();break;
     case 'open':openText(v);break;
     case 'nextread':stopListen();closeBox('#modal');openText(v);break;
     case 'leave':recStop(false);stopListen();renderHome();show('home');break;
