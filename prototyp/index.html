@@ -601,23 +601,16 @@ function renderHome(){
   var h='<header class="top"><h1 class="brand">Readster</h1><span class="proto">Prototyp</span><div class="chips"><button class="iconbtn" data-a="stats" aria-label="Dein Fortschritt"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="12" width="4" height="7" rx="1.5" fill="currentColor"/><rect x="9" y="7" width="4" height="12" rx="1.5" fill="currentColor"/><rect x="15" y="3" width="4" height="16" rx="1.5" fill="currentColor"/></svg></button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
   h+='<div class="modebar"><span>'+(MODE==='partner'?'👴 Mit Partner':'🎧 Allein')+'</span><button class="btn ghost sm" data-a="mode" data-v="">Wechseln</button></div>';
   if(S.whNote)h+='<section class="card left whnote"><p class="fb">'+esc(S.whNote)+'</p><button class="btn ghost sm" data-a="whNoteOk">Okay</button></section>';
-  if(sg){
-    var teaser=sg.from?'Offene Frage':(n?'Neuer Text':'Los geht’s');
-    h+='<section class="card next"><span class="eyebrow">'+teaser+'</span><p class="q">'+esc(sg.from?sg.from.ask:sg.t.title)+'</p><button class="btn wide" data-a="open" data-v="'+sg.t.id+'">Lesen</button></section>';
-  }else{
-    h+='<section class="card next"><span class="eyebrow">Geschafft</span><p class="q">Alle 24 Texte gelesen. Such dir einen aus und lies ihn nochmal.</p></section>';
-  }
   var due=wjDue().length;
   if(due)h+='<button class="wjcta" data-a="wj"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg><div><b>Wort-Jäger</b><span>'+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' zum Üben</span></div></button>';
-  var stn=MON.STAGES[rankOf(p.L)].n;
-  h+='<section class="card week"><div class="hero" style="display:flex">'+stageHTML(rankOf(p.L))+'<div class="info"><span class="eyebrow">'+(S.name?'Dein Monster · '+esc(stn):'Dein Monster')+'</span><span class="stagename">'+esc(S.name||stn)+'</span><div class="bar" role="progressbar" aria-valuenow="'+p.pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+p.pct+'%"></i></div><span class="xptext">Level '+p.L+' · noch '+p.need+' XP</span></div></div>'+
-    '<div class="wk"><div class="row" style="flex-wrap:nowrap;justify-content:space-between;align-items:baseline"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></div><div class="dots">'+wk.arr.map(function(d){return '<div class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></div>';}).join('')+'</div></div></section>';
-  var rp=repeatPick();
-  if(rp)h+='<section class="card next"><span class="eyebrow">Nochmal lesen</span><p class="q" style="font-size:1.2rem">'+esc(rp.title)+'</p><span class="hint">Beim zweiten Mal geht es leichter.</span><button class="btn ghost wide" data-a="open" data-v="'+rp.id+'">Nochmal lesen</button></section>';
-  h+='<section><div class="cats">'+CATS.map(function(c){
+  h+='<section class="left"><h2 style="margin-bottom:12px">Worüber willst du lesen?</h2><div class="cats">'+CATS.map(function(c){
     var tot=TEXTS.filter(function(t){return t.cat===c.id;}),d=tot.filter(function(t){return S.done[t.id];}).length;
     return '<button class="cat" data-a="cat" data-v="'+c.id+'">'+c.ic+'<b>'+c.id+'</b><span>'+d+' von '+tot.length+'</span></button>';
   }).join('')+'</div></section>';
+  if(sg)h+='<button class="btn ghost wide" data-a="open" data-v="'+sg.t.id+'">'+(sg.from?'Rätsel lösen: '+esc(sg.t.title):'Überrasch mich')+'</button>';
+  var stn=MON.STAGES[rankOf(p.L)].n;
+  h+='<section class="card week"><div class="hero" style="display:flex">'+stageHTML(rankOf(p.L))+'<div class="info"><span class="eyebrow">'+(S.name?'Dein Monster · '+esc(stn):'Dein Monster')+'</span><span class="stagename">'+esc(S.name||stn)+'</span><div class="bar" role="progressbar" aria-valuenow="'+p.pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+p.pct+'%"></i></div><span class="xptext">Level '+p.L+' · noch '+p.need+' XP</span></div></div>'+
+    '<div class="wk"><div class="row" style="flex-wrap:nowrap;justify-content:space-between;align-items:baseline"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></div><div class="dots">'+wk.arr.map(function(d){return '<div class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></div>';}).join('')+'</div></div></section>';
   h+='<button class="btn ghost wide" data-a="album">Wissensalbum · '+n+' von '+TEXTS.length+' Karten</button>';
   h+='<div class="foot"><div class="madeby"><span>Made with love by</span><img alt="A Simple Man’s Lab" src="'+MADEBY+'"></div></div>';
   $('#v-home').innerHTML=h;
