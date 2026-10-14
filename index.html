@@ -105,6 +105,7 @@ button,input{font:inherit;color:inherit}
 .hero .info{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
 .stagename{font-family:var(--f-display);font-weight:600;font-size:1.7rem;line-height:1.05}
 .week{gap:14px}
+.card.prog{width:100%;font:inherit;color:var(--ink);text-align:left;cursor:pointer;box-shadow:0 5px 0 var(--line)}.card.prog .more{align-self:flex-end;color:var(--accent);font-weight:500}
 .alt{display:flex;flex-direction:column;gap:8px;margin-top:4px}
 .alt .row>*{flex:1 1 120px}
 #rtop{display:flex;flex-direction:column;gap:16px}#rtop:empty{display:none}
@@ -782,7 +783,7 @@ function renderHome(){
   if(GATE&&!CODE){renderGate();return;}
   if(!MODE){renderPick();return;}
   var p=lvlProg(S.xp),sg=suggest(),wk=weekInfo(),n=doneCount();
-  var h='<header class="top"><h1 class="brand"><img class="wordmark sm" alt="Readster" src="'+LOGO+'"></h1><div class="chips"><div class="mtog" role="group" aria-label="Wie liest du?"><button data-a="mode" data-v="solo" aria-pressed="'+(MODE==='solo')+'" aria-label="Allein">'+IC_SOLO+'</button><button data-a="mode" data-v="partner" aria-pressed="'+(MODE==='partner')+'" aria-label="Mit Partner">'+IC_DUO+'</button></div><button class="iconbtn" data-a="stats" aria-label="Dein Fortschritt"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="12" width="4" height="7" rx="1.5" fill="currentColor"/><rect x="9" y="7" width="4" height="12" rx="1.5" fill="currentColor"/><rect x="15" y="3" width="4" height="16" rx="1.5" fill="currentColor"/></svg></button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
+  var h='<header class="top"><h1 class="brand"><img class="wordmark sm" alt="Readster" src="'+LOGO+'"></h1><div class="chips"><div class="mtog" role="group" aria-label="Wie liest du?"><button data-a="mode" data-v="solo" aria-pressed="'+(MODE==='solo')+'" aria-label="Allein">'+IC_SOLO+'</button><button data-a="mode" data-v="partner" aria-pressed="'+(MODE==='partner')+'" aria-label="Mit Partner">'+IC_DUO+'</button></div><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
   if(S.whNote)h+='<section class="card left whnote"><p class="fb">'+esc(S.whNote)+'</p><button class="btn ghost sm" data-a="whNoteOk">Okay</button></section>';
   var due=wjDue().length;
   if(due)h+='<button class="wjcta" data-a="wj"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg><div><b>Wort-Jäger</b><span>'+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' zum Üben</span></div></button>';
@@ -795,8 +796,14 @@ function renderHome(){
   h+='<h2 style="margin:10px 0 -4px">Dein Level</h2>';
   h+='<section class="card week rgar"><button class="rgo" data-a="garage" aria-label="Garage öffnen">'+stageHTML(rk)+'<div class="info"><span class="eyebrow">Deine Garage</span><span class="stagename">'+esc(cc?cc.n:'Unter der Plane')+'</span><div class="bar" role="progressbar" aria-valuenow="'+stageProg().pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+stageProg().pct+'%"></i></div><span class="xptext">'+esc(growText())+'</span></div><span class="chev" aria-hidden="true">›</span></button>'+
     (cc?'<div class="rtank"><span class="eyebrow">Tank</span>'+tankPips(false)+(fuelFull()?'<button class="btn" data-a="race">Rennen fahren</button>':'')+'</div>':'')+
-    '<div class="wk"><div class="row" style="flex-wrap:nowrap;justify-content:space-between;align-items:baseline"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></div><div class="dots">'+wk.arr.map(function(d){return '<div class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></div>';}).join('')+'</div></div></section>';
-  h+='<button class="btn ghost wide" data-a="album">Wissensalbum · '+n+' von '+TEXTS.length+' Karten</button>';
+    '</section>';
+  /* Fortschritt direkt auf der Startseite, Details per Antippen */
+  var LG=S.log.filter(function(x){return x.wpm;}),tw=LG.length?avg(LG.slice(-3).map(function(x){return x.wpm;})):0,t0=LG.length?LG[0].wpm:0;
+  h+='<h2 style="margin:10px 0 -4px">Dein Fortschritt</h2>';
+  h+='<button class="card prog" data-a="stats" aria-label="Fortschritt ansehen"><div class="tiles"><div class="tile"><b>'+n+'</b><span>von '+TEXTS.length+' Texten gelesen</span></div>'+
+    (S.set.nums&&LG.length?'<div class="tile"><b>'+tw+'</b><span>Wörter pro Minute</span>'+(LG.length>=4&&t0?'<span class="was">Am Anfang: '+t0+'</span>':'')+'</div>':'')+'</div>'+
+    '<div class="wk"><div class="row" style="flex-wrap:nowrap;justify-content:space-between;align-items:baseline"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></div><div class="dots">'+wk.arr.map(function(d){return '<div class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></div>';}).join('')+'</div></div>'+
+    '<span class="more">Alles ansehen ›</span></button>';
   h+='<div class="foot"><div class="madeby"><span>Made with love by</span><img alt="A Simple Man’s Lab" src="'+MADEBY+'"></div></div>';
   $('#v-home').innerHTML=h;
 }
@@ -936,8 +943,8 @@ function renderCtl(){
     /* Fragen einzeln nacheinander */
     var nq=t.q.length,qi=Math.min(R.qi||0,nq-1),q=t.q[qi],o=R.opts[qi],pk=R.pick[qi],done=pk!==null||!o||o.length<2,last=qi>=nq-1;
     if(!o||o.length<2)R.qs[qi]=R.qs[qi]===null?1:R.qs[qi];
-    dk=!done?'<button class="btn wide" disabled>'+(last?'Karte holen':'Nächste Frage')+'</button>':
-      (last?'<button class="btn wide" data-a="finish">Karte holen</button>':'<button class="btn wide" data-a="nextQ">Nächste Frage</button>');
+    dk=!done?'<button class="btn wide" disabled>'+(last?'Fertig':'Nächste Frage')+'</button>':
+      (last?'<button class="btn wide" data-a="finish">Fertig</button>':'<button class="btn wide" data-a="nextQ">Nächste Frage</button>');
     h+='<div class="flat" id="qcard"><span class="eyebrow">Frage '+(qi+1)+' von '+nq+'</span>';
     if(!o||o.length<2)h+='<div class="qa"><p>'+esc(q.q)+'</p><div class="ans">'+esc(q.a)+'</div></div>';
     else h+='<div class="qa"><p>'+esc(q.q)+'</p><span class="hint">Tippe die richtige Antwort an.</span><div class="opts">'+o.map(function(a,j){
@@ -1227,7 +1234,7 @@ function chartSVG(pts){
 function renderStats(){
   var L=S.log.filter(function(x){return x.wpm;}),days=Object.keys(S.days).length;
   var h='<div class="backrow"><button class="back" data-a="home">‹ Zurück</button></div><h2>Dein Fortschritt</h2>';
-  h+='<div class="tiles"><div class="tile"><b>'+days+'</b><span>Tage geübt</span></div><div class="tile"><b>'+doneCount()+'</b><span>Texte gelesen</span></div><div class="tile"><b>'+L.length+'</b><span>Durchgänge</span></div></div>';
+  h+='<div class="tiles"><div class="tile"><b>'+days+'</b><span>Tage geübt</span></div><div class="tile"><b>'+doneCount()+'</b><span>Texte gelesen</span></div></div>';
   if(S.opa.length){
     var ot={};S.opa.forEach(function(x){ot[x.id]=1;});
     h+='<section class="card left"><h2>Mit Partner gelesen</h2><p class="fb">'+S.opa.length+(S.opa.length===1?' Mal':' Mal')+', '+Object.keys(ot).length+(Object.keys(ot).length===1?' Text':' verschiedene Texte')+'.</p><span class="hint">Zuletzt: '+esc(byId[S.opa[S.opa.length-1].id]?byId[S.opa[S.opa.length-1].id].title:'')+' am '+fmtDate(S.opa[S.opa.length-1].ts)+'</span></section>';
@@ -1244,7 +1251,7 @@ function renderStats(){
       h+='<p class="fb">Am Anfang lagst du im Schnitt bei '+a+', zuletzt bei '+b+' Wörtern pro Minute.'+(b>a?' Das sind '+(b-a)+' mehr.':'')+'</p>';
       if(b<=a)h+='<p class="hint">Die Texte sind unterschiedlich schwer, deshalb schwankt das Tempo. Wichtig ist, dass du dranbleibst.</p>';
     }else h+='<p class="hint">Nach ein paar Durchgängen zeige ich dir, wie du dich verbessert hast.</p>';
-    h+='<details class="tip"><summary>Als Tabelle</summary><table class="tb"><tr><th>Datum</th><th>Text</th><th>Wörter/Min.</th></tr>'+pts.slice().reverse().map(function(p){return '<tr><td>'+fmtDate(p.ts)+'</td><td>'+esc(byId[p.id]?byId[p.id].title:'')+'</td><td>'+p.wpm+'</td></tr>';}).join('')+'</table></details></section>';
+    h+='</section>';
     var per={};L.forEach(function(x){(per[x.id]=per[x.id]||[]).push(x.wpm);});
     var imp=Object.keys(per).filter(function(k){return per[k].length>=2&&Math.max.apply(null,per[k])>per[k][0];}).map(function(k){return {id:k,a:per[k][0],b:Math.max.apply(null,per[k])};}).sort(function(x,y){return (y.b-y.a)-(x.b-x.a);}).slice(0,5);
     if(imp.length)h+='<section class="card left"><h2>Besser geworden</h2>'+imp.map(function(x){return '<div class="sb" style="grid-template-columns:1fr auto"><span>'+esc(byId[x.id].title)+'</span><span>'+x.a+' → '+x.b+'</span></div>';}).join('')+'<span class="hint">Erster Durchgang und bester Durchgang pro Text.</span></section>';
@@ -1603,7 +1610,7 @@ function cardHTML(t,full){
 }
 function showReward(t,first,gain,list){
   var p=lvlProg(S.xp),sg=suggest();
-  var h='<div class="card"><span class="eyebrow">'+(first?'Neue Karte im Wissensalbum':'Text nochmal gelesen')+(R&&R.withOpa?' · mit Partner':'')+'</span>'+cardHTML(t,true)+'<span class="xpgain">Super gelesen!</span>'+'<ul class="xplist" hidden></ul>';
+  var h='<div class="card"><span class="eyebrow">'+(first?'Text geschafft':'Nochmal gelesen')+(R&&R.withOpa?' · mit Partner':'')+'</span><h2>'+esc(t.title)+'</h2><span class="xpgain">Super gelesen!</span>';
   h+=tankBlock();
   h+=riddleBlock(t,true);
   if(fuelFull())h+='<button class="btn wide" data-a="race">Rennen fahren</button>';
@@ -1794,7 +1801,7 @@ function logout(msg){
   if(msg)loginMsg(msg);
 }
 function renderReset(){
-  openBox('#sheet','<div class="card"><h2>Fortschritt löschen?</h2><p class="hint">Alle Karten, XP und markierten Wörter auf diesem Gerät werden gelöscht.</p><div class="cfbtns"><button class="btn ghost" data-a="sheetOk">Abbrechen</button><button class="btn" data-a="doReset">Löschen</button></div></div>');
+  openBox('#sheet','<div class="card"><h2>Fortschritt löschen?</h2><p class="hint">Alle gelesenen Texte, Autos und markierten Wörter auf diesem Gerät werden gelöscht.</p><div class="cfbtns"><button class="btn ghost" data-a="sheetOk">Abbrechen</button><button class="btn" data-a="doReset">Löschen</button></div></div>');
 }
 /* Klicks */
 document.addEventListener('click',function(e){
