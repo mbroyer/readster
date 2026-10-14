@@ -32,18 +32,20 @@ for o in out:
     x=raet[o["id"]];nr=len(x["raetsel"].split());nw=len(o["syl"].split(" "));assert x["text"].endswith(x["raetsel"]),o["id"]
     for sp in "ns":
         fa=f"{AUD_DIR}/{o['id']}-{sp}-a";fb=f"{AUD_DIR}/{o['id']}-{sp}-b"
-        if not (os.path.exists(fa+".json") and os.path.exists(fb+".json")): continue
-        ta=json.load(open(fa+".json"));tb=json.load(open(fb+".json"))
-        if not (len(ta)==nw-nr and len(tb)==nr):
+        if not os.path.exists(fa+".json"): continue
+        # Teil b (Rätsel) wird seit 14.10. nicht mehr vertont; alte Dateien werden noch mitgenommen
+        hb=os.path.exists(fb+".json") and os.path.exists(fb+".mp3")
+        ta=json.load(open(fa+".json"));tb=json.load(open(fb+".json")) if hb else None
+        if not (len(ta)==nw-nr and (tb is None or len(tb)==nr)):
             print("WARNUNG: Aufnahme passt nicht mehr zum Text, wird weggelassen:",o["id"],sp);continue
         if AUD_MODE=="dateien":
             # Aufnahmen bleiben einzelne Dateien neben der Seite; die App lädt nur, was gerade gebraucht wird.
             # Der Anhang ?v= ändert sich mit dem Inhalt, damit Browser keine alte Fassung aus dem Zwischenspeicher nehmen.
             rel=os.path.relpath(AUD_DIR,os.path.dirname(os.path.abspath(OUT)))
-            AUD[o["id"]][sp]={k:f"{rel}/{o['id']}-{sp}-{k}.mp3?v="+hashlib.sha1(open(f+".mp3","rb").read()).hexdigest()[:8] for k,f in (("a",fa),("b",fb))}
+            AUD[o["id"]][sp]={k:f"{rel}/{o['id']}-{sp}-{k}.mp3?v="+hashlib.sha1(open(f+".mp3","rb").read()).hexdigest()[:8] for k,f in (("a",fa),("b",fb)) if k=="a" or hb}
         else:
-            AUD[o["id"]][sp]={"a":base64.b64encode(open(fa+".mp3","rb").read()).decode(),"b":base64.b64encode(open(fb+".mp3","rb").read()).decode()}
-        TIM[o["id"]][sp]={"a":ta,"b":tb}
+            AUD[o["id"]][sp]={k:base64.b64encode(open(f+".mp3","rb").read()).decode() for k,f in (("a",fa),("b",fb)) if k=="a" or hb}
+        TIM[o["id"]][sp]={"a":ta,"b":tb} if hb else {"a":ta}
 # Sprach-Hinweise der Bedienung: Text immer (für die Gerätestimme als Ersatz), MP3 wenn vorhanden
 HIN={}
 if os.path.exists("hinweise.json"):

@@ -16,7 +16,7 @@ Optionen:
     --nur tier-02            nur einen Text erzeugen (zum Ausprobieren, kostet wenig)
     --tempi n,s              auch eine eigene langsame Fassung erzeugen; Standard: n (Langsam spielt die App mit 80 %)
     --ordner audio           Zielordner (Standard: aufnahmen)
-    --voice ID               andere Stimme (Standard: Matilda)
+    --voice ID               andere Stimme (Standard: Marks deutsche Stimme)
     --speed-n 0.95           Tempo "Normal"  (ElevenLabs erlaubt 0.7 bis 1.2)
     --speed-s 0.78           Tempo "Langsam"
     --model eleven_multilingual_v2   schönere Stimme, kostet doppelt so viel wie der Standard eleven_flash_v2_5
@@ -31,7 +31,7 @@ Kosten fuer alle 24 Texte: etwa 6.300 Credits mit Flash v2.5, etwa 12.500 mit Mu
 """
 import argparse, base64, hashlib, json, os, re, sys, time, urllib.request, urllib.error
 
-STIMME = "XrExE9yKIg1WjnnlVkGX"  # Matilda
+STIMME = "3EKymYQPdS1Q9fxZBuq8"  # deutsche Stimme, von Mark gewählt 14.10. (vorher Matilda XrExE9yKIg1WjnnlVkGX, klang amerikanisch)
 
 # ---------- Aussprache-Hilfen: nur fuer die Audio-Eingabe, angezeigt wird der Originaltext ----------
 ZAHLEN = {
@@ -65,10 +65,10 @@ def text_mit_offsets(text):
     return out, spans
 
 def teile(x):
-    """Zerlegt einen Text in (Geschichte, Raetsel). Das Raetsel wird als eigene Aufnahme gesprochen."""
+    """Nur die Geschichte (Teil a). Das Raetsel am Ende zeigt die App nicht mehr an und wird nicht vertont."""
     r = x["raetsel"].strip()
     assert x["text"].strip().endswith(r), x["id"]
-    return [("a", x["text"].strip()[: -len(r)].strip()), ("b", r)]
+    return [("a", x["text"].strip()[: -len(r)].strip())]
 
 def wortzeiten(spans, zeichen, starts, ends):
     """Ordnet jedem Wort den Zeitraum zu: von seinem Beginn bis zum Beginn des naechsten Wortes."""
@@ -114,7 +114,7 @@ def anfrage(key, voice, model, text, speed):
 def selftest():
     t = "Der Gecko läuft an der Wand. Er wiegt 100 Gramm, sagt Usain Bolt. Warum fällt er nicht?"
     x = {"id": "t", "text": t, "raetsel": "Warum fällt er nicht?"}
-    assert [k for k, _ in teile(x)] == ["a", "b"] and teile(x)[1][1] == "Warum fällt er nicht?"
+    assert [k for k, _ in teile(x)] == ["a"] and not teile(x)[0][1].endswith("Warum fällt er nicht?")
     out, spans = text_mit_offsets(t)
     zeichen = list(out); starts = [i * 0.07 for i in range(len(zeichen))]; ends = [s + 0.07 for s in starts]
     z = wortzeiten(spans, zeichen, starts, ends)
