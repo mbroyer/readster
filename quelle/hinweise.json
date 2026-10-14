@@ -16,6 +16,11 @@
     "tank2": "Noch zwei Texte, dann fährst du ein Rennen!",
     "tank3": "Noch drei Texte, dann fährst du ein Rennen!",
     "tankvoll": "Dein Tank ist voll! Tippe auf Rennen fahren.",
-    "rennen": "Drück aufs Gas und halte den Finger drauf. Bei Grün tippst du auf Los!"
+    "rennen": "Drück aufs Gas und halte den Finger drauf. Bei Grün tippst du auf Los!",
+    "tour1": "Hallo! Ich zeige dir kurz, wie Readster geht.",
+    "tour2": "Zuerst hörst du dir die Geschichte an.",
+    "tour3": "Dann liest du sie laut vor. Ich nehme dich dabei auf.",
+    "tour4": "Danach hörst du dich selbst an und tippst auf die Wörter, die schwer waren.",
+    "tour5": "Jeder Text füllt deinen Tank. Ist er voll, fährst du ein Rennen!"
   }
 }
