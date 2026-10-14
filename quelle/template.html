@@ -114,6 +114,13 @@ button,input{font:inherit;color:inherit}
 #v-home .sechead .hint{font-size:.85rem}#v-home{gap:12px}#v-home .tile b{font-size:1.3rem}#v-home .tile span{font-size:.75rem}#v-home .rtank{min-height:0}#v-home .rtank .btn{padding:7px 14px;min-height:0}
 .sechead{display:flex;flex-direction:column;gap:4px;margin:4px 0 -6px}.sechead h2{font-size:1.2rem}
 .lvchip{align-self:flex-start;background:var(--xp);color:var(--xp-ink);border-radius:999px;padding:2px 12px;font-weight:600;font-size:.9rem}
+.prog0{all:unset;box-sizing:border-box;width:100%;display:flex;flex-direction:column;gap:14px;padding:6px 4px 2px;cursor:pointer;color:var(--ink)}
+.prog0:focus-visible{outline:3px solid var(--accent);outline-offset:4px;border-radius:12px}
+.prog0 .phead{display:flex;justify-content:space-between;align-items:baseline}.prog0 .ph2{font-family:var(--f-display);font-size:1.25rem;font-weight:500}.prog0 .more{color:var(--accent);font-weight:500;font-size:.95rem}
+.pnums{display:flex}.pnums>span{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:2px;padding:0 10px;border-left:2px solid var(--line)}.pnums>span:first-child{padding-left:0;border-left:0}
+.pnums b{font-family:var(--f-display);font-size:2.1rem;line-height:1.05;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}.pnums b small{font-size:1.1rem;color:var(--muted);font-weight:500}
+.pnums i{font-style:normal;font-size:.8rem;line-height:1.25;color:var(--muted)}
+.prog0 .dots{display:flex}.prog0 .dot i{max-width:30px;border-width:2px}
 .card.prog{width:100%;font:inherit;color:var(--ink);text-align:left;cursor:pointer;box-shadow:0 5px 0 var(--line)}.card.prog .more{align-self:flex-end;color:var(--accent);font-weight:500}
 .alt{display:flex;flex-direction:column;gap:8px;margin-top:4px}
 .alt .row>*{flex:1 1 120px}
@@ -715,11 +722,10 @@ function renderHome(){
   if(sg)h+='<section class="card nxt"><span class="eyebrow">'+(doneCount()?'Dein nächster Text':'Dein erster Text')+' · '+esc(sg.t.cat)+'</span><h2>'+esc(sg.t.title)+'</h2><div class="nxtb"><button class="btn" data-a="open" data-v="'+sg.t.id+'">Jetzt lesen</button><button class="btn ghost" data-a="topics">Thema wählen</button></div>'+(due?'<button class="wjcta sm" data-a="wj">'+IC_WJ+'<span>Oder erst <b>Wort-Jäger</b>: '+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' üben</span></button>':'')+'</section>';
   /* Fortschritt direkt auf der Startseite, Details per Antippen */
   var LG=S.log.filter(function(x){return x.wpm;}),tw=LG.length?avg(LG.slice(-3).map(function(x){return x.wpm;})):0,t0=LG.length?LG[0].wpm:0;
-  h+='<div class="sechead"><h2>Dein Fortschritt</h2></div>';
-  h+='<button class="card prog" data-a="stats" aria-label="Fortschritt ansehen"><div class="tiles"><div class="tile"><b>'+n+'</b><span>von '+TEXTS.length+' Texten gelesen</span></div>'+
-    (S.set.nums&&LG.length?'<div class="tile"><b>'+tw+'</b><span>Wörter pro Minute</span>'+(LG.length>=4&&t0?'<span class="was">Am Anfang: '+t0+'</span>':'')+'</div>':'')+'</div>'+
-    '<div class="wk"><div class="row" style="flex-wrap:nowrap;justify-content:space-between;align-items:baseline"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></div><div class="dots">'+wk.arr.map(function(d){return '<div class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></div>';}).join('')+'</div></div>'+
-    '<span class="more">Alles ansehen ›</span></button>';
+  /* Fortschritt ohne Karte: große Zahlen direkt auf dem Hintergrund, darunter die Woche als Punkte */
+  h+='<button class="prog0" data-a="stats" aria-label="Fortschritt ansehen"><span class="phead"><span class="ph2">Dein Fortschritt</span><span class="more">Alles ansehen ›</span></span>'+
+    '<span class="pnums"><span><b>'+n+'</b><i>Texte gelesen</i></span>'+(S.set.nums&&LG.length?'<span><b>'+tw+'</b><i>Wörter pro Minute</i></span>':'')+'<span><b>'+wk.n+'<small>/'+WEEKGOAL+'</small></b><i>Tage diese Woche</i></span></span>'+
+    '<span class="dots">'+wk.arr.map(function(d){return '<span class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></span>';}).join('')+'</span></button>';
   h+='<div class="foot"><div class="madeby"><span>Made with love by</span><img alt="A Simple Man’s Lab" src="'+MADEBY+'"></div></div>';
   $('#v-home').innerHTML=h;
 }
