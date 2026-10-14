@@ -2206,7 +2206,7 @@ function simStep(dt){
   if(player.launched&&!player.foul&&T>=seq.g&&player.y<FIN+14){var gk=Math.floor((T-seq.g)/0.05);if(ghostRec.length<=gk)ghostRec[gk]=Math.round(player.y*100)/100;}
   if(state==='run'&&!endAt){
     var pOver=(player.done&&(player.v<0.8||player.crashed))||(!player.launched&&opp.done&&T>opp.finishAbs+2.5)||(!player.launched&&opp.foul&&T>seq.g+3);
-    if((opp.done||(opp.foul&&!opp.launched))&&pOver){
+    if((opp.done||(opp.foul&&!opp.launched)||(EMB&&EMB.prac))&&pOver){
       var gap=(player.done&&opp.done&&!player.foul&&!opp.foul)?Math.abs(player.finishAbs-opp.finishAbs):9;
       endAt=T+(gap<0.15?3.0:1.2);
       if(gap<0.15){var pf=$('pf');pf.innerHTML='<b>Zielfoto</b><span>'+(player.finishAbs<opp.finishAbs?'Du':opp.who)+' vorn · '+f3(gap)+' s</span>';pf.hidden=false;var fl=$('flash');fl.classList.remove('on');void fl.offsetWidth;fl.classList.add('on');vib([40,60,40]);}
@@ -3296,7 +3296,8 @@ window.addEventListener('resize',fitAllWb);
    easy (1 = Schalten ohne Gas weg, Standard), night (1), wx (0 trocken, 1 kalt, 2 nass, leer = zufällig),
    diff (0 bis 2), rival (1 = Gegner aus der Rennserie mit Spruch), best (bisherige Bestzeit in s),
    color (Lackfarbe des Gegners, Standard Blau), voice (0 = ohne Stimme), hv (Ordner der Sprach-Aufnahmen,
-   z. B. ../audio/, Dateien hinweis-<id>.mp3, sonst Gerätestimme), tut (1 = Mitmach-Anleitung erzwingen, 0 = nie).
+   z. B. ../audio/, Dateien hinweis-<id>.mp3, sonst Gerätestimme), tut (1 = Mitmach-Anleitung erzwingen, 0 = nie),
+   probe (1 = bei neuem Auto oder neuer Steuerart erst eine Proberunde allein mit Anleitung, dann das echte Rennen; Version 47).
    Kindermodus (Version 46): kein Burnout, schlichte Anzeige, beim ersten Rennen jeder Steuerart eine
    gesprochene Mitmach-Anleitung, die wartet, bis das Kind den Schritt gemacht hat.
    Meldungen an die einbettende Seite (postMessage): {source:'strip402',type:'done',result:{...}} und {source:'strip402',type:'close'}. */
@@ -3330,7 +3331,8 @@ var KTXT={
   rtmehr:'Tipp: Gib beim Start etwas mehr Gas.',
   rtweniger:'Tipp: Gib beim Start etwas weniger Gas.',
   rtschalt:'Tipp: Schalte, wenn der Knopf gelb leuchtet.',
-  rtbrems:'Tipp: Bremse nach dem Ziel früher.'
+  rtbrems:'Tipp: Bremse nach dem Ziel früher.',
+  rprobe:'Super geübt! Jetzt kommt das echte Rennen.'
 };
 var KV={el:null,tok:0};
 function kvStop(){KV.tok++;if(KV.el){try{KV.el.pause();}catch(e){}KV.el=null;}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
@@ -3358,6 +3360,7 @@ function kidVoice(ids){
 /* ---------- Mitmach-Anleitung: Ring um das Bedienelement, kurzer Satz, Stimme ---------- */
 function kidStore(k,set){try{var o=JSON.parse(localStorage.getItem('strip402.kid')||'{}');if(set){o[k]=1;localStorage.setItem('strip402.kid',JSON.stringify(o));}return !!o[k];}catch(e){return false;}}
 function kidKey(){return EMB.auto?'a':(EMB.brake?'m':'mb');}
+function probeKey(){return 'p:'+EMB.car+':'+kidKey();}
 function kidCoach(id,txt,voice,dur){
   var ring=$('kRing'),tip=$('kTip');
   clearTimeout(kidCoach._t);
@@ -3416,14 +3419,15 @@ var EMB_PLAY='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.
 function embIntro(){
   var q=embQ(),o={car:SPECS[carIdx(q.car||'skyline')].id,auto:q.auto==='1',brake:q.brake!=='0'&&(q.brake==='1'||q.auto==='1'),easy:q.easy!=='0',night:q.night==='1',
     wx:(q.wx===''||q.wx==null)?null:Math.max(0,Math.min(2,+q.wx||0)),diff:Math.max(0,Math.min(2,+q.diff||0)),rival:q.rival==='1',best:q.best?parseFloat(String(q.best).replace(',','.')):null,
-    name:q.name||SPECS[carIdx(q.car||'skyline')].name,color:q.color||'#2563c9',voice:q.voice!=='0',hv:q.hv||'',tut:q.tut==null?null:q.tut==='1',ai:null,rv:null};
+    name:q.name||SPECS[carIdx(q.car||'skyline')].name,color:q.color||'#2563c9',voice:q.voice!=='0',hv:q.hv||'',tut:q.tut==null?null:q.tut==='1',probe:q.probe==='1',prac:false,ai:null,rv:null};
   if(o.rival){var rv=CHARS[Math.floor(Math.random()*CHARS.length)],a={};for(var k in rv)a[k]=rv[k];
     if(o.diff>=2){a.pw=Math.max(a.pw,1);a.rt=[Math.max(0.1,a.rt[0]-0.05),Math.max(0.2,a.rt[1]-0.08)];}o.ai=a;o.rv=rv;}
-  EMB=o;
+  EMB=o;o.prac=o.probe&&!kidStore(probeKey());
   var h='<canvas class="ecar" aria-hidden="true"></canvas><h2>'+embEsc(o.name)+'</h2>';
   if(o.night)h+='<p class="etip">Heute fährst du in der Nacht.</p>';
   if(o.rv)h+='<div class="equote"><small>'+embEsc(o.rv.who)+' sagt:</small>'+embEsc(o.rv.quote.replace(/[„“]/g,''))+'</div>';
-  h+='<button class="ebtn go" type="button" data-e="race">'+EMB_PLAY+'Start</button><button class="ebtn ghost" type="button" data-e="close">Zurück</button>';
+  if(o.prac)h+='<p class="etip">Erst eine Proberunde allein. Dann das echte Rennen.</p>';
+  h+='<button class="ebtn go" type="button" data-e="race">'+EMB_PLAY+(o.prac?'Proberunde':'Start')+'</button><button class="ebtn ghost" type="button" data-e="close">Zurück</button>';
   embCard(h);
   var cv=$('emb').querySelector('.ecar');if(cv)drawPv(cv,SPECS[carIdx(o.car)],true);
 }
@@ -3437,7 +3441,9 @@ function embRace(){
   /* Kein Burnout: die Autos rollen gleich zur Linie, Reifen sind schon warm */
   var d=seq.roll-(T+0.4);for(var k in seq)seq[k]-=d;opp.launchAt-=d;if(opp.bluffT)opp.bluffT=opp.bluffT.map(function(t){return t-d;});
   player.heat=opp.heat=0.8;
-  var tut=o.tut!=null?o.tut:!kidStore(kidKey());
+  /* Proberunde: Gegner bleibt unsichtbar in der Box, kein Fehlstart, Anleitung immer an */
+  if(o.prac){opp.launchAt=1e9;cars=[player];}
+  var tut=o.prac?true:(o.probe?false:(o.tut!=null?o.tut:!kidStore(kidKey())));
   KT={tut:tut,step:0,hold:false,inz:0,slow:false,lastSay:-9,vid:null,lastGas:-9,nGas:0,br:false};
 }
 
@@ -3445,6 +3451,7 @@ function embRace(){
 function embFinish(r){
   var o=EMB,title,et=r.et,rec=false,stars=0,tip='',tv=null,v;
   kidCoach(null);if(KT){if(KT.tut&&r.done)kidStore(kidKey(),true);KT=null;}
+  if(o.prac){embProbeDone(r);return;}
   if(et!=null&&!r.crashed&&(o.best==null||et<o.best))rec=true;
   if(r.foul){title='Zu früh gestartet';v='rzufrueh';}
   else if(!r.done){title='Nicht gestartet';v='rzufrueh';}
@@ -3464,11 +3471,25 @@ function embFinish(r){
   h+='<button class="ebtn" type="button" data-e="done">Weiter</button>';
   embCur=r;setTimeout(function(){embCard(h);kidVoice(tv?[v,tv]:v);},350);
 }
+/* Nach der Proberunde: loben, einen Tipp geben, dann gleich das echte Rennen */
+function embProbeDone(r){
+  var o=EMB,tip='',tv=null;
+  if(r.done)kidStore(probeKey(),true);
+  if(r.launch<0){tip='Beim Start etwas mehr Gas.';tv='rtmehr';}
+  else if(r.launch>0){tip='Beim Start etwas weniger Gas.';tv='rtweniger';}
+  else if(r.shifts&&r.good<r.shifts&&!o.auto){tip='Schalte, wenn der Knopf gelb leuchtet.';tv='rtschalt';}
+  else if(r.crashed){tip='Nach dem Ziel früher bremsen.';tv='rtbrems';}
+  var h='<h2 class="etitle">Super geübt!</h2><canvas class="ecar" aria-hidden="true"></canvas>';
+  if(tip)h+='<p class="etip">'+embEsc(tip)+'</p>';
+  h+='<button class="ebtn go" type="button" data-e="real">'+EMB_PLAY+'Echtes Rennen</button>';
+  setTimeout(function(){embCard(h);var cv=$('emb').querySelector('.ecar');if(cv)drawPv(cv,SPECS[carIdx(o.car)],true);kidVoice(tv?['rprobe',tv]:'rprobe');},350);
+}
 function embBoot(){
   document.body.classList.add('emb');homeEl.hidden=true;sheetEl.hidden=true;$('menu').hidden=true;
   $('emb').addEventListener('click',function(e){
     var b=e.target.closest('[data-e]');if(!b)return;var a=b.getAttribute('data-e');
     if(a==='race')embRace();
+    else if(a==='real'){kvStop();EMB.prac=false;embRace();}
     else if(a==='close'){kvStop();embPost({type:'close'});if(window.parent===window)embIntro();}
     else if(a==='done'){kvStop();var r=embCur;embCur=null;embPost({type:'done',result:r});if(window.parent===window){if(r&&r.record&&r.et!=null)EMB.best=r.et;embIntro();}}
   });
