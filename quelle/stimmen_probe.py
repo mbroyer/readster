@@ -22,12 +22,15 @@ def hole(url, daten=None):
     with urllib.request.urlopen(req, timeout=120) as r:
         return r.read()
 
+FREMD = ("american", "british", "us", "uk", "english", "turkish", "russian", "polish", "arabic", "french", "italian", "spanish", "indian", "swiss", "austrian")
+ROH = []
 def deutsch(v):
-    """Muttersprachlich deutsch: Bibliothekssprache de und kein fremder Akzent."""
-    if (v.get("language") or "") != "de":
+    """Muttersprachlich deutsch: Sprache de (oder Locale de-DE) und kein fremder Akzent."""
+    sp = (v.get("language") or "").lower(); lo = (v.get("locale") or "").lower()
+    if not (sp.startswith("de") or lo.startswith("de")):
         return False
     akz = (v.get("accent") or "").lower()
-    return akz in ("", "standard", "german", "standard german", "hochdeutsch", "neutral")
+    return not any(f in akz for f in FREMD)
 
 stimmen = {}
 for uc in ("narrative_story", "informative_educational", "conversational", ""):
@@ -37,7 +40,10 @@ for uc in ("narrative_story", "informative_educational", "conversational", ""):
     try:
         r = json.loads(hole("https://api.elevenlabs.io/v1/shared-voices?" + urllib.parse.urlencode(q)))
     except urllib.error.HTTPError as e:
-        print("Suche fehlgeschlagen:", uc, e.code, e.read()[:200]); continue
+        msg = e.read()[:300].decode("utf-8", "replace"); print("Suche fehlgeschlagen:", uc, e.code, msg)
+        ROH.append({"fehler": e.code, "suche": uc, "text": msg}); continue
+    ROH.extend({k: v.get(k) for k in ("name", "voice_id", "language", "locale", "accent", "gender", "age", "use_case", "usage_character_count_1y", "free_users_allowed")} for v in r.get("voices", [])[:15])
+    print("Suche", uc or "alle", "->", len(r.get("voices", [])), "Stimmen")
     for v in r.get("voices", []):
         if deutsch(v) and v["voice_id"] not in stimmen:
             v["_uc"] = uc; stimmen[v["voice_id"]] = v
@@ -52,6 +58,7 @@ ma = [v for v in nach if v.get("gender") == "male"][:ANZAHL - len(fr)]
 auswahl = fr + ma
 
 os.makedirs(ZIEL, exist_ok=True)
+json.dump({"gefunden": len(stimmen), "auswahl": [v["name"] for v in auswahl], "roh": ROH}, open(os.path.join(ZIEL, "suche.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 karten = []
 for v in auswahl:
     vid = v["voice_id"]; datei = f"{vid}.mp3"; ok = False; hinweis = ""
