@@ -166,17 +166,17 @@ details.adult.set[open]>div{display:flex;flex-direction:column;gap:16px;margin-t
 .ticon{width:48px;height:48px;border-radius:50%;background:var(--bg);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;flex:none}.ticon svg{width:28px;height:28px}
 .tapword{flex-direction:row;align-items:center;gap:12px}.tapword h2{font-size:1.3rem}
 .rec.hear{flex-direction:row;align-items:center;gap:12px;padding:14px}.rec.hear .plr{flex:1}.rec.hear .plb{width:68px;height:68px}.rec.hear .plb svg{width:30px;height:30px}
-.garage{background:var(--deep);border-color:var(--line);gap:10px;padding:14px 16px 16px;overflow:hidden}
-.ghead{all:unset;display:flex;justify-content:space-between;align-items:baseline;cursor:pointer}.gname{color:var(--accent);font-weight:500;font-size:.95rem}
-.gstage{all:unset;cursor:pointer;display:flex;justify-content:center;align-items:center;height:108px;margin:0 -16px;position:relative;
-  background:repeating-linear-gradient(90deg,rgba(255,255,255,.22) 0 18px,transparent 18px 36px) center/100% 4px no-repeat,linear-gradient(#1c2c34,#142127)}
-.gstage::before,.gstage::after{content:'';position:absolute;left:0;right:0;height:4px;background:repeating-linear-gradient(90deg,#fff 0 12px,#e5484d 12px 24px);opacity:.55}.gstage::before{top:0}.gstage::after{bottom:0}
-.gstage .carimg{width:190px;height:96px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 6px 6px rgba(0,0,0,.45))}
-.fuel{display:flex;align-items:center;gap:10px}.pump{flex:none;color:var(--good);display:flex}.pump svg{width:26px;height:26px}
-.fseg{flex:1;display:flex;gap:6px}.fseg i{flex:1;height:16px;border-radius:8px;background:var(--bg);border:2px solid var(--line)}.fseg i.on{background:var(--good);border-color:#2a9a5f}
+.garage{background:var(--deep);border-color:var(--line);gap:12px;padding:12px;overflow:hidden}.grow{display:flex;align-items:center;gap:14px}.gside{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.ghead{all:unset;cursor:pointer}.gname{color:var(--muted);font-weight:500;font-size:.85rem}
+.gstage{all:unset;cursor:pointer;flex:none;display:flex;justify-content:center;align-items:center;width:124px;height:70px;border-radius:14px;overflow:hidden;position:relative;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 10px,transparent 10px 20px) center/100% 3px no-repeat,linear-gradient(#1c2c34,#142127)}
+.gstage::before,.gstage::after{content:'';position:absolute;left:0;right:0;height:3px;background:repeating-linear-gradient(90deg,#fff 0 8px,#e5484d 8px 16px);opacity:.3}.gstage::before{top:0}.gstage::after{bottom:0}
+.gstage .carimg{width:104px;height:56px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 4px 4px rgba(0,0,0,.45))}
+.fuel{display:flex;align-items:center;gap:8px}.pump{flex:none;color:var(--good);display:flex}.pump svg{width:20px;height:20px}
+.fseg{flex:1;display:flex;gap:4px}.fseg i{flex:1;height:10px;border-radius:5px;background:var(--bg);border:1.5px solid var(--line)}.fseg i.on{background:var(--good);border-color:#2a9a5f}
 .garage.full .fseg i{animation:fglow 1.4s ease-in-out infinite alternate}@keyframes fglow{to{box-shadow:0 0 12px var(--good)}}
-.fbar{flex:1;height:16px;border-radius:8px;background:var(--bg);border:2px solid var(--line);overflow:hidden}.fbar i{display:block;height:100%;background:var(--good)}
-.gline{display:flex;align-items:center;gap:8px;margin:0;font-weight:500;font-size:1.05rem}.gline svg{flex:none;width:20px;height:20px;color:var(--xp)}
+.fbar{flex:1;height:10px;border-radius:5px;background:var(--bg);border:1.5px solid var(--line);overflow:hidden}.fbar i{display:block;height:100%;background:var(--good)}
+.gline{display:flex;align-items:center;gap:6px;margin:0;font-weight:500;font-size:.9rem;line-height:1.25;color:var(--muted)}.gline svg{flex:none;width:16px;height:16px;color:var(--xp)}
 @media (prefers-reduced-motion:reduce){.garage.full .fseg i{animation:none}}
 .carcard{flex-direction:row;align-items:center;gap:14px;padding:14px}.carbtn{background:none;border:0;padding:0;cursor:pointer;flex:none}.carbtn .carimg{width:120px;height:80px}
 .tankin{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0;align-items:flex-start}.tankin b{font-weight:500;font-size:1.05rem;line-height:1.25}.tankin .bar{width:100%}
@@ -195,9 +195,9 @@ details.adult.set[open]>div{display:flex;flex-direction:column;gap:16px;margin-t
 .hn{flex:none;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:1.1rem}
 ul.howto{margin:0;padding-left:1.2em;color:var(--muted);font-weight:500;font-size:.95rem;display:flex;flex-direction:column;gap:6px}
 @media (prefers-reduced-motion:reduce){.btn.race-go,.pips i.new{animation:none}}
-.mseg{display:flex;background:var(--deep);border:2px solid var(--line);border-radius:999px;padding:4px;gap:4px}
-.mseg button{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border:0;border-radius:999px;background:none;color:var(--muted);font:inherit;font-weight:500;font-size:.95rem;cursor:pointer;padding:0 10px}
-.mseg button svg{width:22px;height:22px;flex:none}
+.mseg{display:inline-flex;align-self:flex-start;background:var(--deep);border:1.5px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.mseg button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:32px;border:0;border-radius:999px;background:none;color:var(--muted);font:inherit;font-weight:500;font-size:.85rem;cursor:pointer;padding:0 12px}
+.mseg button svg{width:17px;height:17px;flex:none}
 .mseg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
 .mtog{display:inline-flex;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:3px;gap:2px}
 .mtog button{width:40px;height:34px;border:0;border-radius:999px;background:none;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
@@ -907,10 +907,9 @@ function renderHome(){
   var cc=curCar(),rk=rankOf(p.L);
   /* Garage: Auto groß auf der Startlinie, darunter die Tankanzeige mit Zapfsäule; Antippen öffnet die Garage */
   var lit=cc?litPips():0,fsg='';for(var fi=0;fi<3;fi++)fsg+='<i class="'+(fi<lit?'on':'')+'"></i>';
-  var gar='<section class="card garage'+(fuelFull()?' full':'')+'"><button class="ghead" data-a="garage" aria-label="Garage öffnen"><span class="eyebrow">Deine Garage</span><span class="gname">'+esc(cc?cc.n:'Geheimes Auto')+' ›</span></button>'+
-    '<button class="gstage" data-a="garage" aria-label="Garage öffnen">'+stageHTML(rk)+'</button>'+
+  var gar='<section class="card garage'+(fuelFull()?' full':'')+'"><div class="grow"><button class="gstage" data-a="garage" aria-label="Garage öffnen">'+stageHTML(rk)+'</button><div class="gside"><button class="ghead" data-a="garage" aria-label="Garage öffnen"><span class="gname">'+esc(cc?cc.n:'Geheimes Auto')+' ›</span></button>'+
     '<div class="fuel"><span class="pump" aria-hidden="true">'+IC_PUMP+'</span>'+(cc?'<span class="fseg">'+fsg+'</span>':'<span class="fbar"><i style="width:'+stageProg().pct+'%"></i></span>')+'</div>'+
-    (fuelFull()?'<button class="btn wide race-go" data-a="race">'+IC_FLAG+'Rennen fahren</button>':'<p class="gline">'+IC_FLAG+'<span>'+esc(tankLine())+'</span></p>')+'</section>';
+    (fuelFull()?'':'<p class="gline">'+IC_FLAG+'<span>'+esc(tankLine())+'</span></p>')+'</div></div>'+(fuelFull()?'<button class="btn wide race-go" data-a="race">'+IC_FLAG+'Rennen fahren</button>':'')+'</section>';
   /* Dann ein klarer Startknopf, Themen dahinter */
   if(!sg)h+='<button class="btn wide" data-a="topics">Thema wählen</button>';
   if(!sg&&due)h+='<button class="wjcta" data-a="wj"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg><div><b>Wort-Jäger</b><span>'+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' zum Üben</span></div></button>';
