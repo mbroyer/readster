@@ -27,6 +27,9 @@
   --f-body:'Lexend',system-ui,-apple-system,'Segoe UI',sans-serif;
   color-scheme:dark;
 }
+/* Partner-Modus: eigener Farbton, damit man sofort sieht, wer liest */
+html[data-mode="partner"]{--bg:#1a1233;--surface:#2a1f4d;--line:#43356f;--muted:#b9acdc;--warn-bg:#3d3060}
+html{background:var(--bg);transition:background .3s}
 *{box-sizing:border-box}
 html,body{margin:0}
 b,strong{font-weight:600}
@@ -105,6 +108,7 @@ button,input{font:inherit;color:inherit}
 .hero .info{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
 .stagename{font-family:var(--f-display);font-weight:600;font-size:1.7rem;line-height:1.05}
 .week{gap:14px}
+.setgrp{font-size:1rem;font-weight:600;margin:6px 0 -6px;padding-top:12px;border-top:2px solid var(--line)}details.adult.set>div>.setgrp:first-child{border-top:0;padding-top:0}.setrow .link{align-self:flex-start;padding-left:0}
 .nxt{gap:10px}.nxt h2{font-size:1.6rem}.nxt .btn{margin-top:6px}
 .sechead{display:flex;flex-direction:column;gap:6px;margin:10px 0 -4px}
 .lvchip{align-self:flex-start;background:var(--xp);color:var(--xp-ink);border-radius:999px;padding:2px 12px;font-weight:600;font-size:.9rem}
@@ -583,6 +587,7 @@ var IC_F1='<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r
 var IC_F0='<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="currentColor" opacity=".25"/><circle cx="11" cy="13" r="2" fill="currentColor"/><circle cx="21" cy="13" r="2" fill="currentColor"/><path d="M9.5 21c2-2.5 4.5-1 6.5-2.3s4.5-.2 6.5 1.8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
 var IC_DUO='<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="11" cy="11" r="5"/><path d="M1.5 27c0-5.8 4.2-9.5 9.5-9.5s9.5 3.7 9.5 9.5z"/><circle cx="22.5" cy="9" r="4" opacity=".65"/><path d="M17.5 17.4c1.4-1 3.1-1.6 5-1.6 4.7 0 8 3.4 8 8.7h-8.7c-.7-2.9-2.2-5.3-4.3-7.1z" opacity=".65"/></svg>';
 var MODE=null;
+function setMode(m){MODE=m;document.documentElement.setAttribute('data-mode',m||'solo');var tc=document.querySelector('meta[name=theme-color]');if(tc)tc.setAttribute('content',m==='partner'?'#1a1233':'#07202b');}
 /* Monster wächst in Stufen; statt XP zeigen wir, wie viele Texte es ungefähr noch bis zur nächsten Stufe sind */
 var XP_TEXT=40;
 function stageProg(){
@@ -1542,12 +1547,12 @@ function renderSheet(){
   h+='<div class="setrow"><span class="eyebrow">Silben in zwei Farben</span>'+seg('syl',[[true,'An'],[false,'Aus']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Vorlese-Tempo</span>'+seg('speed',[['slow','Langsam'],['normal','Normal']])+'</div>';
   h+='<details class="adult set"'+(wasOpen?' open':'')+'><summary>Für Erwachsene</summary><div>';
-  h+='<div class="setrow"><span class="eyebrow">Zeilenabstand</span>'+seg('line',[[0,'Eng'],[1,'Normal'],[2,'Weit']])+'</div>';
+  h+='<h3 class="setgrp">Text</h3><div class="setrow"><span class="eyebrow">Zeilenabstand</span>'+seg('line',[[0,'Eng'],[1,'Normal'],[2,'Weit']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Buchstabenabstand</span>'+seg('space',[[0,'Normal'],[1,'Mehr'],[2,'Viel']])+'</div>';
-  h+='<div class="setrow"><span class="eyebrow">Aufnahme beim Lesen</span>'+seg('rec',[[true,'An'],[false,'Aus']])+'<span class="hint">Die Aufnahmen bleiben nur auf diesem Gerät.</span><button class="link" id="delRecsBtn" data-a="delRecs">Alle Aufnahmen löschen</button></div>';
-  h+='<div class="setrow"><span class="eyebrow">Genaue Auswertung (Whisper)</span>'+seg('wh',[[true,'An'],[false,'Aus']])+'<span class="hint">Erkennt Stockstellen und ausgelassene Wörter genauer. '+(WH_SERVER?'Die Aufnahme geht dafür kurz an Cloudflare und wird dort nicht gespeichert.':'Beim ersten Einschalten werden einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB geladen, am besten im WLAN. Danach läuft alles auf diesem Gerät, der Ton verlässt es nicht.')+'</span><span class="hint fb" id="whst">'+esc(S.set.wh?whStatus():'')+'</span></div>';
+  h+='<h3 class="setgrp">Aufnahme und Auswertung</h3><div class="setrow"><span class="eyebrow">Aufnahme beim Lesen</span>'+seg('rec',[[true,'An'],[false,'Aus']])+'<span class="hint">Die Aufnahmen bleiben nur auf diesem Gerät.</span><button class="link" id="delRecsBtn" data-a="delRecs">Alle Aufnahmen löschen</button></div>';
+  h+='<div class="setrow"><span class="eyebrow">Stockstellen erkennen</span>'+seg('wh',[[true,'An'],[false,'Aus']])+'<span class="hint">Markiert nach dem Lesen Wörter, bei denen du hängen geblieben bist. '+(WH_SERVER?'Die Aufnahme geht dafür kurz an Cloudflare und wird dort nicht gespeichert.':'Beim ersten Einschalten werden einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB geladen, am besten im WLAN. Danach läuft alles auf diesem Gerät, der Ton verlässt es nicht.')+'</span><span class="hint fb" id="whst">'+esc(S.set.wh?whStatus():'')+'</span></div>';
   h+='<div class="setrow"><span class="eyebrow">Tempo-Zahlen zeigen</span>'+seg('nums',[[true,'An'],[false,'Aus']])+'<span class="hint">Aus: Es gibt nur „schneller als beim ersten Mal“, keine Wörter pro Minute.</span></div>';
-  h+='<button class="link" data-a="login">'+(CODE?'Angemeldet mit '+esc(CODE):'Mit Code anmelden')+'</button><button class="link" data-a="backup">Fortschritt sichern oder laden</button><button class="link" data-a="reset">Fortschritt zurücksetzen</button></div></details>';
+  h+='<h3 class="setgrp">Dein Code</h3><div class="setrow">'+(CODE?'<span class="hint">Angemeldet mit <b>'+esc(CODE)+'</b>. Der Fortschritt wird automatisch gespeichert und ist auf jedem Gerät mit diesem Code da.</span><button class="link" data-a="login">Anderen Code nutzen</button>':'<button class="link" data-a="login">Mit Code anmelden</button>')+'<button class="link" data-a="reset">Fortschritt zurücksetzen</button></div></div></details>';
   h+='<button class="btn wide" data-a="sheetOk">Fertig</button></div>';
   openBox('#sheet',h);$('#sheet').scrollTop=sc;
 }
@@ -1679,7 +1684,7 @@ document.addEventListener('click',function(e){
     case 'shareRec':shareRec();break;
     case 'whNoteOk':S.whNote='';save();renderHome();break;
     case 'cancel':recStop(false);cdHide();if(MODE==='partner'&&R.phase==='opa'){stopListen();renderHome();show('home');break;}R.phase='read';renderCtl();break;
-    case 'mode':MODE=v||null;renderHome();show('home');break;
+    case 'mode':setMode(v||null);renderHome();show('home');break;
     case 'again':R.phase='read';renderCtl();window.scrollTo(0,0);break;
     case 'check':R.phase='check';R.qi=0;renderCtl();window.scrollTo(0,0);break;
     case 'pick':var pq=v.split('-'),qi=+pq[0],oj=+pq[1];if(R.pick[qi]===null){R.pick[qi]=oj;R.qs[qi]=R.opts[qi][oj]===R.t.q[qi].a?1:0;renderCtl();}break;
