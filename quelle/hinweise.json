@@ -38,6 +38,10 @@
     "rtweniger": "Tipp: Gib beim Start etwas weniger Gas.",
     "rtschalt": "Tipp: Schalte, wenn der Knopf gelb leuchtet.",
     "rtbrems": "Tipp: Bremse nach dem Ziel früher.",
-    "rprobe": "Super geübt! Jetzt kommt das echte Rennen."
+    "rprobe": "Super geübt! Jetzt kommt das echte Rennen.",
+    "rdrag": "Ein Dragrace geht nur geradeaus. Keine Kurven! Du gibst die ganze Zeit Vollgas, vom Start bis ins Ziel.",
+    "rlosvoll": "Grün! Tippe auf Los und lass das Gas ganz oben!",
+    "rvollgas": "Vollgas bis ins Ziel!",
+    "rganz": "Schieb das Gas ganz nach oben. Vollgas!"
   }
 }

@@ -1755,7 +1755,7 @@ function start(){
   ghostUse=GH[ghKey()]||null;ghostRec=[];
   opp.bluffT=[];var bw=seq.a1-0.45-(seq.arrive+0.4);if(bw>0.35){opp.bluffT.push(seq.arrive+0.4+Math.random()*Math.max(0,bw-0.3));if(bw>1.0)opp.bluffT.push(opp.bluffT[0]+0.45+Math.random()*Math.max(0,bw-0.9));}
   sheetEl.hidden=true;$('menu').hidden=true;hudEl.hidden=false;gasLvl=0;
-  Snd.begin(player,opp);
+  Snd.begin(player,(EMB&&EMB.prac)?null:opp);
 }
 var WXS=[{n:'Trocken',t:22,rho:1.19,mu:[1,1],hg:1,wet:0,w:0.55},{n:'Kalt',t:6,rho:1.27,mu:[0.95,0.88],hg:0.8,wet:0,w:0.2},{n:'Nass',t:11,rho:1.24,mu:[0.74,0.6],hg:0.6,wet:1,w:0.25}];
 var WX=WXS[0];
@@ -2050,11 +2050,11 @@ var Snd=(function(){
     if(!init())return;
     try{if(ac.state!=='running')ac.resume();}catch(e){}
     var my=++gen;
-    if(S.legacy||wk===-1){vs=[voice(p,-0.45,1),voice(o,0.45,0.65)];return;}
+    if(S.legacy||wk===-1){vs=[voice(p,-0.45,1)].concat(o?[voice(o,0.45,0.65)]:[]);return;}
     loadWk().then(function(){
       if(my!==gen)return;
-      if(wk===2){try{vs=[voice2(p,-0.45,1),voice2(o,0.45,0.65)];return;}catch(e){wk=-1;}}
-      vs=[voice(p,-0.45,1),voice(o,0.45,0.65)];
+      if(wk===2){try{vs=[voice2(p,-0.45,1)].concat(o?[voice2(o,0.45,0.65)]:[]);return;}catch(e){wk=-1;}}
+      vs=[voice(p,-0.45,1)].concat(o?[voice(o,0.45,0.65)]:[]);
     });
   };
   S.end=function(quick){
@@ -3332,7 +3332,11 @@ var KTXT={
   rtweniger:'Tipp: Gib beim Start etwas weniger Gas.',
   rtschalt:'Tipp: Schalte, wenn der Knopf gelb leuchtet.',
   rtbrems:'Tipp: Bremse nach dem Ziel früher.',
-  rprobe:'Super geübt! Jetzt kommt das echte Rennen.'
+  rprobe:'Super geübt! Jetzt kommt das echte Rennen.',
+  rdrag:'Ein Dragrace geht nur geradeaus. Keine Kurven! Du gibst die ganze Zeit Vollgas, vom Start bis ins Ziel.',
+  rlosvoll:'Grün! Tippe auf Los und lass das Gas ganz oben!',
+  rvollgas:'Vollgas bis ins Ziel!',
+  rganz:'Schieb das Gas ganz nach oben. Vollgas!'
 };
 var KV={el:null,tok:0};
 function kvStop(){KV.tok++;if(KV.el){try{KV.el.pause();}catch(e){}KV.el=null;}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
@@ -3344,10 +3348,11 @@ function kvTts(t,done){
 }
 /* ids: ein Hinweis oder eine Liste, die nacheinander gesprochen wird */
 function kidVoice(ids){
-  ids=[].concat(ids);if(KT){KT.lastSay=T;KT.vid=ids[0];}
+  ids=[].concat(ids);if(KT){KT.lastSay=T;KT.vid=ids[ids.length-1];}
   if(!EMB||!EMB.voice)return;
   kvStop();var tok=KV.tok;
   (function one(i){
+    if(i>=ids.length&&tok===KV.tok&&KT)KT.lastSay=T;
     if(i>=ids.length||tok!==KV.tok)return;
     var id=ids[i],next=function(){if(tok===KV.tok)setTimeout(function(){one(i+1);},250);};
     if(!EMB.hv){kvTts(KTXT[id],next);return;}
@@ -3392,20 +3397,22 @@ function kidTick(dt){
   if(!KT||state!=='run'||!seq)return;
   var c=player;
   if(KT.tut){
-    if(KT.step===0&&T>=seq.arrive-0.3){KT.step=1;KT.hold=true;kidCoach('gasZone','Finger aufs Gas und hochschieben','rgas');}
+    if(KT.step===0&&T>=seq.arrive-0.3){KT.step=1;KT.hold=true;kidCoach('gasZone',EMB.prac?'Geradeaus mit Vollgas! Finger aufs Gas':'Finger aufs Gas und hochschieben',EMB.prac?['rdrag','rgas']:'rgas');}
     if(KT.step===1&&gasLvl>0.25){KT.step=2;KT.inz=0;kidCoach('tach','Nadel ins grüne Feld','rzone');}
     if(KT.step===2){var inz=c.rpm>=c.zone[0]&&c.rpm<=c.zone[1];KT.inz=inz?KT.inz+dt:Math.max(0,KT.inz-dt*0.5);
       if(KT.inz>1.2){KT.step=3;KT.hold=false;kidCoach('tree','Bei Grün: Los tippen!','rampel');}}
-    if(KT.step===3&&T>=seq.g&&!c.launched){KT.step=4;kidCoach('shBtn','Jetzt Los!','rlos');}
-    if(KT.step>=1&&KT.step<=4&&c.launched){KT.step=5;if(EMB.auto)kidCoach('gasZone','Gas unten lassen','rauto',3);else kidCoach(null);}
-    if(KT.step===5&&!EMB.auto&&!c.over&&c.shiftT<=0&&c.gear<c.ng-1&&c.er-c.opt[c.gear]>=-130){KT.step=6;KT.slow=true;KT.t6=T;KT.ns=c.shifts.length;kidCoach('shBtn','Jetzt schalten!','rschalt');}
+    if(KT.step===3&&T>=seq.g&&!c.launched){KT.step=4;kidCoach('shBtn','Jetzt Los! Gas oben lassen','rlosvoll');}
+    if(KT.step>=1&&KT.step<=4&&c.launched){KT.step=5;KT.t5=Date.now();if(!EMB.auto)KT.slow=true;kidCoach('gasZone','Vollgas bis ins Ziel!',EMB.auto?['rvollgas','rauto']:'rvollgas',3);}
+    if(KT.step===5&&!EMB.auto&&KT.slow&&(Date.now()-KT.t5>1600||c.lim))KT.slow=false;
+    if(KT.step===5&&!EMB.auto&&!KT.slow&&!c.over&&c.shiftT<=0&&c.gear<c.ng-1&&c.er-c.opt[c.gear]>=-130){KT.step=6;KT.slow=true;KT.t6=T;KT.ns=c.shifts.length;kidCoach('shBtn','Jetzt schalten!','rschalt');}
     if(KT.step===6&&(c.shifts.length>KT.ns||T-KT.t6>2.5||c.over)){KT.slow=false;KT.step=7;kidCoach(null);}
     if(!EMB.brake&&c.over&&c.v>3&&!KT.br){KT.br=true;KT.slow=false;kidCoach('shBtn','Bremse gedrückt halten','rbrems',3);}
     if(KT.hold&&T-KT.lastSay>7)kidVoice(KT.vid);
     if((KT.step===2||KT.step===3)&&gasLvl<0.05&&T-KT.lastSay>3)kidVoice('rgas');
     if(KT.hold&&T>=seq.stg-0.1)kidShift(dt);
   }
-  if(c.launched&&!c.foul&&!c.over&&!c.done&&c.shiftT<=0&&gasLvl<0.5&&T-c.launchT>0.6&&T-KT.lastGas>6&&KT.nGas<2&&!KT.slow){KT.lastGas=T;KT.nGas++;kidVoice('rgasweg');}
+  if(c.launched&&!c.foul&&!c.over&&!c.done&&c.shiftT<=0&&gasLvl<0.8&&T-c.launchT>0.6&&T-KT.lastGas>4&&KT.nGas<3&&!KT.slow&&KT.step!==6){KT.lastGas=T;KT.nGas++;kidVoice('rganz');}
+  if(KT.vg&&c.launched&&!c.foul&&T-c.launchT>0.15){KT.vg=false;kidVoice('rvollgas');}
 }
 /* Meldungen des Spiels in Kindersprache, technische weglassen */
 var KMSG=[[/^Burnout|^Reifen heiß/,''],[/^Rollt zur Startlinie/,'Gleich geht’s los'],[/^Staging/,'Gas geben'],[/^Gas halten · grüne Zone/,'Nadel ins Grüne'],[/^Jetzt LOS/,'Jetzt Los!'],
@@ -3426,7 +3433,7 @@ function embIntro(){
   var h='<canvas class="ecar" aria-hidden="true"></canvas><h2>'+embEsc(o.name)+'</h2>';
   if(o.night)h+='<p class="etip">Heute fährst du in der Nacht.</p>';
   if(o.rv)h+='<div class="equote"><small>'+embEsc(o.rv.who)+' sagt:</small>'+embEsc(o.rv.quote.replace(/[„“]/g,''))+'</div>';
-  if(o.prac)h+='<p class="etip">Erst eine Proberunde allein. Dann das echte Rennen.</p>';
+  if(o.prac)h+='<p class="etip">Ein Dragrace geht geradeaus. Vollgas bis ins Ziel! Erst übst du allein, dann kommt das echte Rennen.</p>';
   h+='<button class="ebtn go" type="button" data-e="race">'+EMB_PLAY+(o.prac?'Proberunde':'Start')+'</button><button class="ebtn ghost" type="button" data-e="close">Zurück</button>';
   embCard(h);
   var cv=$('emb').querySelector('.ecar');if(cv)drawPv(cv,SPECS[carIdx(o.car)],true);
@@ -3444,13 +3451,13 @@ function embRace(){
   /* Proberunde: Gegner bleibt unsichtbar in der Box, kein Fehlstart, Anleitung immer an */
   if(o.prac){opp.launchAt=1e9;cars=[player];}
   var tut=o.prac?true:(o.probe?false:(o.tut!=null?o.tut:!kidStore(kidKey())));
-  KT={tut:tut,step:0,hold:false,inz:0,slow:false,lastSay:-9,vid:null,lastGas:-9,nGas:0,br:false};
+  KT={tut:tut,step:0,hold:false,inz:0,slow:false,lastSay:-9,vid:null,lastGas:-9,nGas:0,br:false,vg:!tut&&!!o.afterPrac};
 }
 
 /* ---------- Ergebnis: Sterne, Zeit, ein Tipp ---------- */
 function embFinish(r){
   var o=EMB,title,et=r.et,rec=false,stars=0,tip='',tv=null,v;
-  kidCoach(null);if(KT){if(KT.tut&&r.done)kidStore(kidKey(),true);KT=null;}
+  kidCoach(null);try{Snd.end();}catch(e){}if(KT){if(KT.tut&&r.done)kidStore(kidKey(),true);KT=null;}
   if(o.prac){embProbeDone(r);return;}
   if(et!=null&&!r.crashed&&(o.best==null||et<o.best))rec=true;
   if(r.foul){title='Zu früh gestartet';v='rzufrueh';}
@@ -3489,7 +3496,7 @@ function embBoot(){
   $('emb').addEventListener('click',function(e){
     var b=e.target.closest('[data-e]');if(!b)return;var a=b.getAttribute('data-e');
     if(a==='race')embRace();
-    else if(a==='real'){kvStop();EMB.prac=false;embRace();}
+    else if(a==='real'){kvStop();EMB.prac=false;EMB.afterPrac=true;embRace();}
     else if(a==='close'){kvStop();embPost({type:'close'});if(window.parent===window)embIntro();}
     else if(a==='done'){kvStop();var r=embCur;embCur=null;embPost({type:'done',result:r});if(window.parent===window){if(r&&r.record&&r.et!=null)EMB.best=r.et;embIntro();}}
   });
