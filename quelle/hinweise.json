@@ -1,0 +1,21 @@
+{
+  "_": "Kurze Sprach-Hinweise, die Readster beim Öffnen eines Bildschirms vorspricht (Stimme Matilda, erzeugt von vorlesen_elevenlabs.py als audio/hinweis-<id>.mp3). Ein Kind mit LRS liest keine Bedienungstexte, deshalb sagt die App, was zu tun ist.",
+  "hinweise": {
+    "hoeren": "Tippe auf Zuhören. Dann hörst du die Geschichte.",
+    "lesen": "Jetzt du! Tippe auf Jetzt lesen und lies laut.",
+    "aufnahme": "Gleich geht's los. Lies laut bis zum Ende. Dann tippe auf Fertig.",
+    "gefuehl": "Wie war das Lesen für dich? Tippe auf ein Gesicht.",
+    "zahlen": "Super! Hier siehst du, wie schnell du gelesen hast.",
+    "hoerdich": "Hör dir selbst zu. Tippe auf die Wörter, die schwer waren.",
+    "fragen": "Tippe auf die richtige Antwort.",
+    "satz": "Hör gut zu. Dann liest du den Satz nach.",
+    "auto1": "Noch ein Text, dann bekommst du dein erstes Auto!",
+    "auto2": "Noch zwei Texte, dann bekommst du dein erstes Auto!",
+    "auto3": "Noch drei Texte, dann bekommst du dein erstes Auto!",
+    "tank1": "Noch ein Text, dann ist der Tank voll und du fährst ein Rennen!",
+    "tank2": "Noch zwei Texte, dann fährst du ein Rennen!",
+    "tank3": "Noch drei Texte, dann fährst du ein Rennen!",
+    "tankvoll": "Dein Tank ist voll! Tippe auf Rennen fahren.",
+    "rennen": "Drück aufs Gas und halte den Finger drauf. Bei Grün tippst du auf Los!"
+  }
+}

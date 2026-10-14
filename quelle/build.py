@@ -44,6 +44,19 @@ for o in out:
         else:
             AUD[o["id"]][sp]={"a":base64.b64encode(open(fa+".mp3","rb").read()).decode(),"b":base64.b64encode(open(fb+".mp3","rb").read()).decode()}
         TIM[o["id"]][sp]={"a":ta,"b":tb}
+# Sprach-Hinweise der Bedienung: Text immer (für die Gerätestimme als Ersatz), MP3 wenn vorhanden
+HIN={}
+if os.path.exists("hinweise.json"):
+    for hid,satz in json.load(open("hinweise.json",encoding="utf-8"))["hinweise"].items():
+        e={"t":satz};f=f"{AUD_DIR}/hinweis-{hid}.mp3"
+        if os.path.exists(f):
+            if AUD_MODE=="dateien":
+                rel=os.path.relpath(AUD_DIR,os.path.dirname(os.path.abspath(OUT)))
+                e["u"]=f"{rel}/hinweis-{hid}.mp3?v="+hashlib.sha1(open(f,"rb").read()).hexdigest()[:8]
+            else:
+                e["u"]="data:audio/mpeg;base64,"+base64.b64encode(open(f,"rb").read()).decode()
+        HIN[hid]=e
+t=t.replace("__HINTS__",json.dumps(HIN,separators=(",",":"),ensure_ascii=False))
 t=t.replace("__DATA__",data).replace("__TIMES__",json.dumps(TIM,separators=(",",":"))).replace("__AUDIO__",json.dumps(AUD,separators=(",",":")))
 n_aud=sum(len(v) for v in AUD.values())
 open(OUT,"w",encoding="utf-8").write(t)

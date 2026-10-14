@@ -26,6 +26,7 @@ mit den Wort-Zeiten in Millisekunden (z. B. tier-01-n-a.mp3 fuer die Geschichte 
 
 Den Schluessel nie in den Chat schreiben.
 Alte Aufnahmen von Texten, die es nicht mehr gibt, werden entfernt.
+Die Sprach-Hinweise der Bedienung (hinweise.json) werden mit erzeugt: audio/hinweis-<id>.mp3. Nur Hinweise: --nur hinweise
 Kosten fuer alle 24 Texte: etwa 6.300 Credits mit Flash v2.5, etwa 12.500 mit Multilingual v2; danach nur noch die geaenderten.
 """
 import argparse, base64, hashlib, json, os, re, sys, time, urllib.request, urllib.error
@@ -126,6 +127,7 @@ def main():
     ap.add_argument("--voice"); ap.add_argument("--json", default="lesetexte_stufe1.json")
     ap.add_argument("--nur", nargs="*"); ap.add_argument("--tempi", default="n")
     ap.add_argument("--ordner", default="aufnahmen")
+    ap.add_argument("--hinweise", default="hinweise.json", help="kurze Sprach-Hinweise der Bedienung (audio/hinweis-<id>.mp3)")
     ap.add_argument("--pruefen", action="store_true", help="vorhandene Aufnahmen ohne Fingerabdruck neu erzeugen")
     ap.add_argument("--speed-n", type=float, default=0.95); ap.add_argument("--speed-s", type=float, default=0.78)
     ap.add_argument("--model", default=os.environ.get("ELEVENLABS_MODEL") or "eleven_flash_v2_5"); ap.add_argument("--selftest", action="store_true")
@@ -169,7 +171,19 @@ def main():
                 if vorhanden and (stand.get(name) == fp or (name not in stand and not a.pruefen)):
                     continue
                 auftraege.append((name, fp, inhalt, text, spans, tempi[t]))
-    gebraucht = {f"{x['id']}-{t}-{k}" for x in daten for k, _ in teile(x) for t in a.tempi.split(",")}
+    # Sprach-Hinweise der Bedienung: je ein kurzer Satz, immer im Tempo "Normal"
+    hinweise = json.load(open(a.hinweise, encoding="utf-8"))["hinweise"] if os.path.exists(a.hinweise) else {}
+    for hid, satz in hinweise.items():
+        if a.nur and "hinweise" not in a.nur:
+            continue
+        name = f"hinweis-{hid}"
+        text, spans = text_mit_offsets(satz.strip())
+        fp = hashlib.sha1(json.dumps([text, a.voice, a.model, tempi["n"]]).encode()).hexdigest()[:12]
+        vorhanden = all(os.path.exists(os.path.join(a.ordner, name + e)) for e in (".mp3", ".json"))
+        if vorhanden and (stand.get(name) == fp or (name not in stand and not a.pruefen)):
+            continue
+        auftraege.append((name, fp, satz.strip(), text, spans, tempi["n"]))
+    gebraucht = {f"{x['id']}-{t}-{k}" for x in daten for k, _ in teile(x) for t in a.tempi.split(",")} | {f"hinweis-{hid}" for hid in hinweise}
     if not a.nur:
         for f in sorted(os.listdir(a.ordner)):
             stamm = f.rsplit(".", 1)[0]

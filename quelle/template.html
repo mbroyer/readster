@@ -148,6 +148,21 @@ details.adult.set[open]>div{display:flex;flex-direction:column;gap:16px;margin-t
 .mode span{color:var(--muted);font-weight:600;font-size:.95rem}
 .modetag{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;border:2px solid var(--accent);color:var(--accent);border-radius:999px;padding:3px 12px 3px 8px;font-weight:600;font-size:.85rem}.modetag svg{width:18px;height:18px;flex:none}
 .alt-link{align-self:center}
+.btn svg{width:1.4em;height:1.4em;vertical-align:-0.35em;margin-right:8px}.link svg{width:1.2em;height:1.2em;vertical-align:-0.3em;margin-right:6px}
+#dock .row.sub{justify-content:center;margin-top:2px}#dock .row.sub>*{flex:0 1 auto}#dock .row.sub .link{padding:6px 10px;min-height:0}
+.faces{display:flex;gap:12px}.faces .btn{flex:1;padding:12px 0;min-height:88px;display:flex;align-items:center;justify-content:center}.faces .btn svg{width:56px;height:56px;margin:0;color:var(--accent)}.faces .btn.on svg{color:var(--accent-ink)}
+.ticon{width:48px;height:48px;border-radius:50%;background:var(--bg);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;flex:none}.ticon svg{width:28px;height:28px}
+.tapword{flex-direction:row;align-items:center;gap:12px}.tapword h2{font-size:1.3rem}
+.rec.hear{flex-direction:row;align-items:center;gap:12px;padding:14px}.rec.hear .plr{flex:1}.rec.hear .plb{width:68px;height:68px}.rec.hear .plb svg{width:30px;height:30px}
+.carcard{flex-direction:row;align-items:center;gap:14px;padding:14px}.carbtn{background:none;border:0;padding:0;cursor:pointer;flex:none}.carbtn .carimg{width:120px;height:80px}
+.tankin{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0;align-items:flex-start}.tankin b{font-weight:500;font-size:1.05rem;line-height:1.25}.tankin .bar{width:100%}
+.tankrow{align-items:center}.tankrow .carimg{width:110px;height:73px}
+.pips i.new{animation:pipin .7s cubic-bezier(.2,1.4,.4,1) both}@keyframes pipin{0%{transform:scale(.3);background:var(--bg)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+.btn.race-go{animation:racepulse 1.4s ease-in-out infinite}@keyframes racepulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.howrace{display:flex;gap:12px;width:100%}.howrace>div{flex:1;display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:16px;padding:12px}.howrace b{font-size:1.1rem;font-weight:500}
+.hn{flex:none;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:1.1rem}
+ul.howto{margin:0;padding-left:1.2em;color:var(--muted);font-weight:500;font-size:.95rem;display:flex;flex-direction:column;gap:6px}
+@media (prefers-reduced-motion:reduce){.btn.race-go,.pips i.new{animation:none}}
 .mtog{display:inline-flex;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:3px;gap:2px}
 .mtog button{width:40px;height:34px;border:0;border-radius:999px;background:none;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .mtog button svg{width:22px;height:22px}
@@ -400,7 +415,20 @@ function curCar(){var r=rankOf(lvl(S.xp));if(r<CAR0)return null;var c=carStage(S
 /* Tank: füllt sich mit den XP, sobald ein Auto da ist. Das erste Auto kommt mit vollem Tank. */
 function addFuel(gain,wasRank){var r=rankOf(lvl(S.xp));if(r<CAR0)return;if(wasRank<CAR0)S.fuel=XP_RACE;else S.fuel=Math.min(XP_RACE,(S.fuel||0)+gain);}
 function fuelFull(){return hasCar()&&(S.fuel||0)>=XP_RACE;}
-function tankPips(big){var o='<div class="pips'+(big?' big':'')+'" aria-hidden="true">';for(var i=0;i<3;i++)o+='<i class="'+(hasCar()&&(S.fuel||0)>=(i+1)*XP_RACE/3-0.01?'on':'')+'"></i>';return o+'</div>';}
+function litPips(){if(!hasCar())return 0;var n=0;for(var i=0;i<3;i++)if((S.fuel||0)>=(i+1)*XP_RACE/3-0.01)n++;return n;}
+function tankPips(big,before){var lit=litPips(),o='<div class="pips'+(big?' big':'')+'" aria-hidden="true">';for(var i=0;i<3;i++)o+='<i class="'+(i<lit?'on':'')+(before!=null&&i>=before&&i<lit?' new':'')+'"></i>';return o+'</div>';}
+/* Eine kurze Zeile und ein Hinweis-Ton: wie weit ist es bis zum Auto oder zum Rennen */
+function textsToCar(){var need=XPK*(RSTAGES[CAR0].lv-1)*(RSTAGES[CAR0].lv-1);return Math.max(1,Math.ceil((need-S.xp)/XP_TEXT));}
+function tankLine(){
+  if(!hasCar()){var n=textsToCar();return 'Noch '+(n===1?'ein Text':n+' Texte')+', dann dein erstes Auto!';}
+  if(fuelFull())return 'Tank voll! Rennen fahren!';
+  var m=Math.max(1,Math.ceil((XP_RACE-(S.fuel||0))/XP_TEXT));return 'Noch '+(m===1?'ein Text':m+' Texte')+', dann Rennen!';
+}
+function tankHint(){
+  if(!hasCar())return 'auto'+Math.min(3,textsToCar());
+  if(fuelFull())return 'tankvoll';
+  return 'tank'+Math.min(3,Math.max(1,Math.ceil((XP_RACE-(S.fuel||0))/XP_TEXT)));
+}
 function tankText(){var need=Math.max(1,Math.ceil((XP_RACE-(S.fuel||0))/XP_TEXT));
   return fuelFull()?'Jetzt kannst du ein Rennen fahren.':'Noch '+(need===1?'ein Text':need+' Texte')+', dann ist der Tank voll.';}
 function tankBlock(){
@@ -438,7 +466,7 @@ TEXTS.forEach(function(t){
 });
 (function(){var ds=TEXTS.map(function(t){return t.diff;}).sort(function(a,b){return a-b;}),med=ds[Math.floor(ds.length/2)];TEXTS.forEach(function(t){t.stars=t.diff>=med?2:1;});})();
 /* ---------- Zustand ---------- */
-function defaults(){return {ts:0,whNote:'',xp:0,fuel:0,rcar:'',rbest:{},done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Lexend',lx:1,size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1,whv:0}};}
+function defaults(){return {ts:0,whNote:'',xp:0,fuel:0,rcar:'',rbest:{},done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Lexend',lx:1,size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1,whv:0,voice:true},raceIntro:0};}
 function fixState(d){
   /* Ältere Stände: gesammelte Wörter in den Wort-Jäger übernehmen */
   Object.keys(d.stolper||{}).forEach(function(w){if(!d.wj[w])d.wj[w]={n:d.stolper[w],ok:[],done:false};});
@@ -592,6 +620,25 @@ var IC_F1='<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r
 var IC_F0='<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="currentColor" opacity=".25"/><circle cx="11" cy="13" r="2" fill="currentColor"/><circle cx="21" cy="13" r="2" fill="currentColor"/><path d="M9.5 21c2-2.5 4.5-1 6.5-2.3s4.5-.2 6.5 1.8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
 var IC_DUO='<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="11" cy="11" r="5"/><path d="M1.5 27c0-5.8 4.2-9.5 9.5-9.5s9.5 3.7 9.5 9.5z"/><circle cx="22.5" cy="9" r="4" opacity=".65"/><path d="M17.5 17.4c1.4-1 3.1-1.6 5-1.6 4.7 0 8 3.4 8 8.7h-8.7c-.7-2.9-2.2-5.3-4.3-7.1z" opacity=".65"/></svg>';
 var MODE=null;
+/* Sprach-Hinweise: die App sagt, was zu tun ist, statt es hinzuschreiben (MP3 von Matilda, sonst Gerätestimme) */
+var HINTS=__HINTS__,HQ={el:null,tok:0,t:0};
+function sayStop(){HQ.tok++;clearTimeout(HQ.t);if(HQ.el){try{HQ.el.pause();}catch(e){}HQ.el=null;}try{if(window.speechSynthesis&&HQ.sp){window.speechSynthesis.cancel();HQ.sp=false;}}catch(e){}}
+function say(id,delay){
+  var h=HINTS[id];if(!h||!S.set.voice)return;
+  sayStop();var tok=HQ.tok;
+  HQ.t=setTimeout(function(){
+    if(tok!==HQ.tok)return;
+    function fallback(){try{if(!window.speechSynthesis||!window.SpeechSynthesisUtterance)return;var u=new SpeechSynthesisUtterance(h.t);u.lang='de-DE';u.rate=0.9;var v=pickVoice();if(v)u.voice=v;HQ.sp=true;window.speechSynthesis.speak(u);}catch(e){}}
+    if(!h.u){fallback();return;}
+    var a=new Audio(h.u);HQ.el=a;a.onerror=function(){if(tok===HQ.tok)fallback();};
+    var pr=a.play();if(pr&&pr.catch)pr.catch(function(){});
+  },delay||0);
+}
+function sayOnce(key,id,delay){if(!R||R.said===key)return;R.said=key;say(id,delay);}
+var IC_EAR='<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13a8 8 0 0 1 16 0c0 4-3 5-4 8-.8 2.3-2 4-4.5 4"/><path d="M13 13a3 3 0 0 1 6 0c0 2-2 2.5-2.5 4"/></svg>';
+var IC_TAP='<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 17V7a2.5 2.5 0 0 1 5 0v8"/><path d="M18 14a2.5 2.5 0 0 1 5 1v2"/><path d="M23 17a2.5 2.5 0 0 1 4 2v4c0 4-3 6-7 6h-3c-3 0-5-1.5-6.5-4L7 20a2.3 2.3 0 0 1 3.6-2.6L13 20"/></svg>';
+var IC_LIST='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1.2" fill="currentColor"/><circle cx="4" cy="12" r="1.2" fill="currentColor"/><circle cx="4" cy="18" r="1.2" fill="currentColor"/></svg>';
+var IC_FLAG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 3v18h2v-7h10l-2-4 2-4H7V3z"/></svg>';
 var IC_WJ='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg>';
 function modeTag(){return '<span class="modetag">'+(MODE==='partner'?IC_DUO+'Partner-Modus: Ihr lest zu zweit':IC_SOLO+'Solo-Modus: Du liest allein')+'</span>';}
 function setMode(m){MODE=m;try{if(m)localStorage.setItem('readster.mode',m);}catch(e){}document.documentElement.setAttribute('data-mode',m||'solo');var tc=document.querySelector('meta[name=theme-color]');if(tc)tc.setAttribute('content',m==='partner'?'#2a1206':'#07202b');}
@@ -636,15 +683,14 @@ function renderHome(){
   h+=modeTag();
   if(S.whNote)h+='<section class="card left whnote"><p class="fb">'+esc(S.whNote)+'</p><button class="btn ghost sm" data-a="whNoteOk">Okay</button></section>';
   var due=wjDue().length;
-  /* Ganz oben ein klarer Startknopf, Themen danach als Alternative */
+  /* Ganz oben: Auto und Tank, ohne Level und Erklärungen. Antippen öffnet die Garage. */
+  var cc=curCar(),rk=rankOf(p.L);
+  h+='<section class="card carcard"><button class="carbtn" data-a="garage" aria-label="Garage öffnen">'+stageHTML(rk)+'</button><div class="tankin">'+(cc?tankPips(true):'<div class="bar"><i style="width:'+stageProg().pct+'%"></i></div>')+
+    (fuelFull()?'<button class="btn race-go" data-a="race">'+IC_FLAG+'Rennen fahren</button>':'<b>'+esc(tankLine())+'</b>')+'</div></section>';
+  /* Dann ein klarer Startknopf, Themen dahinter */
   if(!sg)h+='<button class="btn wide" data-a="topics">Thema wählen</button>';
   if(!sg&&due)h+='<button class="wjcta" data-a="wj"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg><div><b>Wort-Jäger</b><span>'+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' zum Üben</span></div></button>';
   if(sg)h+='<section class="card nxt"><span class="eyebrow">'+(sg.from?'Rätsel lösen':(doneCount()?'Dein nächster Text':'Dein erster Text'))+' · '+esc(sg.t.cat)+'</span><h2>'+esc(sg.t.title)+'</h2><div class="nxtb"><button class="btn" data-a="open" data-v="'+sg.t.id+'">Jetzt lesen</button><button class="btn ghost" data-a="topics">Thema wählen</button></div>'+(due?'<button class="wjcta sm" data-a="wj">'+IC_WJ+'<span>Oder erst <b>Wort-Jäger</b>: '+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' üben</span></button>':'')+'</section>';
-  var rk=rankOf(p.L),cc=curCar();
-  h+='<div class="sechead"><h2>Deine Garage</h2><p class="hint">Jeder Text bringt dich ein Level weiter, neue Level bringen neue Autos.</p></div>';
-  h+='<section class="card week rgar"><button class="rgo" data-a="garage" aria-label="Garage öffnen">'+stageHTML(rk)+'<div class="info"><span class="lvchip">Level '+p.L+'</span><span class="stagename">'+esc(cc?cc.n:'Unter der Plane')+'</span><div class="bar" role="progressbar" aria-valuenow="'+stageProg().pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+stageProg().pct+'%"></i></div><span class="xptext">'+esc(growText())+'</span></div><span class="chev" aria-hidden="true">›</span></button>'+
-    (cc?'<div class="rtank"><span class="eyebrow">Tank</span>'+tankPips(false)+(fuelFull()?'<button class="btn" data-a="race">Rennen fahren</button>':'<span class="xptext">'+esc(tankText())+'</span>')+'</div>':'')+
-    '</section>';
   /* Fortschritt direkt auf der Startseite, Details per Antippen */
   var LG=S.log.filter(function(x){return x.wpm;}),tw=LG.length?avg(LG.slice(-3).map(function(x){return x.wpm;})):0,t0=LG.length?LG[0].wpm:0;
   h+='<div class="sechead"><h2>Dein Fortschritt</h2></div>';
@@ -671,6 +717,10 @@ function renderGarage(){
 /* Rennen: das Spiel läuft im Vollbild-Rahmen und meldet das Ergebnis per postMessage */
 function raceOpen(){
   var c=curCar();if(!c||!fuelFull())return;
+  if(!S.raceIntro){ /* Vor dem ersten Rennen: ein Bild, zwei Sätze, die Stimme sagt sie */
+    openBox('#modal','<div class="card"><h2>Dein erstes Rennen!</h2>'+carImg(c.car,'big',c.full)+'<div class="howrace"><div><span class="hn">1</span><b>Gas halten</b></div><div><span class="hn">2</span><b>Bei Grün: Los!</b></div></div><button class="btn wide" data-a="raceGo">Los geht’s</button></div>');
+    say('rennen',300);return;
+  }
   var p=RSTAGES[rankOf(lvl(S.xp))].r,q={car:c.car,name:c.full,auto:p.auto,brake:p.brake,night:Math.random()<p.night?1:0,wx:p.wx,diff:p.diff,rival:p.rival?1:0};
   if(S.rbest[c.car])q.best=S.rbest[c.car].toFixed(2);
   var u='rennen/strip402.html?readster';for(var k in q)u+='&'+k+'='+encodeURIComponent(q[k]);
@@ -756,24 +806,27 @@ function renderCtl(){
   var tcard=tx.closest('section');if(tcard){tcard.hidden=R.phase==='check'||(R.phase==='mark'&&R.ms!=='listen');tcard.classList.toggle('live',R.phase==='timing'&&!!R.recOn);} /* Fragen und die ersten Rückblick-Schritte ohne Text */
   tx.classList.toggle('marking',R.phase==='mark');tx.classList.toggle('seek',R.phase==='read');tx.classList.toggle('opa',R.phase==='opa');
   if(R.phase==='read'){
-    dk='<div class="row"><button class="btn ghost" data-a="listen" id="bL">'+btnLabel()+'</button><button class="btn" data-a="start">'+(R.round?'Nochmal lesen':'Ich lese jetzt')+'</button></div>';
+    /* Ein großer Knopf: erst Zuhören, danach wird er zu Jetzt lesen */
+    var ready=R.round>0||R.sbsDone||R.heard;
+    if(ready)dk='<button class="btn wide" data-a="start">'+(R.round?'Nochmal lesen':'Jetzt lesen')+'</button><div class="row sub"><button class="link" data-a="listen" id="bL">'+(tts.on&&tts.part==='a'?btnLabel():'Nochmal hören')+'</button></div>';
+    else dk='<button class="btn wide" data-a="listen" id="bL">'+IC_EAR+btnLabel()+'</button><div class="row sub"><button class="link" data-a="start">Gleich lesen</button></div>';
     if(R.msg)h+='<p class="hint fb">'+esc(R.msg)+'</p>';
-    else h+=R.sbsDone?'<p class="hint fb">Super, alle Sätze geschafft! Jetzt lies den ganzen Text am Stück.</p>':'<p class="hint fb">Erst hören, dann selbst lesen.</p>';
-    h+='<button class="link alt-link" data-a="solo">Zu schwer am Stück? Satz für Satz</button>';
+    h+='<button class="link alt-link" data-a="solo">'+IC_LIST+'Satz für Satz</button>';
+    sayOnce('read'+(ready?'1':'0'),ready?'lesen':'hoeren',300);
   }else if(R.phase==='opa'){
     var n=t.sents.length,lastS=R.si>=n-1,solo=R.who==='solo';
     dk='<div class="lbl '+R.turn+'"><b>'+(R.turn==='opa'?(solo?'Hör gut zu':'Partner liest vor'):(solo?'Jetzt liest du laut':'Jetzt liest du'))+'</b><span>Satz '+(R.si+1)+' von '+n+'</span></div>';
     dk+='<div class="row">'+(R.si>0||R.turn==='kid'?'<button class="btn ghost sm" data-a="opaBack" aria-label="Einen Schritt zurück">‹</button>':'')+
        (solo?'<button class="btn ghost" data-a="soloHear" aria-label="Satz nochmal hören">Nochmal</button>':'')+
        (R.turn==='opa'?'<button class="btn" data-a="opaKid">'+(solo?'Jetzt ich':'Jetzt du')+'</button>':'<button class="btn" data-a="opaNext">'+(lastS?(solo?'Geschafft':'Fertig'):'Nächster Satz')+'</button>')+'</div>';
-    h+='<p class="hint fb">Schweres Wort? Antippen.</p>';
+    if(solo&&R.turn==='opa'&&R.si===0)sayOnce('satz','satz',200);
     if(solo)h+='<details class="tip"><summary>So geht Satz für Satz</summary><ul><li>Die Stimme liest einen Satz vor.</li><li>Dann liest du ihn laut nach.</li><li>„Nochmal“ spielt den Satz noch einmal.</li><li>Schwere Wörter antippen.</li><li>Danach liest du den ganzen Text am Stück.</li></ul></details>';
     else h+='<details class="tip"><summary>So klappt es zu zweit</summary><ul><li>Der Partner liest den Satz ruhig und deutlich vor.</li><li>Dann liest das Kind denselben Satz nach.</li><li>Bleibt das Kind hängen: Wort leise vorsagen, kein Druck.</li><li>Schwere Wörter antippen, sie kommen in den Wort-Jäger.</li><li>Zehn Minuten reichen. Am Ende kurz loben.</li></ul></details>';
     h+='<button class="link" data-a="cancel">Beenden</button>';
   }else if(R.phase==='timing'){
-    dk='<button class="btn wide stop" data-a="stop"><i></i>Fertig gelesen</button>';
-    top=R.recOn?'<div class="recbar" role="status"><span class="pulse"></span><div><b>Aufnahme läuft</b><span>Lies laut bis zum Ende. Die Aufnahme bleibt nur auf diesem Gerät.</span></div></div>':
-      '<div class="recbar off" role="status"><div><b>Lies jetzt laut</b><span>Lies bis zum Ende. Dann tippe auf „Fertig gelesen“.</span></div></div>';
+    dk='<button class="btn wide stop" data-a="stop"><i></i>Fertig</button>';
+    top=R.recOn?'<div class="recbar" role="status"><span class="pulse"></span><div><b>Aufnahme läuft</b><span>Lies laut bis zum Ende.</span></div></div>':
+      '<div class="recbar off" role="status"><div><b>Lies jetzt laut</b><span>Bis zum Ende, dann „Fertig“.</span></div></div>';
     if(!R.recOn&&R.recTried&&S.set.rec)h+='<p class="hint">'+esc(recFailText())+'</p>';
     h+='<button class="link" data-a="cancel">Abbrechen</button>';
   }else if(R.phase==='count'){
@@ -783,15 +836,17 @@ function renderCtl(){
     var w=R.rounds[R.rounds.length-1],en=R.entry,ms=R.ms||'self';
     if(ms==='self'){
       dk='<button class="btn wide" data-a="ms" data-v="nums"'+(en&&en.self!=null?'':' disabled')+'>Weiter</button>';
-      top='<div class="flat"><span class="eyebrow">Geschafft!</span><h2>Wie war das Lesen für dich?</h2><div class="selfq selfrow">'+[[2,'Flüssig',IC_F2],[1,'Ging so',IC_F1],[0,'Holprig',IC_F0]].map(function(o){return '<button class="btn '+(en&&en.self===o[0]?'on':'ghost')+'" data-a="self" data-v="'+o[0]+'">'+o[2]+o[1]+'</button>';}).join('')+'</div></div>';
+      top='<div class="flat"><h2>Wie war das?</h2><div class="faces selfrow">'+[[2,'Flüssig',IC_F2],[1,'Ging so',IC_F1],[0,'Holprig',IC_F0]].map(function(o){return '<button class="btn '+(en&&en.self===o[0]?'on':'ghost')+'" data-a="self" data-v="'+o[0]+'" aria-label="'+o[1]+'">'+o[2]+'</button>';}).join('')+'</div></div>';
+      sayOnce('self','gefuehl',300);
     }else if(ms==='nums'){
-      dk='<button class="btn wide" data-a="ms" data-v="listen">Weiter</button>';
+      dk='<button class="btn wide" data-a="ms" data-v="listen">Weiter</button>';sayOnce('nums','zahlen',300);
       var pv=R.prev&&R.prev.length?R.prev[0].wpm:0;
       top='<div class="flat result-card"><b class="rhead" id="rhead">'+esc(R.head||'')+'</b>'+
         '<div class="tiles">'+(S.set.nums?'<div class="tile"><b>'+w+'</b><span>Wörter pro Minute</span>'+(pv?'<span class="was">Beim ersten Mal: '+pv+'</span>':'')+'</div>':'')+'<div class="tile"><b>'+fmtSec(R.sec)+'</b><span>Lesezeit</span></div><div class="tile" id="sugtile"'+(R.sugState&&R.sugState!=='none'?'':' hidden')+'>'+sugTile()+'</div></div></div>';
     }else{
       dk='<div class="row">'+(R.round<3?'<button class="btn ghost" data-a="again">Nochmal lesen</button>':'')+'<button class="btn" data-a="check">Zu den Fragen</button></div>';
-      top='<div id="recm"></div><section class="card"><h2>Schwere Wörter</h2><p>Tippe im Text die Wörter an, die schwer waren. Sie kommen in den Wort-Jäger.</p><div id="sugbox"></div></section>';
+      top='<div id="recm"></div><div class="flat tapword"><span class="ticon">'+IC_TAP+'</span><h2>Schwere Wörter antippen</h2></div>';
+      sayOnce('listen','hoerdich',400);
     }
   }else if(R.phase==='check'){
     /* Fragen einzeln nacheinander */
@@ -800,8 +855,9 @@ function renderCtl(){
     dk=!done?'<button class="btn wide" disabled>'+(last?'Fertig':'Nächste Frage')+'</button>':
       (last?'<button class="btn wide" data-a="finish">Fertig</button>':'<button class="btn wide" data-a="nextQ">Nächste Frage</button>');
     h+='<div class="flat" id="qcard"><span class="eyebrow">Frage '+(qi+1)+' von '+nq+'</span>';
+    if(!done)sayOnce('q'+qi,'fragen',300);
     if(!o||o.length<2)h+='<div class="qa"><p>'+esc(q.q)+'</p><div class="ans">'+esc(q.a)+'</div></div>';
-    else h+='<div class="qa"><p>'+esc(q.q)+'</p><span class="hint">Tippe die richtige Antwort an.</span><div class="opts">'+o.map(function(a,j){
+    else h+='<div class="qa"><p>'+esc(q.q)+'</p><div class="opts">'+o.map(function(a,j){
         var cl=done?(a===q.a?' right':(j===pk?' miss':' off')):'';
         return '<button class="opt'+cl+'" data-a="pick" data-v="'+qi+'-'+j+'"'+(done?' disabled':'')+'>'+esc(a)+'</button>';
       }).join('')+'</div>'+(done?'<p class="qfb '+(R.qs[qi]?'ok':'')+'">'+(R.qs[qi]?'Richtig!':'Fast! Die richtige Antwort ist grün.')+'</p>':'')+'</div>';
@@ -811,10 +867,11 @@ function renderCtl(){
   if(R.phase==='mark'){if(R.ms==='listen')fillRec($('#recm'),t.id,true);updateMarkInfo();}else{var os=document.querySelectorAll('#rtext .w.sug,#rtext .w.srm');for(var oi=0;oi<os.length;oi++)os[oi].classList.remove('sug','srm');}
 }
 /* Vorlesen */
-function setBtn(){var b=$('#bL');if(b)b.textContent=lab('a','Zuhören');var r=$('#bR');if(r)r.textContent=lab('b','Rätsel anhören');}
+function setBtn(){var b=$('#bL');if(b)b.innerHTML=(b.classList.contains('btn')?IC_EAR:'')+lab('a',b.classList.contains('btn')?'Zuhören':'Nochmal hören');var r=$('#bR');if(r)r.textContent=lab('b','Rätsel anhören');}
 function lab(p,idle){return (tts.on&&tts.part===p)?(tts.paused?'Weiter':'Pause'):idle;}
 function btnLabel(){return lab('a','Zuhören');}
 function stopListen(){
+  sayStop();
   tts.tok++;tts.on=false;tts.paused=false;tts.gapK=null;clearTimeout(tts.timer);clearTimeout(tts.gap);
   if(tts.raf){cancelAnimationFrame(tts.raf);tts.raf=0;}
   if(tts.srcs){tts.srcs.forEach(function(s){try{s.onended=null;s.stop();}catch(e){}});tts.srcs=null;}
@@ -836,13 +893,13 @@ function pickVoice(){
 }
 var GAP=2;
 
-function listenTTS(from,part,to){
+function listenTTS(from,part,to,onIdx){
   if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){var b0=$('#bL');if(b0)b0.textContent='Kein Ton möglich';return;}
   stopListen();
   var t=R.t,tok=++tts.tok,gotB=false,rate=S.set.speed==='slow'?0.7:0.92,pt=0;
   var bounds=[part==='b'?[t.rs,t.words.length]:[0,t.rs]].filter(function(p){return p[1]>p[0];});
   from=from||0;
-  function end(){if(tok!==tts.tok)return;tts.on=false;tts.paused=false;clearTimeout(tts.timer);clearTimeout(tts.gap);mark(-1);setBtn();}
+  function end(){if(tok!==tts.tok)return;tts.on=false;tts.paused=false;clearTimeout(tts.timer);clearTimeout(tts.gap);mark(-1);setBtn();if(onIdx)onIdx(-1);}
   function est(my,i,e){
     tts.est=function(){est(my,i,e);};
     if(tok!==tts.tok||gotB||my!==pt||i>=e||tts.paused)return;
@@ -933,7 +990,8 @@ function listen(from,part,to){
     from=part==='b'?T.rs:0;
   }else part=from>=T.rs?'b':'a';
   var pk=part==='b'?'b':'a';
-  playPart(T.id,pk,from,to,mark,function(){listenTTS(from,part,to);});
+  function done(i){mark(i);if(i===-1&&pk==='a'&&to==null&&R&&R.phase==='read'&&!R.heard){R.heard=true;renderCtl();}}
+  playPart(T.id,pk,from,to,done,function(){listenTTS(from,part,to,done);});
 }
 /* Einzelnes Wort vorlesen (Wort-Jäger): Ausschnitt aus der Aufnahme, sonst Gerätestimme */
 function sayWord(w){
@@ -1056,12 +1114,6 @@ function updateMarkInfo(){
   var c=R.chk,miss=c&&c.state==='done'?c.miss:[],sug=R.phase==='mark'&&R.sug?R.sug:[];
   miss.forEach(function(k){var w=$('#rtext .w[data-i="'+k+'"]');if(w)w.classList.add('srm');});
   sug.forEach(function(k){var w=$('#rtext .w[data-i="'+k+'"]');if(w)w.classList.add('sug');});
-  var sb=$('#sugbox');if(!sb)return;
-  var l='<div class="lg"><i class="l-st"></i>So sieht ein angetipptes Wort aus.</div>';
-  if(sug.length)l+='<div class="lg"><i class="l-sug"></i>Hier hast du länger überlegt.</div>';
-  if(miss.length)l+='<div class="lg"><i class="l-srm"></i>Diese Wörter lies ruhig noch einmal.</div>';
-  if(c&&c.state==='wait')l+='<span class="hint">Deine Aufnahme wird noch angeschaut. Gleich zeigen wir hier Wörter zum Üben.</span>';
-  sb.innerHTML=l;
 }
 /* ---------- Fortschritt ---------- */
 function fmtDate(ts){var d=new Date(ts);return d.getDate()+'.'+(d.getMonth()+1)+'.';}
@@ -1218,7 +1270,7 @@ function fillRec(el,id,withMark){
     var f=r[0],l=r[1];if(!l){el.innerHTML='';return;}
     freeUrls();var multi=(S.recN[id]||0)>=2&&f;REC.share={b:l,id:id};
     var sh=FRAMED?'':'<button class="link" data-a="shareRec">Aufnahme teilen</button>';
-    if(withMark){el.innerHTML='<section class="card rec"><h2>Hör dich selbst</h2><span class="hint">Lies beim Hören im Text mit.</span>'+audioTag(l)+'</section>';return;}
+    if(withMark){el.innerHTML='<section class="card rec hear"><span class="ticon">'+IC_EAR+'</span>'+audioTag(l)+'</section>';return;}
     el.innerHTML='<div class="card rec"><span class="eyebrow">Deine Aufnahmen</span>'+
       (multi?'<span class="hint">Erste Aufnahme</span>'+audioTag(f)+'<span class="hint">Letzte Aufnahme</span>'+audioTag(l):audioTag(l))+
       '<span class="hint">Bleibt nur auf diesem Gerät.</span>'+sh+'</div>';
@@ -1377,8 +1429,13 @@ function cdHide(){var d=$('#cdown');if(d)d.remove();}
 function startRound(){
   stopListen();plStop();R.phase='count';R.recTried=false;R.recOn=false;REC.want=true;renderCtl();
   var rr=R,n=3,tail=function(){return '<button class="link" data-a="cancel">Abbrechen</button>';};
-  cdShow('<span>Mikrofon wird vorbereitet …</span>'+tail());
+  cdShow('<b>Gleich geht es los</b>'+tail());say('aufnahme');
+  var t00=Date.now();
   recStart(true).then(function(ok){
+    /* Der Hinweis darf zu Ende gesprochen werden, bevor gezählt wird (sonst landet er in der Aufnahme) */
+    var wait=Math.max(0,(S.set.voice&&HINTS.aufnahme?3600:0)-(Date.now()-t00));
+    return new Promise(function(res){setTimeout(function(){res(ok);},wait);});
+  }).then(function(ok){
     if(R!==rr||R.phase!=='count')return;R.recTried=true;R.recOn=ok;
     (function tick(){
       if(R!==rr||R.phase!=='count')return;
@@ -1431,7 +1488,7 @@ function commitMarks(){
 }
 function finish(){
   var t=R.t,first=!S.done[t.id],best=R.rounds.length?Math.max.apply(null,R.rounds):0,gain=0,list=[];
-  var wasRank=rankOf(lvl(S.xp));
+  var wasRank=rankOf(lvl(S.xp));R.pipsBefore=litPips();
   var markedN=Object.keys(R.all).length;
   if(R.entry){R.entry.marked=markedN;}
   if(first){gain+=30;list.push('Text gelesen: 30 XP');}else{gain+=15;list.push('Nochmal gelesen: 15 XP');}
@@ -1463,12 +1520,14 @@ function cardHTML(t,full){
 }
 function showReward(t,first,gain,list){
   var p=lvlProg(S.xp),sg=suggest();
-  var h='<div class="card"><span class="eyebrow">'+(first?'Text geschafft':'Nochmal gelesen')+(R&&R.withOpa?' · mit Partner':'')+'</span><h2>'+esc(t.title)+'</h2><span class="xpgain">Super gelesen!</span>';
-  /* Nur das Rätsel und ein Hauptknopf; Rennen nur bei vollem Tank */
+  var full=fuelFull(),before=R&&R.pipsBefore!=null?R.pipsBefore:litPips();
+  var h='<div class="card"><span class="xpgain">Super gelesen!</span>';
+  /* Der Tank füllt sich sichtbar; Wörter sagt die Stimme */
+  h+='<div class="rwt tankrow">'+carImg(curCar()?curCar().car:RSTAGES[rankOf(lvl(S.xp))].img,'')+'<div class="tankin">'+(hasCar()?tankPips(true,before):'<div class="bar"><i style="width:'+stageProg().pct+'%"></i></div>')+'<b>'+esc(tankLine())+'</b></div></div>';
+  if(full)h+='<button class="btn wide race-go" data-a="race">'+IC_FLAG+'Rennen fahren</button>';
   h+=riddleBlock(t,true);
-  var full=fuelFull();
-  if(full)h+='<div class="rwt">'+tankPips(true)+'<div><b>Dein Tank ist voll!</b></div></div><button class="btn wide" data-a="race">Rennen fahren</button>';
   h+='<button class="btn wide'+(full?' ghost':'')+'" data-a="home2">Zur Übersicht</button>';
+  say(tankHint(),900);
   if(sg)h+='<button class="link" data-a="nextread" data-v="'+sg.t.id+'">Gleich den nächsten Text lesen</button>';
   h+='</div>';
   openBox('#modal',h);readStyle();burst();
@@ -1562,9 +1621,11 @@ function renderSheet(){
   h+='<details class="adult set"'+(wasOpen?' open':'')+'><summary>Für Erwachsene</summary><div>';
   h+='<h3 class="setgrp">Text</h3><div class="setrow"><span class="eyebrow">Zeilenabstand</span>'+seg('line',[[0,'Eng'],[1,'Normal'],[2,'Weit']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Buchstabenabstand</span>'+seg('space',[[0,'Normal'],[1,'Mehr'],[2,'Viel']])+'</div>';
+  h+='<div class="setrow"><span class="eyebrow">Sprach-Hinweise</span>'+seg('voice',[[true,'An'],[false,'Aus']])+'<span class="hint">Die Stimme sagt auf jedem Bildschirm, was zu tun ist.</span></div>';
   h+='<h3 class="setgrp">Aufnahme und Auswertung</h3><div class="setrow"><span class="eyebrow">Aufnahme beim Lesen</span>'+seg('rec',[[true,'An'],[false,'Aus']])+'<span class="hint">Die Aufnahmen bleiben nur auf diesem Gerät.</span><button class="link" id="delRecsBtn" data-a="delRecs">Alle Aufnahmen löschen</button></div>';
   h+='<div class="setrow"><span class="eyebrow">Stockstellen erkennen</span>'+seg('wh',[[true,'An'],[false,'Aus']])+'<span class="hint">Markiert nach dem Lesen Wörter, bei denen du hängen geblieben bist. '+(WH_SERVER?'Die Aufnahme geht dafür kurz an Cloudflare und wird dort nicht gespeichert.':'Beim ersten Einschalten werden einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB geladen, am besten im WLAN. Danach läuft alles auf diesem Gerät, der Ton verlässt es nicht.')+'</span><span class="hint fb" id="whst">'+esc(S.set.wh?whStatus():'')+'</span></div>';
   h+='<div class="setrow"><span class="eyebrow">Tempo-Zahlen zeigen</span>'+seg('nums',[[true,'An'],[false,'Aus']])+'<span class="hint">Aus: Es gibt nur „schneller als beim ersten Mal“, keine Wörter pro Minute.</span></div>';
+  h+='<h3 class="setgrp">So funktioniert Readster</h3><div class="setrow"><ul class="howto"><li>Zuhören, dann selbst laut lesen (mit Aufnahme).</li><li>Danach: Gesicht wählen, Tempo ansehen, sich selbst anhören und schwere Wörter antippen.</li><li>Zwei Fragen zum Text, dann ein Rätsel, das zum nächsten Text führt.</li><li>Jeder Text füllt den Tank. Drei Texte: ein Rennen. Neue Autos kommen mit der Zeit dazu (Garage: aufs Auto tippen).</li><li>Schwere Wörter landen im Wort-Jäger und werden an mehreren Tagen geübt.</li></ul></div>';
   h+='<h3 class="setgrp">Dein Code</h3><div class="setrow">'+(CODE?'<span class="hint">Angemeldet mit <b>'+esc(CODE)+'</b>. Der Fortschritt wird automatisch gespeichert und ist auf jedem Gerät mit diesem Code da.</span><button class="link" data-a="login">Anderen Code nutzen</button>':'<button class="link" data-a="login">Mit Code anmelden</button>')+'<button class="link" data-a="reset">Fortschritt zurücksetzen</button></div></div></details>';
   h+='<button class="btn wide" data-a="sheetOk">Fertig</button></div>';
   openBox('#sheet',h);$('#sheet').scrollTop=sc;
@@ -1707,6 +1768,7 @@ document.addEventListener('click',function(e){
     case 'garage':renderGarage();break;
     case 'pickcar':S.rcar=v;save();renderGarage();break;
     case 'race':stopListen();closeBox('#modal');raceOpen();break;
+    case 'raceGo':S.raceIntro=1;save();closeBox('#modal');raceOpen();break;
     case 'evoOk':closeBox('#modal');if(R&&R.afterEvo){var f=R.afterEvo;R.afterEvo=null;f();}break;
     case 'col':S.col=v;save();renderSheet();if(!$('#v-home').hidden)renderHome();break;
     case 'album':renderAlbum();break;
