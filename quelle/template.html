@@ -165,6 +165,18 @@ details.adult.set[open]>div{display:flex;flex-direction:column;gap:16px;margin-t
 .ticon{width:48px;height:48px;border-radius:50%;background:var(--bg);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;flex:none}.ticon svg{width:28px;height:28px}
 .tapword{flex-direction:row;align-items:center;gap:12px}.tapword h2{font-size:1.3rem}
 .rec.hear{flex-direction:row;align-items:center;gap:12px;padding:14px}.rec.hear .plr{flex:1}.rec.hear .plb{width:68px;height:68px}.rec.hear .plb svg{width:30px;height:30px}
+.garage{gap:10px;padding:14px 16px 16px;overflow:hidden}
+.ghead{all:unset;display:flex;justify-content:space-between;align-items:baseline;cursor:pointer}.gname{color:var(--accent);font-weight:500;font-size:.95rem}
+.gstage{all:unset;cursor:pointer;display:flex;justify-content:center;align-items:center;height:108px;margin:0 -16px;position:relative;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.22) 0 18px,transparent 18px 36px) center/100% 4px no-repeat,linear-gradient(#1c2c34,#142127)}
+.gstage::before,.gstage::after{content:'';position:absolute;left:0;right:0;height:4px;background:repeating-linear-gradient(90deg,#fff 0 12px,#e5484d 12px 24px);opacity:.55}.gstage::before{top:0}.gstage::after{bottom:0}
+.gstage .carimg{width:190px;height:96px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 6px 6px rgba(0,0,0,.45))}
+.fuel{display:flex;align-items:center;gap:10px}.pump{flex:none;color:var(--good);display:flex}.pump svg{width:26px;height:26px}
+.fseg{flex:1;display:flex;gap:6px}.fseg i{flex:1;height:16px;border-radius:8px;background:var(--bg);border:2px solid var(--line)}.fseg i.on{background:var(--good);border-color:#2a9a5f}
+.garage.full .fseg i{animation:fglow 1.4s ease-in-out infinite alternate}@keyframes fglow{to{box-shadow:0 0 12px var(--good)}}
+.fbar{flex:1;height:16px;border-radius:8px;background:var(--bg);border:2px solid var(--line);overflow:hidden}.fbar i{display:block;height:100%;background:var(--good)}
+.gline{display:flex;align-items:center;gap:8px;margin:0;font-weight:500;font-size:1.05rem}.gline svg{flex:none;width:20px;height:20px;color:var(--xp)}
+@media (prefers-reduced-motion:reduce){.garage.full .fseg i{animation:none}}
 .carcard{flex-direction:row;align-items:center;gap:14px;padding:14px}.carbtn{background:none;border:0;padding:0;cursor:pointer;flex:none}.carbtn .carimg{width:120px;height:80px}
 .tankin{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0;align-items:flex-start}.tankin b{font-weight:500;font-size:1.05rem;line-height:1.25}.tankin .bar{width:100%}
 .tankrow{align-items:center}.tankrow .carimg{width:110px;height:73px}
@@ -670,6 +682,7 @@ function tourOpen(i){TI=i||0;var x=TOUR[TI],last=TI===TOUR.length-1,vis;
   openBox('#modal','<div class="card tour">'+d+vis+'<h2>'+x.h+'</h2><button class="tsay" data-a="tourSay" aria-label="Nochmal hören">'+IC_SPK+'</button><button class="btn wide" data-a="'+(last?'tourEnd':'tourNext')+'">'+(last?'Los geht’s':'Weiter')+'</button>'+(last?'':'<button class="link" data-a="tourEnd">Überspringen</button>')+'</div>');
   say(x.s,250);}
 function tourEnd(){sayStop();S.tour=1;save();closeBox('#modal');}
+var IC_PUMP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M3 21h13M7 7h5v4H7z"/><path d="M15 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3"/></svg>';
 var IC_FLAG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 3v18h2v-7h10l-2-4 2-4H7V3z"/></svg>';
 var IC_WJ='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg>';
 function modeTag(){return '<span class="modetag">'+(MODE==='partner'?IC_DUO+'Partner-Modus: Ihr lest zu zweit':IC_SOLO+'Solo-Modus: Du liest allein')+'</span>';}
@@ -718,8 +731,12 @@ function renderHome(){
   var due=wjDue().length;
   /* Ganz oben: Auto und Tank, ohne Level und Erklärungen. Antippen öffnet die Garage. */
   var cc=curCar(),rk=rankOf(p.L);
-  h+='<section class="card carcard"><button class="carbtn" data-a="garage" aria-label="Garage öffnen">'+stageHTML(rk)+'</button><div class="tankin">'+(cc?tankPips(true):'<div class="bar"><i style="width:'+stageProg().pct+'%"></i></div>')+
-    (fuelFull()?'<button class="btn race-go" data-a="race">'+IC_FLAG+'Rennen fahren</button>':'<b>'+esc(tankLine())+'</b>')+'</div></section>';
+  /* Garage: Auto groß auf der Startlinie, darunter die Tankanzeige mit Zapfsäule; Antippen öffnet die Garage */
+  var lit=cc?litPips():0,fsg='';for(var fi=0;fi<3;fi++)fsg+='<i class="'+(fi<lit?'on':'')+'"></i>';
+  h+='<section class="card garage'+(fuelFull()?' full':'')+'"><button class="ghead" data-a="garage" aria-label="Garage öffnen"><span class="eyebrow">Deine Garage</span><span class="gname">'+esc(cc?cc.n:'Geheimes Auto')+' ›</span></button>'+
+    '<button class="gstage" data-a="garage" aria-label="Garage öffnen">'+stageHTML(rk)+'</button>'+
+    '<div class="fuel"><span class="pump" aria-hidden="true">'+IC_PUMP+'</span>'+(cc?'<span class="fseg">'+fsg+'</span>':'<span class="fbar"><i style="width:'+stageProg().pct+'%"></i></span>')+'</div>'+
+    (fuelFull()?'<button class="btn wide race-go" data-a="race">'+IC_FLAG+'Rennen fahren</button>':'<p class="gline">'+IC_FLAG+'<span>'+esc(tankLine())+'</span></p>')+'</section>';
   /* Dann ein klarer Startknopf, Themen dahinter */
   if(!sg)h+='<button class="btn wide" data-a="topics">Thema wählen</button>';
   if(!sg&&due)h+='<button class="wjcta" data-a="wj"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg><div><b>Wort-Jäger</b><span>'+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' zum Üben</span></div></button>';
