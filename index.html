@@ -406,21 +406,6 @@ details.adult p{color:var(--muted);font-weight:600;font-size:.92rem;margin-top:6
 textarea.code{width:100%;min-height:90px;font:600 .8rem/1.3 ui-monospace,Menlo,monospace;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:8px;resize:vertical}
 input.codein{width:100%;font:600 1.4rem/1.2 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-align:center;text-transform:uppercase;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:12px;min-height:56px}
 .pick .link{align-self:center}
-.pick:has(.gatebox){gap:44px}
-.pick .pv{display:flex;flex-direction:column;gap:36px;text-align:center}
-.pick .pv .lead{margin:0;font-size:1.05rem}
-.pick .shots{display:flex;gap:24px;justify-content:center;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 16px 10px;margin:0 -16px}
-.pick .shots figure{margin:0;flex:0 0 auto;scroll-snap-align:center;display:flex;flex-direction:column;gap:8px}
-.pick .shots img{width:200px;height:auto;display:block;border-radius:24px;border:6px solid var(--deep);box-shadow:0 0 0 2px var(--line),0 16px 36px rgba(0,0,0,.35)}
-.pick .shots figcaption{font-size:.85rem;color:var(--muted);font-weight:600}
-.pick .steps{list-style:none;margin:0;padding:0;display:grid;gap:8px;text-align:left}
-.pick .steps li{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:10px 12px;font-size:.9rem;color:var(--muted);font-weight:600;display:flex;gap:10px;align-items:baseline}
-.pick .steps b{color:var(--accent);font-size:1.1rem}
-.pick .gatebox{display:flex;flex-direction:column;gap:14px;background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:20px}
-.pick .gatebox h2{margin:0}
-.pick .ask{text-align:center;margin:0}.pick .ask a{color:var(--accent);font-weight:700}
-@media (min-width:640px){.pick .steps{grid-template-columns:repeat(3,1fr)}.pick .steps li{flex-direction:column;gap:4px}}
-@media (max-width:460px){.pick .shots{justify-content:flex-start}}
 input.name{width:100%;font:700 1.1rem var(--f-body);color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px 12px;min-height:48px}
 </style>
 </head>
@@ -915,17 +900,11 @@ function growText(){
   return 'Noch '+t+' bis zum nächsten Auto.';
 } /* wird bei jedem Start neu gewählt */
 function renderGate(msg,pre){
-  var h='<div class="pickwrap"><div class="pick"><div class="applogo"><img class="wordmark" alt="Readster" src="'+LOGO+'"></div>';
-  h+='<section class="pv" aria-label="Vorschau"><p class="lead">Lesetraining für Kinder mit LRS. Vorlesen, aufnehmen, besser werden.</p>';
-  h+='<div class="shots"><figure><img src="vorschau-1.jpg" alt="Startbildschirm von Readster mit einem Text zum Lesen" width="390" height="620"><figcaption>Jeden Tag ein neuer Text</figcaption></figure>';
-  h+='<figure><img src="vorschau-2.jpg" alt="Ein Text in Readster, die Silben sind farbig markiert" width="390" height="620"><figcaption>Silben in Farbe, zum Mitlesen</figcaption></figure></div>';
-  h+='<ol class="steps"><li><b>1</b>Text zuerst anhören</li><li><b>2</b>Selbst laut vorlesen, allein oder zu zweit</li><li><b>3</b>Texte sammeln und Autos freischalten</li></ol></section>';
-  h+='<div class="gatebox"><h2>Schon dabei?</h2>';
+  var h='<div class="pickwrap"><div class="pick"><div class="applogo"><img class="wordmark" alt="Readster" src="'+LOGO+'"></div><h2>Willkommen!</h2>';
   h+='<p class="hint" style="text-align:center">Melde dich mit deinem Code an. Den Code bekommst du von der Person, die dich zu Readster eingeladen hat.</p>';
   h+='<input class="codein" id="codeIn" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24" placeholder="Dein Code" value="'+esc(pre||'')+'">';
   if(msg)h+='<p class="hint fb" id="codemsg" style="text-align:center">'+esc(msg)+'</p>';
   h+='<button class="btn wide" data-a="codeGo">Anmelden</button>';
-  h+='<p class="hint ask">Noch keinen Code? <a href="mailto:hello@asimplemanslab.com?subject=Code%20f%C3%BCr%20Readster">Schreib Mark</a>, dann bekommst du einen.</p></div>';
   h+='</div><div class="foot"><div class="madeby small"><span>Made with love by</span><img alt="A Simple Man’s Lab" src="'+MADEBY+'"></div></div></div>';
   $('#v-home').innerHTML=h;
 }
