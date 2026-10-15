@@ -21,7 +21,7 @@
     "tour2": "Zuerst hörst du dir die Geschichte an.",
     "tour3": "Dann liest du sie laut vor. Ich nehme dich dabei auf.",
     "tour4": "Danach hörst du dich selbst an und tippst auf die Wörter, die schwer waren.",
-    "tour5": "Jeder Text füllt deinen Tank. Ist er voll, fährst du ein Rennen!",
+    "tour5": "Jeder Text, den du liest, füllt deinen Tank. Nach drei Texten ist er voll.",
     "rgas": "Leg deinen Finger auf das Gaspedal und schieb ihn nach oben.",
     "rzone": "Gut! Halte die Nadel im grünen Feld.",
     "rampel": "Bleib auf dem Gas. Wenn die Ampel grün wird, tippst du auf Los.",
@@ -42,6 +42,8 @@
     "rdrag": "Ein Dragrace geht nur geradeaus. Keine Kurven! Du gibst die ganze Zeit Vollgas, vom Start bis ins Ziel.",
     "rlosvoll": "Grün! Tippe auf Los und lass das Gas ganz oben!",
     "rvollgas": "Vollgas bis ins Ziel!",
-    "rganz": "Schieb das Gas ganz nach oben. Vollgas!"
+    "rganz": "Schieb das Gas ganz nach oben. Vollgas!",
+    "tour6": "Du kannst allein lesen oder zu zweit. Zu zweit lest ihr abwechselnd, Satz für Satz, zum Beispiel mit Opa. Oben kannst du jederzeit umschalten.",
+    "tour7": "Ist der Tank voll, fährst du ein Beschleunigungsrennen. Zwei Autos stehen an der Startlinie. Bei Grün geht es los. Wer als Erster die Viertelmeile schafft, gewinnt!"
   }
 }

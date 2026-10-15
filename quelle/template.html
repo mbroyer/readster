@@ -190,6 +190,21 @@ details.adult.set[open]>div{display:flex;flex-direction:column;gap:16px;margin-t
 .tvis svg{width:84px;height:84px}.tvis.car{width:auto;height:auto;border-radius:24px;padding:14px 18px;flex-direction:column;gap:12px}.tvis.car .carimg{width:190px;max-width:60vw}
 .tvis.logo{width:auto;height:auto;border-radius:24px;padding:22px}.tvis.logo img{width:200px;max-width:60vw}
 .tourpips i:nth-child(2){animation-delay:.5s}.tourpips i:nth-child(3){animation-delay:1s}.tvis .hn svg{width:20px;height:20px}
+.tvis.modes{width:auto;height:auto;border-radius:24px;padding:16px;gap:12px;color:var(--muted)}.tvis.modes span{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 16px;border-radius:18px;border:2px solid var(--line)}.tvis.modes span.on{border-color:var(--accent);color:var(--accent)}.tvis.modes svg{width:46px;height:46px}.tvis.modes b{font-weight:500;font-size:.95rem}
+.tourfuel{display:flex;align-items:center;gap:8px;width:190px;max-width:60vw}.tourfuel .fseg i{height:14px}.tourfuel .pump svg{width:24px;height:24px}
+.tvis.strip{width:100%;height:auto;border-radius:18px;padding:10px 0;display:flex;align-items:stretch;gap:0;background:linear-gradient(#1c2c34,#142127);overflow:hidden;position:relative}
+.tree{flex:none;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:0 10px;background:#0b1418}.tree i{width:14px;height:14px;border-radius:50%;background:#2a3338}
+.tree i:nth-child(1){animation:lr 4s infinite}.tree i:nth-child(2){animation:ly 4s infinite}.tree i:nth-child(3){animation:lg 4s infinite}
+@keyframes lr{5%,20%{background:#e5484d;box-shadow:0 0 8px #e5484d}0%,25%,100%{background:#2a3338;box-shadow:none}}
+@keyframes ly{25%,40%{background:#ffd04d;box-shadow:0 0 8px #ffd04d}0%,20%,45%,100%{background:#2a3338;box-shadow:none}}
+@keyframes lg{45%,90%{background:#4ade80;box-shadow:0 0 8px #4ade80}0%,40%,95%,100%{background:#2a3338;box-shadow:none}}
+.lanes{flex:1;display:flex;flex-direction:column;gap:6px;padding:4px 0}.lane{height:46px;position:relative;border-bottom:2px dashed rgba(255,255,255,.18)}.lane:last-child{border-bottom:0}
+.lane .carimg{position:absolute;left:4px;top:3px;width:72px;height:40px;object-fit:contain}
+.lane .tc1{animation:drive1 4s infinite}.lane .tc2{animation:drive2 4s infinite}
+@keyframes drive1{0%,45%{transform:translateX(0)}88%,100%{transform:translateX(calc(100% + 40px))}}
+@keyframes drive2{0%,45%{transform:translateX(0)}88%,100%{transform:translateX(calc(100% + 10px))}}
+.fin{flex:none;width:30px;position:relative;background:repeating-conic-gradient(#fff 0 25%,#111 0 50%) 0 0/10px 10px;opacity:.85}.fin span{position:absolute;right:34px;top:2px;font-size:.75rem;font-weight:600;color:var(--xp);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.tree i,.lane .carimg{animation:none}}
 .tdots{display:flex;gap:8px;justify-content:center}.tdots i{width:10px;height:10px;border-radius:50%;background:var(--line)}.tdots i.on{background:var(--accent);width:26px;border-radius:5px}
 .tsay{align-self:center;width:56px;height:56px;border-radius:50%;border:2px solid var(--line);background:none;color:var(--text);display:flex;align-items:center;justify-content:center}.tsay svg{width:28px;height:28px}
 .hn{flex:none;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:1.1rem}
@@ -679,10 +694,12 @@ var IC_LIST='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 var IC_MIC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/></svg>';
 var IC_SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
 /* Kurze Einführung beim ersten Start: ein Bild, zwei Wörter, die Stimme erklärt */
-var TOUR=[{h:'Hallo!',s:'tour1',v:'logo'},{h:'Zuhören',s:'tour2',v:'ear'},{h:'Laut lesen',s:'tour3',v:'mic'},{h:'Dich anhören',s:'tour4',v:'tap'},{h:'Tank voll: Rennen!',s:'tour5',v:'car'}],TI=0;
+var TOUR=[{h:'Hallo!',s:'tour1',v:'logo'},{h:'Allein oder zu zweit',s:'tour6',v:'mode'},{h:'Zuhören',s:'tour2',v:'ear'},{h:'Laut lesen',s:'tour3',v:'mic'},{h:'Dich anhören',s:'tour4',v:'tap'},{h:'Tank füllen',s:'tour5',v:'car'},{h:'Rennen über ¼ Meile',s:'tour7',v:'race'}],TI=0;
 function tourOpen(i){TI=i||0;var x=TOUR[TI],last=TI===TOUR.length-1,vis;
   if(x.v==='logo')vis='<div class="tvis logo"><img alt="Readster" src="'+LOGO+'"></div>';
-  else if(x.v==='car')vis='<div class="tvis car">'+stageHTML(Math.max(CAR0,rankOf(lvl(S.xp))))+'<div class="pips big tourpips" aria-hidden="true"><i class="on"></i><i class="on new"></i><i class="on new"></i></div><span class="hn">'+IC_FLAG+'</span></div>';
+  else if(x.v==='car')vis='<div class="tvis car">'+stageHTML(Math.max(CAR0,rankOf(lvl(S.xp))))+'<div class="tourfuel"><span class="pump">'+IC_PUMP+'</span><span class="fseg tourpips"><i class="on new"></i><i class="on new"></i><i class="on new"></i></span></div></div>';
+  else if(x.v==='mode')vis='<div class="tvis modes"><span class="'+(MODE!=='partner'?'on':'')+'">'+IC_SOLO+'<b>Allein</b></span><span class="'+(MODE==='partner'?'on':'')+'">'+IC_DUO+'<b>Zu zweit</b></span></div>';
+  else if(x.v==='race')vis='<div class="tvis strip" aria-hidden="true"><div class="tree"><i></i><i></i><i></i></div><div class="lanes"><div class="lane">'+carImg(RSTAGES[CAR0].car,'tc1')+'</div><div class="lane">'+carImg(RSTAGES[CAR0+1].car,'tc2')+'</div></div><div class="fin"><span>¼ Meile</span></div></div>';
   else vis='<div class="tvis">'+({ear:IC_EAR,mic:IC_MIC,tap:IC_TAP})[x.v]+'</div>';
   var d='<div class="tdots" aria-hidden="true">';for(var k=0;k<TOUR.length;k++)d+='<i class="'+(k===TI?'on':'')+'"></i>';d+='</div>';
   openBox('#modal','<div class="card tour">'+d+vis+'<h2>'+x.h+'</h2><button class="tsay" data-a="tourSay" aria-label="Nochmal hören">'+IC_SPK+'</button><button class="btn wide" data-a="'+(last?'tourEnd':'tourNext')+'">'+(last?'Los geht’s':'Weiter')+'</button>'+(last?'':'<button class="link" data-a="tourEnd">Überspringen</button>')+'</div>');
