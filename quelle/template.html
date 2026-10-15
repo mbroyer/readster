@@ -694,13 +694,17 @@ var IC_LIST='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 var IC_MIC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/></svg>';
 var IC_SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
 /* Kurze Einführung beim ersten Start: ein Bild, zwei Wörter, die Stimme erklärt */
-var TOUR=[{h:'Hallo!',s:'tour1',v:'logo'},{h:'Allein oder zu zweit',s:'tour6',v:'mode'},{h:'Zuhören',s:'tour2',v:'ear'},{h:'Laut lesen',s:'tour3',v:'mic'},{h:'Dich anhören',s:'tour4',v:'tap'},{h:'Tank füllen',s:'tour5',v:'car'},{h:'Rennen über ¼ Meile',s:'tour7',v:'race'}],TI=0;
-function tourOpen(i){TI=i||0;var x=TOUR[TI],last=TI===TOUR.length-1,vis;
+/* Die Mitte der Einführung hängt vom Modus ab: allein mit Aufnahme, zu zweit Satz für Satz ohne Aufnahme */
+function tourList(){return [{h:'Hallo!',s:'tour1',v:'logo'},{h:'Allein oder zu zweit',s:'tour6',v:'mode'}].concat(MODE==='partner'?
+  [{h:'Partner liest vor',s:'tourp1',v:'ear'},{h:'Du liest nach',s:'tourp2',v:'solo'},{h:'Schwere Wörter',s:'tourp3',v:'tap'}]:
+  [{h:'Zuhören',s:'tour2',v:'ear'},{h:'Laut lesen',s:'tour3',v:'mic'},{h:'Dich anhören',s:'tour4',v:'tap'}]).concat([{h:'Tank füllen',s:'tour5',v:'car'},{h:'Rennen über ¼ Meile',s:'tour7',v:'race'}]);}
+var TOUR=tourList(),TI=0;
+function tourOpen(i){TI=i||0;if(!TI)TOUR=tourList();var x=TOUR[TI],last=TI===TOUR.length-1,vis;
   if(x.v==='logo')vis='<div class="tvis logo"><img alt="Readster" src="'+LOGO+'"></div>';
   else if(x.v==='car')vis='<div class="tvis car">'+stageHTML(Math.max(CAR0,rankOf(lvl(S.xp))))+'<div class="tourfuel"><span class="pump">'+IC_PUMP+'</span><span class="fseg tourpips"><i class="on new"></i><i class="on new"></i><i class="on new"></i></span></div></div>';
   else if(x.v==='mode')vis='<div class="tvis modes"><span class="'+(MODE!=='partner'?'on':'')+'">'+IC_SOLO+'<b>Allein</b></span><span class="'+(MODE==='partner'?'on':'')+'">'+IC_DUO+'<b>Zu zweit</b></span></div>';
   else if(x.v==='race')vis='<div class="tvis strip" aria-hidden="true"><div class="tree"><i></i><i></i><i></i></div><div class="lanes"><div class="lane">'+carImg(RSTAGES[CAR0].car,'tc1')+'</div><div class="lane">'+carImg(RSTAGES[CAR0+1].car,'tc2')+'</div></div><div class="fin"><span>¼ Meile</span></div></div>';
-  else vis='<div class="tvis">'+({ear:IC_EAR,mic:IC_MIC,tap:IC_TAP})[x.v]+'</div>';
+  else vis='<div class="tvis">'+({ear:IC_EAR,mic:IC_MIC,tap:IC_TAP,solo:IC_SOLO})[x.v]+'</div>';
   var d='<div class="tdots" aria-hidden="true">';for(var k=0;k<TOUR.length;k++)d+='<i class="'+(k===TI?'on':'')+'"></i>';d+='</div>';
   openBox('#modal','<div class="card tour">'+d+vis+'<h2>'+x.h+'</h2><button class="tsay" data-a="tourSay" aria-label="Nochmal hören">'+IC_SPK+'</button><button class="btn wide" data-a="'+(last?'tourEnd':'tourNext')+'">'+(last?'Los geht’s':'Weiter')+'</button>'+(last?'':'<button class="link" data-a="tourEnd">Überspringen</button>')+'</div>');
   say(x.s,250);}
