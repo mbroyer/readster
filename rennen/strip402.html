@@ -3434,7 +3434,7 @@ function embIntro(){
   if(o.night)h+='<p class="etip">Heute fährst du in der Nacht.</p>';
   if(o.rv)h+='<div class="equote"><small>'+embEsc(o.rv.who)+' sagt:</small>'+embEsc(o.rv.quote.replace(/[„“]/g,''))+'</div>';
   if(o.prac)h+='<p class="etip">Ein Dragrace geht geradeaus. Vollgas bis ins Ziel! Erst übst du allein, dann kommt das echte Rennen.</p>';
-  h+='<button class="ebtn go" type="button" data-e="race">'+EMB_PLAY+(o.prac?'Proberunde':'Start')+'</button><button class="ebtn ghost" type="button" data-e="close">Zurück</button>';
+  h+='<button class="ebtn go" type="button" data-e="race">'+EMB_PLAY+(o.prac?'Üben':'Start')+'</button><button class="ebtn ghost" type="button" data-e="close">Zurück</button>';
   embCard(h);
   var cv=$('emb').querySelector('.ecar');if(cv)drawPv(cv,SPECS[carIdx(o.car)],true);
 }
