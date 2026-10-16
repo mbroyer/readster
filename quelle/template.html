@@ -292,6 +292,9 @@ ul.howto{margin:0;padding-left:1.2em;color:var(--muted);font-weight:500;font-siz
 .rtext.syl-on .sy.s0{color:var(--sy-a)}
 .rtext.syl-on .sy.s1{color:var(--sy-b)}
 .rtext .w.now{background:var(--warn-bg);box-shadow:0 0 0 3px var(--accent)}
+.rtext{position:relative;isolation:isolate}.rtext.finger{touch-action:none;-webkit-user-select:none;user-select:none}
+.rtext .w.fw{background:color-mix(in srgb,var(--xp) 30%,transparent);box-shadow:inset 0 -4px 0 var(--xp)}
+.lruler{position:absolute;left:-8px;right:-8px;border-radius:10px;background:color-mix(in srgb,var(--accent) 12%,transparent);pointer-events:none;z-index:-1;transition:top .12s}
 .rtext.marking .w{cursor:pointer}
 .rtext.seek .w{cursor:pointer}
 .rtext .w.st{background:var(--bad-bg);text-decoration:underline wavy var(--bad);text-underline-offset:6px}
@@ -587,7 +590,7 @@ TEXTS.forEach(function(t){
 });
 (function(){var ds=TEXTS.map(function(t){return t.diff;}).sort(function(a,b){return a-b;}),med=ds[Math.floor(ds.length/2)];TEXTS.forEach(function(t){t.stars=t.diff>=med?2:1;});})();
 /* ---------- Zustand ---------- */
-function defaults(){return {ts:0,whNote:'',xp:0,fuel:0,rcar:'',rbest:{},done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Lexend',lx:1,size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1,whv:0,voice:true,sfx:true},raceIntro:0,tour:0,tourSeen:{}};}
+function defaults(){return {ts:0,whNote:'',xp:0,fuel:0,rcar:'',rbest:{},done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Lexend',lx:1,size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1,whv:0,voice:true,sfx:true,live:false},raceIntro:0,tour:0,tourSeen:{}};}
 function fixState(d){
   /* Ältere Stände: gesammelte Wörter in den Wort-Jäger übernehmen */
   Object.keys(d.stolper||{}).forEach(function(w){if(!d.wj[w])d.wj[w]={n:d.stolper[w],ok:[],done:false};});
@@ -985,8 +988,8 @@ function renderCtl(){
     h+='<button class="link" data-a="cancel">Beenden</button>';
   }else if(R.phase==='timing'){
     dk='<button class="btn wide stop" data-a="stop"><i></i>Fertig</button>';
-    top=R.recOn?'<div class="recbar" role="status"><span class="pulse"></span><div><b>Aufnahme läuft</b><span>Lies laut bis zum Ende.</span></div></div>':
-      '<div class="recbar off" role="status"><div><b>Lies jetzt laut</b><span>Bis zum Ende, dann „Fertig“.</span></div></div>';
+    top=R.recOn?'<div class="recbar" role="status"><span class="pulse"></span><div><b>Aufnahme läuft</b><span>Lies laut bis zum Ende. Dein Finger kann mitlesen.</span></div></div>':
+      '<div class="recbar off" role="status"><div><b>Lies jetzt laut</b><span>Bis zum Ende, dann „Fertig“. Dein Finger kann mitlesen.</span></div></div>';
     if(!R.recOn&&R.recTried&&S.set.rec)h+='<p class="hint">'+esc(recFailText())+'</p>';
     h+='<button class="link" data-a="cancel">Abbrechen</button>';
   }else if(R.phase==='count'){
@@ -1028,6 +1031,7 @@ function renderCtl(){
     h+='</div>';
   }
   c.innerHTML=h;setDock(dk);var rt=$('#rtop');if(rt)rt.innerHTML=top;
+  var rx=$('#rtext');if(rx)rx.classList.toggle('finger',R.phase==='timing');if(R.phase!=='timing'){fingClear();liveStop();}
   if(R.phase==='mark'){if(R.ms==='listen')fillRec($('#recm'),t.id,true);updateMarkInfo();}else{var os=document.querySelectorAll('#rtext .w.sug,#rtext .w.srm');for(var oi=0;oi<os.length;oi++)os[oi].classList.remove('sug','srm');}
 }
 /* Vorlesen */
@@ -1433,7 +1437,45 @@ function recGet(k){k=rk(k);return recDB().then(function(db){if(!db)return REC.me
 function recMine(k){k=String(k);return CODE?k.indexOf(CODE+'|')===0:k.indexOf('|')<0;}
 function recDelAll(){Object.keys(REC.mem).forEach(function(k){if(recMine(k))delete REC.mem[k];});S.recN={};save();return recDB().then(function(db){if(!db)return;return new Promise(function(r){try{var x=db.transaction('r','readwrite'),st=x.objectStore('r'),q=st.openCursor();q.onsuccess=function(){var cu=q.result;if(!cu)return;if(recMine(cu.key))cu.delete();cu.continue();};x.oncomplete=r;x.onerror=r;x.onabort=r;}catch(e){r();}});});}
 function recCleanup(){if(REC.stream){REC.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});REC.stream=null;}}
-function recGo(){var r=REC.rec;if(r&&r.state==='inactive'){try{r.start();}catch(e){}}}
+/* ---------- Mitlesen mit dem Finger: Wort unter dem Finger markieren, Zeile hervorheben ---------- */
+var FG={w:null,bar:null};
+function fingClear(){if(FG.w)FG.w.classList.remove('fw');FG.w=null;if(FG.bar){FG.bar.remove();FG.bar=null;}}
+function fingAt(x,y){
+  var tx=$('#rtext');if(!tx||!tx.classList.contains('finger'))return;
+  var w=null;[0,-18,-34,12].some(function(d){var e=document.elementFromPoint(x,y+d);w=e&&e.closest&&e.closest('#rtext .w');return !!w;});
+  if(!w||w===FG.w)return;
+  if(FG.w)FG.w.classList.remove('fw');FG.w=w;w.classList.add('fw');
+  if(!FG.bar||!FG.bar.isConnected){FG.bar=document.createElement('i');FG.bar.className='lruler';tx.appendChild(FG.bar);}
+  FG.bar.style.top=(w.offsetTop-4)+'px';FG.bar.style.height=(w.offsetHeight+8)+'px';
+  /* Am unteren oder oberen Rand von selbst weiterscrollen, weil der Finger auf dem Text nicht scrollt */
+  var r=w.getBoundingClientRect(),dk=$('#dock'),lim=innerHeight-((dk&&!dk.hidden)?dk.offsetHeight:0)-90;
+  if(r.bottom>lim)window.scrollBy({top:r.bottom-lim+60,behavior:'smooth'});else if(r.top<90)window.scrollBy({top:r.top-150,behavior:'smooth'});
+}
+document.addEventListener('pointerdown',function(e){if(e.target.closest&&e.target.closest('#rtext.finger'))fingAt(e.clientX,e.clientY);});
+document.addEventListener('pointermove',function(e){if(e.pointerType==='mouse'&&!e.buttons)return;if(e.target.closest&&e.target.closest('#rtext.finger'))fingAt(e.clientX,e.clientY);});
+/* ---------- Mitlesen per Sprache (Test): Spracherkennung des Browsers, Abgleich mit dem Text ---------- */
+var LIVE_OK=!!(window.SpeechRecognition||window.webkitSpeechRecognition),LV=null;
+function lvNorm(x){return String(x).toLowerCase().replace(/[^a-zäöüß0-9]/g,'');}
+function lvNear(a,b){if(!a||!b)return false;if(a===b)return true;if(a.length>3&&b.length>3&&(a.indexOf(b)===0||b.indexOf(a)===0))return true;
+  if(Math.abs(a.length-b.length)>1||a.length<4)return false;var d=0,i=0,j=0;while(i<a.length&&j<b.length){if(a[i]===b[j]){i++;j++;continue;}if(++d>1)return false;if(a.length>b.length)i++;else if(b.length>a.length)j++;else{i++;j++;}}return d+(a.length-i)+(b.length-j)<=1;}
+function liveStart(){
+  if(!LIVE_OK||LV||!R||!R.t)return;var C=window.SpeechRecognition||window.webkitSpeechRecognition,t=R.t;
+  LV={on:true,p:0,base:0,tw:t.words.slice(0,t.rs).map(function(w){return lvNorm(w.sy.join(''));}),rr:R};
+  function run(){
+    if(!LV||!LV.on)return;var r;try{r=new C();}catch(e){LV=null;return;}LV.r=r;LV.base=LV.p;
+    r.lang='de-DE';r.continuous=true;r.interimResults=true;
+    r.onresult=function(ev){if(!LV||LV.rr!==R)return;var txt='';for(var i=0;i<ev.results.length;i++)txt+=' '+ev.results[i][0].transcript;
+      var hw=txt.split(/\s+/).map(lvNorm).filter(Boolean),p=LV.base;
+      hw.forEach(function(h){for(var j=p;j<Math.min(LV.tw.length,p+5);j++){if(lvNear(h,LV.tw[j])){p=j+1;break;}}});
+      if(p!==LV.p){LV.p=p;var o=document.querySelectorAll('#rtext .w.now');for(var k=0;k<o.length;k++)o[k].classList.remove('now');var w=$('#rtext .w[data-i="'+(p-1)+'"]');if(w)w.classList.add('now');}};
+    r.onerror=function(ev){if(ev&&(ev.error==='not-allowed'||ev.error==='service-not-allowed')&&LV)LV.on=false;};
+    r.onend=function(){if(LV&&LV.on&&LV.rr===R&&R.phase==='timing')setTimeout(run,150);};
+    try{r.start();}catch(e){}
+  }
+  run();
+}
+function liveStop(){if(!LV)return;LV.on=false;try{LV.r&&LV.r.abort();}catch(e){}LV=null;var o=document.querySelectorAll('#rtext .w.now');for(var k=0;k<o.length;k++)o[k].classList.remove('now');}
+function recGo(){var r=REC.rec;if(r&&r.state==='inactive'){try{r.start();}catch(e){}}if(S.set.live)liveStart();}
 function recStart(defer){
   REC.fail='';
   if(!S.set.rec)return Promise.resolve(false);
@@ -1448,7 +1490,7 @@ function recStart(defer){
   }).catch(function(e){REC.fail=(e&&e.name)||'Fehler';recCleanup();return false;});
 }
 function recStop(keep){
-  REC.want=false;
+  liveStop();REC.want=false;
   return new Promise(function(res){
     var r=REC.rec;REC.rec=null;
     if(!r||r.state==='inactive'){recCleanup();res(null);return;}
@@ -1841,7 +1883,8 @@ function renderSheet(){
   h+='<section class="sgrp"><h3>Ton</h3>'+tg('voice','Sprach-Hinweise','Die Stimme sagt, was zu tun ist.')+tg('sfx','Töne und Musik','Klicks auf Knöpfen, Beat nach jeder geschafften Übung.')+'</section>';
   h+='<section class="sgrp"><h3>Aufnahme und Auswertung</h3>'+tg('rec','Aufnahme beim Lesen','Bleibt nur auf diesem Gerät.','<button class="link" id="delRecsBtn" data-a="delRecs">Alle Aufnahmen löschen</button>')+
     tg('wh','Stockstellen erkennen',(WH_SERVER?'Die Aufnahme geht kurz an Cloudflare und wird dort nicht gespeichert.':'Lädt einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB, danach läuft alles auf dem Gerät.'),'<span class="hint fb" id="whst">'+esc(s.wh?whStatus():'')+'</span>')+
-    tg('nums','Tempo-Zahlen zeigen','Aus: nur „schneller als beim ersten Mal“.')+'</section>';
+    tg('nums','Tempo-Zahlen zeigen','Aus: nur „schneller als beim ersten Mal“.')+
+    tg('live','Mitlesen per Sprache (Test)',LIVE_OK?'Beim lauten Lesen markiert die App das Wort, bei dem das Kind gerade ist. Der Ton geht dafür an Apple oder Google.':'Dieser Browser kann das leider nicht.')+'</section>';
   h+='<section class="sgrp"><h3>Hilfe</h3><details class="howto-d"><summary>So funktioniert Readster</summary><ul class="howto"><li>Zuhören, dann selbst laut lesen (mit Aufnahme).</li><li>Danach: Gesicht wählen, Tempo ansehen, sich selbst anhören und schwere Wörter antippen.</li><li>Zwei Fragen zum Text.</li><li>Jeder Text füllt den Tank. Drei Texte: ein Rennen. Neue Autos kommen mit der Zeit dazu.</li><li>Schwere Wörter landen im Wort-Jäger und werden an mehreren Tagen geübt.</li></ul></details><button class="link" data-a="tourAgain">Einführung nochmal zeigen</button></section>';
   /* Zum Ausprobieren der Rennen: Level springen und Tank füllen (ändert den echten Fortschritt dieses Codes) */
   var Lc=lvl(S.xp);
@@ -2003,7 +2046,7 @@ document.addEventListener('click',function(e){
     case 'card':var t=byId[v];openBox('#modal','<div class="card">'+cardHTML(t,true)+'<div class="cfbtns"><button class="btn ghost" data-a="closeModal">Schließen</button><button class="btn" data-a="nextread" data-v="'+t.id+'">Nochmal lesen</button></div></div>');break;
     case 'closeModal':stopListen();closeBox('#modal');break;
     case 'settings':renderSheet();break;
-    case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl'||k==='rec'||k==='nums'||k==='wh'||k==='voice'||k==='sfx')val=(v==='true');S.set[k]=val;save();if(k==='wh'&&val)whPreload();renderSheet();readStyle();break;
+    case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl'||k==='rec'||k==='nums'||k==='wh'||k==='voice'||k==='sfx'||k==='live')val=(v==='true');S.set[k]=val;save();if(k==='wh'&&val)whPreload();renderSheet();readStyle();break;
     case 'sheetOk':closeBox('#sheet');break;
     case 'reset':renderReset();break;
     case 'dbgLv':S.xp=XPK*(+v-1)*(+v-1);var ds=RSTAGES[rankOf(+v)];if(ds.car)S.rcar=ds.car;save();renderSheet();renderHome();break;
