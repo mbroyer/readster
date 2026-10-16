@@ -2264,9 +2264,11 @@ var Snd=(function(){
   /* Version 77: Ton beim ersten echten Tippen freischalten (iPhone/Safari zählt nur touchend/click, nicht pointerdown). true = war noch gesperrt */
   /* Version 79: App im Hintergrund oder iPhone gesperrt = Ton sofort aus, beim Zurückkommen wieder an */
   S.sleep=function(h){if(!ac)return;try{if(h)ac.suspend();else if(S.on)ac.resume();}catch(e){}};
-  function vis(){S.sleep(document.hidden);if(document.hidden){try{speechSynthesis.cancel();}catch(e){}}}
+  function vis(){S.sleep(document.hidden);if(document.hidden){try{speechSynthesis.cancel();}catch(e){}try{kvStop();}catch(e){}}}
+  /* Kurze Töne statt Musik: so zeigt das iPhone keinen Player im Sperrbildschirm */
+  try{if(navigator.audioSession)navigator.audioSession.type='transient';}catch(e){}
   document.addEventListener('visibilitychange',vis);
-  window.addEventListener('pagehide',function(){S.sleep(true);});
+  window.addEventListener('pagehide',function(){S.sleep(true);try{kvStop();}catch(e){}});
   window.addEventListener('pageshow',function(){if(!document.hidden)S.sleep(false);});
   S.unlock=function(){if(!init())return false;var was=ac.state==='running';if(!was){try{ac.resume();}catch(e){}}return !was;};
   S.setOn=function(o){S.on=o;if(master)master.gain.value=o?0.6:0;};
@@ -3793,7 +3795,9 @@ var KTXT={
   rganz:'Schieb das Gas ganz nach oben. Vollgas!'
 };
 var KV={el:null,tok:0};
-function kvStop(){KV.tok++;if(KV.el){try{KV.el.pause();}catch(e){}KV.el=null;}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
+/* Stimme ganz freigeben (pause allein lässt auf dem iPhone den Player im Sperrbildschirm stehen) */
+function kvRel(a){if(!a)return;try{a.onended=null;a.onerror=null;a.pause();a.removeAttribute('src');a.load();}catch(e){}}
+function kvStop(){KV.tok++;if(KV.el){kvRel(KV.el);KV.el=null;}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
 function kvTts(t,done){
   try{if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){if(done)done();return;}
     var u=new SpeechSynthesisUtterance(t);u.lang='de-DE';u.rate=0.95;
@@ -3811,7 +3815,7 @@ function kidVoice(ids,done){
     var id=ids[i],next=function(){if(tok===KV.tok)setTimeout(function(){one(i+1);},250);};
     if(!EMB.hv){kvTts(KTXT[id],next);return;}
     var a=new Audio(EMB.hv+'hinweis-'+id+'.mp3'),fell=false,fb=function(){if(fell||tok!==KV.tok)return;fell=true;kvTts(KTXT[id],next);};
-    KV.el=a;a.onended=next;a.onerror=fb;
+    KV.el=a;a.onended=function(){if(KV.el===a)KV.el=null;kvRel(a);next();};a.onerror=fb;
     var p=a.play();if(p&&p.catch)p.catch(function(e){if(!(e&&e.name==='NotAllowedError'))fb();});
   })(0);
 }

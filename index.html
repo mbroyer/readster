@@ -1326,6 +1326,9 @@ function sfxFanfare(){if(!sfxOn())return 0;var ac=sfxAC();if(!ac)return 0;var t0
   return 2500;}
 /* Medien freigeben, damit iOS sie nicht auf dem Sperrbildschirm anzeigt */
 function relA(a){if(!a)return;try{a.onended=null;a.pause();a.removeAttribute('src');a.load();}catch(e){}}
+/* iPhone: kurze Töne statt Musik, dann gibt es keinen Player im Sperrbildschirm. Bei der Aufnahme braucht es play-and-record */
+function aSess(t){try{if(navigator.audioSession&&navigator.audioSession.type!==t)navigator.audioSession.type=t;}catch(e){}}
+aSess('transient');
 function mediaOff(){try{if('mediaSession' in navigator){navigator.mediaSession.metadata=null;navigator.mediaSession.playbackState='none';}}catch(e){}}
 /* Spielt einen Teil (a = Geschichte, b = Rätsel) ab Wort "from" bis vor Wort "to". onIdx bekommt das gerade gesprochene Wort. */
 function playPart(id,pk,from,to,onIdx,onFail){
@@ -1605,7 +1608,7 @@ function recGet(k){k=rk(k);return recDB().then(function(db){if(!db)return REC.me
 /* Löscht nur die Aufnahmen des aktuellen Codes (ohne Code: die ohne Code) */
 function recMine(k){k=String(k);return CODE?k.indexOf(CODE+'|')===0:k.indexOf('|')<0;}
 function recDelAll(){Object.keys(REC.mem).forEach(function(k){if(recMine(k))delete REC.mem[k];});S.recN={};save();return recDB().then(function(db){if(!db)return;return new Promise(function(r){try{var x=db.transaction('r','readwrite'),st=x.objectStore('r'),q=st.openCursor();q.onsuccess=function(){var cu=q.result;if(!cu)return;if(recMine(cu.key))cu.delete();cu.continue();};x.oncomplete=r;x.onerror=r;x.onabort=r;}catch(e){r();}});});}
-function recCleanup(){if(REC.stream){REC.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});REC.stream=null;}}
+function recCleanup(){if(REC.stream){REC.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});REC.stream=null;}aSess('transient');}
 /* ---------- Mitlesen mit dem Finger: Wort unter dem Finger markieren, Zeile hervorheben ---------- */
 var FG={w:null,bar:null};
 function fingClear(){if(FG.w)FG.w.classList.remove('fw');FG.w=null;if(FG.bar){FG.bar.remove();FG.bar=null;}}
@@ -1658,6 +1661,7 @@ function recStart(defer){
   REC.fail='';
   if(!S.set.rec)return Promise.resolve(false);
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){REC.fail='nicht unterstützt';return Promise.resolve(false);}
+  aSess('play-and-record');
   return navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){
     if(!REC.want){st.getTracks().forEach(function(t){try{t.stop();}catch(e){}});return false;}
     REC.stream=st;REC.chunks=[];
@@ -2273,7 +2277,7 @@ function goQuiet(){
   /* Läuft gerade eine Aufnahme oder der Countdown: Runde abbrechen und das Mikrofon sofort freigeben */
   if(R&&(R.phase==='timing'||R.phase==='count')){recStop(false);recCleanup();cdHide();R.phase='read';R.msg='Das Lesen wurde unterbrochen. Starte einfach nochmal.';try{renderCtl();}catch(e){}R.msg='';}
   else if(REC.stream||REC.rec){recStop(false);recCleanup();}
-  sayStop();if(typeof stopListen==='function')stopListen();if(typeof plStop==='function')plStop();var ps=document.querySelectorAll('.plr');for(var i=0;i<ps.length;i++){if(ps[i]._a){relA(ps[i]._a);ps[i]._a=null;}}mediaOff();try{if(AC&&AC.state==='running')AC.suspend();}catch(e){}}
+  sayStop();if(typeof stopListen==='function')stopListen();if(typeof plStop==='function')plStop();var ps=document.querySelectorAll('.plr');for(var i=0;i<ps.length;i++){if(ps[i]._a){relA(ps[i]._a);ps[i]._a=null;}}mediaOff();/* Tonquelle ganz schließen, nur anhalten reicht dem iPhone nicht; sie wird beim nächsten Ton neu angelegt */try{if(AC){AC.close();AC=null;SFX.g=null;SFX.nb=null;}}catch(e){AC=null;SFX.g=null;SFX.nb=null;}}
 document.addEventListener('visibilitychange',function(){if(document.hidden)goQuiet();});
 window.addEventListener('pagehide',goQuiet);
 })();
