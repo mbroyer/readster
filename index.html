@@ -2257,7 +2257,11 @@ document.addEventListener('click',function(e){
   sfxClick(b.classList.contains('btn')&&!b.classList.contains('ghost'));
 },true);
 /* Telefon gesperrt oder App gewechselt: alles anhalten und freigeben, damit nichts auf dem Sperrbildschirm bleibt */
-function goQuiet(){sayStop();if(typeof stopListen==='function')stopListen();if(typeof plStop==='function')plStop();var ps=document.querySelectorAll('.plr');for(var i=0;i<ps.length;i++){if(ps[i]._a){relA(ps[i]._a);ps[i]._a=null;}}mediaOff();try{if(AC&&AC.state==='running')AC.suspend();}catch(e){}}
+function goQuiet(){
+  /* Läuft gerade eine Aufnahme oder der Countdown: Runde abbrechen und das Mikrofon sofort freigeben */
+  if(R&&(R.phase==='timing'||R.phase==='count')){recStop(false);recCleanup();cdHide();R.phase='read';R.msg='Das Lesen wurde unterbrochen. Starte einfach nochmal.';try{renderCtl();}catch(e){}R.msg='';}
+  else if(REC.stream||REC.rec){recStop(false);recCleanup();}
+  sayStop();if(typeof stopListen==='function')stopListen();if(typeof plStop==='function')plStop();var ps=document.querySelectorAll('.plr');for(var i=0;i<ps.length;i++){if(ps[i]._a){relA(ps[i]._a);ps[i]._a=null;}}mediaOff();try{if(AC&&AC.state==='running')AC.suspend();}catch(e){}}
 document.addEventListener('visibilitychange',function(){if(document.hidden)goQuiet();});
 window.addEventListener('pagehide',goQuiet);
 })();
