@@ -320,7 +320,7 @@ ul.howto{margin:0;padding-left:1.2em;color:var(--muted);font-weight:500;font-siz
 .sb i{display:block;height:12px;border-radius:6px;background:var(--accent);min-width:2px}
 table.tb{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:8px}table.tb td,table.tb th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}
 .fb{font-weight:600;color:var(--ink)}
-.sent.todo{opacity:.35}.sent.done{opacity:.65}
+.sent.todo{opacity:.35}.sent.done{opacity:.65}.lvs .sent.todo{opacity:.6}
 .sent.cur{background:var(--warn-bg);border-radius:10px;padding:2px 4px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .turn{display:flex;flex-direction:column;gap:2px;padding:12px 16px;border-radius:14px;border:2px solid var(--line);background:var(--surface)}
 .turn b{font-family:var(--f-display);font-size:1.3rem}
@@ -1461,23 +1461,32 @@ var LIVE_OK=!!(window.SpeechRecognition||window.webkitSpeechRecognition),LV=null
 function lvNorm(x){return String(x).toLowerCase().replace(/[^a-zäöüß0-9]/g,'');}
 function lvNear(a,b){if(!a||!b)return false;if(a===b)return true;if(a.length>3&&b.length>3&&(a.indexOf(b)===0||b.indexOf(a)===0))return true;
   if(Math.abs(a.length-b.length)>1||a.length<4)return false;var d=0,i=0,j=0;while(i<a.length&&j<b.length){if(a[i]===b[j]){i++;j++;continue;}if(++d>1)return false;if(a.length>b.length)i++;else if(b.length>a.length)j++;else{i++;j++;}}return d+(a.length-i)+(b.length-j)<=1;}
+function lvSent(p){var ss=R.t.sents,k=ss.length-1;for(var i=0;i<ss.length;i++){if(p<ss[i][1]){k=i;break;}}return k;}
+function lvShow(k){
+  if(!LV||LV.k===k)return;LV.k=k;var o=document.querySelectorAll('#rtext .sent');
+  for(var i=0;i<o.length;i++){o[i].classList.toggle('done',i<k);o[i].classList.toggle('cur',i===k);o[i].classList.toggle('todo',i>k);}
+  var c=$('#rtext .sent.cur');try{if(c&&k>0)c.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}
+}
 function liveStart(){
   if(!LIVE_OK||LV||!R||!R.t)return;var C=window.SpeechRecognition||window.webkitSpeechRecognition,t=R.t;
-  LV={on:true,p:0,base:0,tw:t.words.slice(0,t.rs).map(function(w){return lvNorm(w.sy.join(''));}),rr:R};
+  LV={on:true,p:0,base:0,k:-1,tw:t.words.slice(0,t.rs).map(function(w){return lvNorm(w.sy.join(''));}),rr:R};
+  /* Text in Sätze gliedern wie bei „Satz für Satz“: der Satz, bei dem das Kind gerade ist, ist hervorgehoben */
+  var tx=$('#rtext');if(tx){tx.innerHTML=sentHTML(t);tx.classList.add('lvs');}lvShow(0);
   function run(){
-    if(!LV||!LV.on)return;var r;try{r=new C();}catch(e){LV=null;return;}LV.r=r;LV.base=LV.p;
+    if(!LV||!LV.on)return;var r;try{r=new C();}catch(e){liveStop();return;}LV.r=r;LV.base=LV.p;
     r.lang='de-DE';r.continuous=true;r.interimResults=true;
     r.onresult=function(ev){if(!LV||LV.rr!==R)return;var txt='';for(var i=0;i<ev.results.length;i++)txt+=' '+ev.results[i][0].transcript;
       var hw=txt.split(/\s+/).map(lvNorm).filter(Boolean),p=LV.base;
-      hw.forEach(function(h){for(var j=p;j<Math.min(LV.tw.length,p+5);j++){if(lvNear(h,LV.tw[j])){p=j+1;break;}}});
-      if(p!==LV.p){LV.p=p;var o=document.querySelectorAll('#rtext .w.now');for(var k=0;k<o.length;k++)o[k].classList.remove('now');var w=$('#rtext .w[data-i="'+(p-1)+'"]');if(w)w.classList.add('now');}};
-    r.onerror=function(ev){if(ev&&(ev.error==='not-allowed'||ev.error==='service-not-allowed')&&LV)LV.on=false;};
+      hw.forEach(function(h){for(var j=p;j<Math.min(LV.tw.length,p+8);j++){if(lvNear(h,LV.tw[j])){p=j+1;break;}}});
+      if(p!==LV.p){LV.p=p;lvShow(lvSent(p));}};
+    r.onerror=function(ev){if(ev&&(ev.error==='not-allowed'||ev.error==='service-not-allowed'))liveStop();};
     r.onend=function(){if(LV&&LV.on&&LV.rr===R&&(R.phase==='timing'||R.phase==='count'))setTimeout(run,150);};
     try{r.start();}catch(e){}
   }
   run();
 }
-function liveStop(){if(!LV)return;LV.on=false;try{LV.r&&LV.r.abort();}catch(e){}LV=null;var o=document.querySelectorAll('#rtext .w.now');for(var k=0;k<o.length;k++)o[k].classList.remove('now');}
+function liveStop(){if(!LV)return;LV.on=false;try{LV.r&&LV.r.abort();}catch(e){}var rr=LV.rr;LV=null;
+  var tx=$('#rtext');if(tx&&tx.classList.contains('lvs')&&rr&&rr.t){tx.classList.remove('lvs');tx.innerHTML=textHTML(rr.t);}}
 function recGo(){var r=REC.rec;if(r&&r.state==='inactive'){try{r.start();}catch(e){}}if(S.set.mit)liveStart();}
 function recStart(defer){
   REC.fail='';
