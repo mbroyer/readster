@@ -175,6 +175,29 @@ details.adult.set[open]>div{display:flex;flex-direction:column;gap:16px;margin-t
 .gstage .carimg{width:104px;height:56px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 4px 4px rgba(0,0,0,.45))}
 .fuel{display:flex;align-items:center;gap:8px}.pump{flex:none;color:var(--good);display:flex}.pump svg{width:20px;height:20px}
 .fseg{flex:1;display:flex;gap:4px}.fseg i{flex:1;height:10px;border-radius:5px;background:var(--bg);border:1.5px solid var(--line)}.fseg i.on{background:var(--good);border-color:#2a9a5f}
+/* Startseite auf dem Tablet: Raster mit großer Lesekarte, Garage und Woche daneben, Themen darunter */
+.hgrid{display:flex;flex-direction:column;gap:18px}.tab{display:none}
+button.card{font:inherit;color:inherit;text-align:left;cursor:pointer;width:100%}
+.hwkh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.hwk .dots{display:flex;gap:6px}.hwk .dot{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.hnums{display:flex;gap:18px;margin-top:2px}.hnums span{font-size:.9rem;color:var(--muted);font-weight:500;display:flex;align-items:baseline;gap:6px}.hnums b{font-family:var(--f-display);font-size:1.7rem;color:var(--xp);line-height:1}
+.htopics{flex-direction:column;gap:10px}.htopics .cat{min-height:0}
+@media (min-width:700px){
+ .tab{display:flex}
+ .hgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch}.hgrid>.nxt{grid-column:1/-1}
+ #v-home .nxt{padding:24px;gap:18px}.nxt h2{font-size:1.8rem}.nxic{width:88px;height:88px;border-radius:24px}.nxic svg{width:52px;height:52px}
+ .nxt .btn.wide{min-height:64px;font-size:1.3rem}
+ #v-home .garage{padding:16px;justify-content:space-between}.garage .grow{flex-direction:column;align-items:stretch}
+ .gstage{width:auto;height:130px}.gstage .carimg{width:220px;height:110px}.gname{font-size:1.05rem}
+ #v-home .hwk{padding:16px;gap:14px;justify-content:space-between}#v-home .hwk .dot i{max-width:40px}#v-home .hwk .dot span{font-size:.8rem}
+ .htopics .cats{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .nxtl .link{display:none}.nxtl:not(:has(.wjcta)){display:none}
+}
+@media (min-width:1000px){
+ .app:has(#v-home:not([hidden])){max-width:1040px}
+ .hgrid{grid-template-columns:1.35fr 1fr}.hgrid>.nxt{grid-column:1;grid-row:1/3;justify-content:center;padding:32px}
+ .nxt .nxth{flex-direction:column;align-items:flex-start;gap:18px}.nxic{width:112px;height:112px;border-radius:30px}.nxic svg{width:66px;height:66px}.nxt h2{font-size:2.1rem}
+ .htopics .cats{grid-template-columns:repeat(6,minmax(0,1fr))}
+}
 .garage.full .fseg i{animation:fglow 1.4s ease-in-out infinite alternate}@keyframes fglow{to{box-shadow:0 0 12px var(--good)}}
 .fbar{flex:1;height:10px;border-radius:5px;background:var(--bg);border:1.5px solid var(--line);overflow:hidden}.fbar i{display:block;height:100%;background:var(--good)}
 .gline{display:flex;align-items:center;gap:6px;margin:0;font-weight:500;font-size:.9rem;line-height:1.25;color:var(--muted)}.gline svg{flex:none;width:16px;height:16px;color:var(--xp)}
@@ -938,14 +961,21 @@ function renderHome(){
   if(!sg)h+='<button class="btn wide" data-a="topics">Thema wählen</button>';
   if(!sg&&due)h+='<button class="wjcta" data-a="wj"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><circle cx="17" cy="17" r="11"/><path d="M25 25l10 10"/><path d="M12 17h10M17 12v10" stroke-width="2.6"/></svg><div><b>Wort-Jäger</b><span>'+Math.min(due,WJ_MAX)+(Math.min(due,WJ_MAX)===1?' Wort':' Wörter')+' zum Üben</span></div></button>';
   /* Nächster Text: Themen-Bild, Titel, ein großer Knopf. Thema wechseln und Wort-Jäger klein darunter. */
+  var nxt='';
   if(sg){var sc=CATS.filter(function(c){return c.id===sg.t.cat;})[0];
-    h+='<section class="card nxt" style="--c:'+(TILE[sg.t.cat]||'var(--accent)')+'"><div class="nxth"><span class="nxic" aria-hidden="true">'+(sc?sc.ic:'')+'</span><div><span class="eyebrow">'+esc(sg.t.cat)+'</span><h2>'+esc(sg.t.title)+'</h2></div></div>'+
+    nxt='<section class="card nxt" style="--c:'+(TILE[sg.t.cat]||'var(--accent)')+'"><div class="nxth"><span class="nxic" aria-hidden="true">'+(sc?sc.ic:'')+'</span><div><span class="eyebrow">'+esc(sg.t.cat)+'</span><h2>'+esc(sg.t.title)+'</h2></div></div>'+
       '<button class="btn wide" data-a="open" data-v="'+sg.t.id+'">Jetzt lesen</button>'+
       '<div class="nxtl"><button class="link" data-a="topics">Anderes Thema</button>'+(due?'<button class="wjcta sm" data-a="wj">'+IC_WJ+'<span><b>Wort-Jäger</b> · '+Math.min(due,WJ_MAX)+'</span></button>':'')+'</div></section>';}
   /* Garage unter dem Lesen: dunkler, damit „Jetzt lesen“ die Hauptsache bleibt */
-  h+=gar;
-  /* Fortschritt direkt auf der Startseite, Details per Antippen */
-  /* Fortschritt ohne Karte: große Zahlen direkt auf dem Hintergrund, darunter die Woche als Punkte */
+  /* Tablet: mehr Platz, also Woche und Themen gleich mit auf die Startseite. Auf dem Handy bleiben sie hinter den Knöpfen. */
+  var days=Object.keys(S.days).length;
+  var wkc='<button class="card wkcard hwk tab" data-a="stats" aria-label="Dein Fortschritt"><span class="hwkh"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></span><span class="dots">'+wk.arr.map(function(d){return '<span class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></span>';}).join('')+'</span>'+
+    '<span class="hnums"><span><b>'+n+'</b>'+(n===1?'Text':'Texte')+' gelesen</span><span><b>'+days+'</b>'+(days===1?'Tag':'Tage')+' geübt</span></span></button>';
+  h+='<div class="hgrid">'+nxt+gar+wkc+'</div>';
+  h+='<section class="htopics tab"><span class="eyebrow">Themen</span><div class="cats">'+CATS.map(function(c){
+    var tot=TEXTS.filter(function(t){return t.cat===c.id;}),d=tot.filter(function(t){return S.done[t.id];}).length;
+    return '<button class="cat" data-a="cat" data-v="'+c.id+'" style="--c:'+TILE[c.id]+'"><span class="ci">'+c.ic+'</span><b>'+c.id+'</b><span>'+d+' von '+tot.length+'</span></button>';
+  }).join('')+'</div></section>';
   h+='<div class="foot"><div class="madeby"><span>Made with love by</span><img alt="A Simple Man’s Lab" src="'+MADEBY+'"></div></div>';
   $('#v-home').innerHTML=h;
 }
