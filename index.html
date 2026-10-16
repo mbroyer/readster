@@ -180,7 +180,15 @@ details.adult.set[open]>div{display:flex;flex-direction:column;gap:16px;margin-t
 button.card{font:inherit;color:inherit;text-align:left;cursor:pointer;width:100%}
 .hwkh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.hwk .dots{display:flex;gap:6px}.hwk .dot{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
 .hnums{display:flex;gap:18px;margin-top:2px}.hnums span{font-size:.9rem;color:var(--muted);font-weight:500;display:flex;align-items:baseline;gap:6px}.hnums b{font-family:var(--f-display);font-size:1.7rem;color:var(--xp);line-height:1}
-.htopics{flex-direction:column;gap:10px}.htopics .cat{min-height:0}
+.htopics{display:flex;flex-direction:column;gap:10px}.htopics .cat{min-height:0}
+.nxtl .link{display:none}.nxtl:not(:has(.wjcta)){display:none}
+/* Handy: Themen als Reihe zum Wischen, nur Bild und Name */
+@media (max-width:699px){
+ .htopics .cats{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:16px;gap:10px;margin-inline:-16px;padding:2px 16px 8px;scrollbar-width:none}.htopics .cats::-webkit-scrollbar{display:none}
+ .htopics .cat{flex:none;width:92px;padding:10px 6px;align-items:center;text-align:center;gap:4px;scroll-snap-align:start;border-radius:16px}
+ .htopics .cat .ci{width:46px;height:46px;border-radius:14px;margin:0}.htopics .cat .ci svg{width:30px;height:30px}
+ .htopics .cat b{font-size:.95rem}.htopics .cat span:last-child{font-size:.75rem}
+}
 @media (min-width:700px){
  .tab{display:flex}
  .hgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch}.hgrid>.nxt{grid-column:1/-1}
@@ -190,7 +198,6 @@ button.card{font:inherit;color:inherit;text-align:left;cursor:pointer;width:100%
  .gstage{width:auto;height:130px}.gstage .carimg{width:220px;height:110px}.gname{font-size:1.05rem}
  #v-home .hwk{padding:16px;gap:14px;justify-content:space-between}#v-home .hwk .dot i{max-width:40px}#v-home .hwk .dot span{font-size:.8rem}
  .htopics .cats{grid-template-columns:repeat(3,minmax(0,1fr))}
- .nxtl .link{display:none}.nxtl:not(:has(.wjcta)){display:none}
 }
 @media (min-width:1000px){
  .app:has(#v-home:not([hidden])){max-width:1040px}
@@ -972,7 +979,7 @@ function renderHome(){
   var wkc='<button class="card wkcard hwk tab" data-a="stats" aria-label="Dein Fortschritt"><span class="hwkh"><span class="eyebrow">Diese Woche</span><span class="xptext">'+wk.n+' von '+WEEKGOAL+' Tagen</span></span><span class="dots">'+wk.arr.map(function(d){return '<span class="dot'+(d.on?' on':'')+(d.today?' today':'')+'"><i></i><span>'+d.lab+'</span></span>';}).join('')+'</span>'+
     '<span class="hnums"><span><b>'+n+'</b>'+(n===1?'Text':'Texte')+' gelesen</span><span><b>'+days+'</b>'+(days===1?'Tag':'Tage')+' geübt</span></span></button>';
   h+='<div class="hgrid">'+nxt+gar+wkc+'</div>';
-  h+='<section class="htopics tab"><span class="eyebrow">Themen</span><div class="cats">'+CATS.map(function(c){
+  h+='<section class="htopics"><span class="eyebrow">Themen</span><div class="cats">'+CATS.map(function(c){
     var tot=TEXTS.filter(function(t){return t.cat===c.id;}),d=tot.filter(function(t){return S.done[t.id];}).length;
     return '<button class="cat" data-a="cat" data-v="'+c.id+'" style="--c:'+TILE[c.id]+'"><span class="ci">'+c.ic+'</span><b>'+c.id+'</b><span>'+d+' von '+tot.length+'</span></button>';
   }).join('')+'</div></section>';
