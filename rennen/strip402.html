@@ -467,7 +467,7 @@ body:not(.emb) .ktip{font:600 19px/1.2 var(--f-display);letter-spacing:.02em}
 .slip .slbtn{display:block;width:100%;min-height:40px;margin-top:8px;border:1px dashed #8a909c;border-radius:8px;background:transparent;color:#15171c;font:600 15px var(--f-display);letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
 .slip .slx{margin-top:10px}.slip .slx[hidden]{display:none}
 /* Version 51: drei gleich große Spalten – Gas | Drehzahl | Los/Schalten */
-.hrow{display:grid;grid-template-columns:1fr var(--tw) 1fr;gap:6px;height:calc(var(--tw) + 62px)}
+.hrow{display:grid;grid-template-columns:minmax(0,1fr) var(--tw) minmax(0,1fr);gap:6px;height:calc(var(--tw) + 62px)}
 .hrow .dash{display:flex;flex-direction:column;gap:6px;justify-content:flex-end}
 .hrow .tbox{display:none}
 .hrow .box{padding:5px 8px 6px}.hrow .box .val{margin-top:2px;font-size:22px}.hrow .box .unit{display:inline;margin-left:4px}
@@ -593,6 +593,10 @@ body:not(.emb) .ktip{font:600 19px/1.2 var(--f-display);letter-spacing:.02em}
 .h-hero.drive{transform:translate3d(-50%,-110vh,0)}
 .home{transition:opacity .2s ease-out}.home.fade{opacity:0;pointer-events:none}
 @media (prefers-reduced-motion:reduce){.h-hero,.home,.h-mode{transition:none}}
+/* Version 74: Bedienelemente springen nicht mehr: feste Breite fuer das Zeitfeld, Pedal wird beim Gasgeben nicht schmaler */
+.hrow .dash .box:not(.tbox){width:100px;box-sizing:border-box;flex:none}
+.hrow .box .val{font-variant-numeric:tabular-nums;white-space:nowrap}
+.hrow .pdl{transform:translateY(calc(var(--g,0)*5px)) scaleY(calc(1 - var(--g,0)*.08));transform-origin:50% 100%}
 </style>
 
 <div id="stage">
@@ -1993,7 +1997,7 @@ function engInit(c){
 function launch(c){
   c.launched=true;c.t=0;c.launchT=T;
   c.launchRpm=c.isPlayer?c.rpm:c.launchRpm;
-  c.er=c.launchRpm;
+  c.er=c.launchRpm;c.dr=c.launchRpm;
   c.heatL=c.heat||0;c.ty=c.heatL;c.thrL=0.5;c.wt=0.3;
   c.spinK=Math.max(0,Math.min(1,(fwheel(c,0,c.launchRpm)/c.Ftr-1.1)/0.9))*(1-0.3*c.heatL);
   c.bog=c.launchRpm>=c.bogLim?1:Math.max(0.35,0.35+0.65*(c.launchRpm-c.e.idle)/(c.bogLim-c.e.idle));
@@ -2054,6 +2058,8 @@ function physics(c,dt){
     c.slip=(c.spinK>0.1&&c.t<1.6&&c.gear===0)||(sl>0.15&&c.t<3);
   }
   c.er=er;
+  // Version 74: Anzeige/Klang: beim Start sackt die Drehzahl nur leicht ab (Kupplung schleift) und steigt dann mit dem Tempo
+  c.dr=(c.gear===0&&!c.over&&c.shiftT<=0)?Math.max(er,c.launchRpm*(1-0.2*Math.min(1,c.t/0.18))):er;
   c.thrNow=(c.shiftT>0||c.over)?0:c.thrIn;
   if(c.braking){
     c.hop=false;c.bt=Math.min(1,(c.bt||0)+dt/0.35);
@@ -2214,7 +2220,7 @@ var Snd=(function(){
     return {v2:true,c:c,n:n,g:g,gq:gq,out:out,src:[nq],P:n.parameters};
   }
   function upd2(v,t){
-    var c=v.c,rpm=c.launched?c.er:c.rpm,thr=c.thrNow||0,cut0=(c.launched&&c.shiftT>0);
+    var c=v.c,rpm=c.launched?(c.dr||c.er):c.rpm,thr=c.thrNow||0,cut0=(c.launched&&c.shiftT>0);
     if(cut0)thr=0;
     var lim=c.lim&&thr>0.35&&!c.over&&!cut0;
     v.P.get('rpm').setTargetAtTime(rpm,t,0.01);v.P.get('thr').setTargetAtTime(thr,t,0.012);v.P.get('cut').setValueAtTime(lim?1:0,t);
@@ -2252,7 +2258,7 @@ var Snd=(function(){
     var t=ac.currentTime,k=0.035;
     vs.forEach(function(v){
       if(v.v2){upd2(v,t);return;}
-      var c=v.c,rpm=c.launched?c.er:c.rpm,thr=c.thrNow||0,f=Math.max(10,rpm/60*v.ch.p),lvl,cut,cut0=(c.launched&&c.shiftT>0);
+      var c=v.c,rpm=c.launched?(c.dr||c.er):c.rpm,thr=c.thrNow||0,f=Math.max(10,rpm/60*v.ch.p),lvl,cut,cut0=(c.launched&&c.shiftT>0);
       if(cut0){thr=0.04;if(!v.sh){v.sh=true;for(var i=0;i<2;i++)if(Math.random()<0.8)pop(v,0.03+Math.random()*0.12);}}else v.sh=false;
       cut=Math.min(4200,(320+rpm*0.32+thr*800)*v.ch.cut);
       lvl=0.2+0.5*thr;
@@ -2899,7 +2905,7 @@ function drawSkids(){
 function bodyMotion(dt){
   dt=Math.min(dt,0.033);
   cars.forEach(function(c){
-    var tgt=0,sh=0,thr=c.launched?c.thrNow:c.thrNow,w=24,z=0.32,rpm=c.launched?c.er:c.rpm;
+    var tgt=0,sh=0,thr=c.launched?c.thrNow:c.thrNow,w=24,z=0.32,rpm=c.launched?(c.dr||c.er):c.rpm;
     if(state==='ready'){c.vx=0;c.vy=0;c.vvy=0;return;}
     if(c.launched&&!c.over){
       tgt=-0.012*(c.wtK/0.37)*Math.max(-4,Math.min(12,c.acc));
@@ -3220,7 +3226,7 @@ function drawTach(){
   var cs=tach.clientWidth||190,s=Math.round(cs*dpr);if(tach.width!==s){tach.width=tach.height=s;}
   var g=tg,c=player,e=c.e,cx=95,cy=95,mx=Math.ceil((e.red+300)/1000)*1000;
   var a0=Math.PI*0.75,A=function(r){return a0+Math.PI*1.5*Math.min(r,mx)/mx;};
-  var r=c.launched?c.er:c.rpm,i,k,a,z=null;
+  var r=c.launched?(c.dr||c.er):c.rpm,i,k,a,z=null;
   g.setTransform(s/190,0,0,s/190,0,0);g.clearRect(0,0,190,190);
   g.fillStyle='rgba(9,12,20,.9)';g.beginPath();g.arc(cx,cy,92,0,6.2832);g.fill();
   g.lineWidth=2;g.strokeStyle=c.lim?'#ff3347':(c.boostT>0?'#ffd23f':'rgba(255,255,255,.28)');if(c.boostT>0)g.lineWidth=4;g.stroke();
