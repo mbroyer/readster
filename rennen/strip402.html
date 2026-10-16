@@ -598,6 +598,8 @@ body:not(.emb) .ktip{font:600 19px/1.2 var(--f-display);letter-spacing:.02em}
 .hrow .box .val{font-variant-numeric:tabular-nums;white-space:nowrap}
 .hrow .pdl{transform:translateY(calc(var(--g,0)*5px)) scaleY(calc(1 - var(--g,0)*.08));transform-origin:50% 100%}
 .hrow{touch-action:none}
+/* Version 80: kein Doppeltipp-Zoom auf dem iPhone */
+html,body{touch-action:manipulation}
 </style>
 
 <div id="stage">
@@ -2039,7 +2041,8 @@ function physics(c,dt){
   if(c.shiftT>0){c.shiftT-=dt;er=Math.max(c.e.idle,wr);}
   else if(!c.over){
     var sk=0;
-    if(c.gear===0&&c.t<TC){sk=1-c.t/TC;er=wr+Math.max(0,c.launchRpm-wr)*sk;}
+    /* Version 81: Kupplung schleift beim Start, bis die Räder die Drehzahl einholen: Motor sackt nur leicht ab statt auf Leerlauf (vorher wirkte das Anfahren wie Zeitlupe) */
+    if(c.gear===0&&!c.over)er=Math.max(wr,c.launchRpm*(1-0.2*Math.min(1,c.t/0.18)));
     er=Math.max(c.e.idle,er);
     if(er>=c.e.red){er=c.e.red;c.lim=true;}
     var Fw=torque(c,er)*c.eff*Rt/RW*(1+0.6*(WX.rho/1.2-1))*(1-(c.hl||0)*Math.pow(c.v/60,2));
@@ -3290,6 +3293,11 @@ gasZone.addEventListener('pointermove',function(e){if(gasZone._d)gasFrom(e);});
 /* Version 78: iPhone: tippt ein zweiter Finger auf Los, bricht Safari den Gas-Finger manchmal ab (pointercancel). Darum zählen hier auch die Touch-Ereignisse:
    solange ein Finger auf dem Pedal liegt, bleibt Gas aktiv, und das Pedal folgt dem Finger weiter. Außerdem keine Zoom-/Wischgesten in der Bedienleiste. */
 gasZone._t=0;
+/* Version 80: iPhone zoomt bei schnellem Doppeltipp (z. B. aufs Gas) hinein. Zweiter Tipp innerhalb 350 ms im Spiel wird darum nicht als Zoom-Geste durchgelassen, Pinch-Zoom im Spiel ist aus. */
+(function(){var lt=0,st=document.getElementById('stage');
+  st.addEventListener('touchend',function(e){var n=Date.now();if(n-lt<350&&e.cancelable&&e.touches.length===0){var t=e.target;if(!(t&&t.closest&&t.closest('input,textarea,select')))e.preventDefault();}lt=n;},{passive:false});
+  ['gesturestart','gesturechange'].forEach(function(ev){document.addEventListener(ev,function(e){e.preventDefault();});});
+  document.addEventListener('dblclick',function(e){e.preventDefault();});})();
 function gasTouch(e){var t=e.targetTouches;gasZone._t=t.length;if(t.length){var f=t[0];if(!gasZone._d){gasZone._d=true;gasZone._pk=0;}gasFrom(f);}else if(gasZone._d){gasZone._d=false;gasLvl=0;}}
 ['touchstart','touchmove','touchend','touchcancel'].forEach(function(ev){gasZone.addEventListener(ev,gasTouch,{passive:true});});
 (function(){var row=gasZone.parentNode;['touchstart','touchmove'].forEach(function(ev){row.addEventListener(ev,function(e){if(e.cancelable)e.preventDefault();},{passive:false});});
@@ -3784,9 +3792,7 @@ var KTXT={
   rganz:'Schieb das Gas ganz nach oben. Vollgas!'
 };
 var KV={el:null,tok:0};
-/* Ton freigeben, damit iOS keinen Player auf dem Sperrbildschirm zeigt */
-function kvRel(a){if(!a)return;try{a.onended=null;a.pause();a.removeAttribute('src');a.load();}catch(e){}try{if('mediaSession' in navigator){navigator.mediaSession.metadata=null;navigator.mediaSession.playbackState='none';}}catch(e){}}
-function kvStop(){KV.tok++;if(KV.el){kvRel(KV.el);KV.el=null;}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
+function kvStop(){KV.tok++;if(KV.el){try{KV.el.pause();}catch(e){}KV.el=null;}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
 function kvTts(t,done){
   try{if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){if(done)done();return;}
     var u=new SpeechSynthesisUtterance(t);u.lang='de-DE';u.rate=0.95;
@@ -3804,15 +3810,10 @@ function kidVoice(ids,done){
     var id=ids[i],next=function(){if(tok===KV.tok)setTimeout(function(){one(i+1);},250);};
     if(!EMB.hv){kvTts(KTXT[id],next);return;}
     var a=new Audio(EMB.hv+'hinweis-'+id+'.mp3'),fell=false,fb=function(){if(fell||tok!==KV.tok)return;fell=true;kvTts(KTXT[id],next);};
-    KV.el=a;a.onended=function(){if(KV.el===a){kvRel(a);KV.el=null;}next();};a.onerror=fb;
+    KV.el=a;a.onended=next;a.onerror=fb;
     var p=a.play();if(p&&p.catch)p.catch(function(e){if(!(e&&e.name==='NotAllowedError'))fb();});
   })(0);
 }
-
-/* Gesperrt oder App gewechselt: Stimme stoppen und Motorsound anhalten (geht beim nächsten Tippen weiter) */
-function kvQuiet(){kvStop();try{var d=Snd&&Snd._dbg&&Snd._dbg();if(d&&d.ac&&d.ac.state==='running')d.ac.suspend();}catch(e){}}
-document.addEventListener('visibilitychange',function(){if(document.hidden)kvQuiet();else{try{var d=Snd&&Snd._dbg&&Snd._dbg();if(d&&d.ac&&d.ac.state==='suspended')d.ac.resume().catch(function(){});}catch(e){}}});
-window.addEventListener('pagehide',kvQuiet);
 
 /* ---------- Mitmach-Anleitung: Ring um das Bedienelement, kurzer Satz, Stimme ---------- */
 function kidStore(k,set){try{var o=JSON.parse(localStorage.getItem('strip402.kid')||'{}');if(set){o[k]=1;localStorage.setItem('strip402.kid',JSON.stringify(o));}return !!o[k];}catch(e){return false;}}
