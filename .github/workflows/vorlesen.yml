@@ -50,7 +50,9 @@ jobs:
 
       - name: Lautstärke der Hinweise angleichen
         working-directory: quelle
-        run: python3 lautstaerke.py ../audio
+        run: |
+          command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+          python3 lautstaerke.py ../audio
 
       - name: Seite bauen
         working-directory: quelle

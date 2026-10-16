@@ -21,6 +21,10 @@ def messen(pfad):
 
 
 def main():
+    import shutil
+    if not shutil.which("ffmpeg"):
+        print("::warning::ffmpeg fehlt, Lautstärke der Hinweise wurde nicht angeglichen.")
+        return
     ordner = sys.argv[1] if len(sys.argv) > 1 else "../audio"
     for pfad in sorted(glob.glob(os.path.join(ordner, "hinweis-*.mp3"))):
         i = messen(pfad)
