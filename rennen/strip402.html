@@ -3762,7 +3762,9 @@ var KTXT={
   rganz:'Schieb das Gas ganz nach oben. Vollgas!'
 };
 var KV={el:null,tok:0};
-function kvStop(){KV.tok++;if(KV.el){try{KV.el.pause();}catch(e){}KV.el=null;}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
+/* Ton freigeben, damit iOS keinen Player auf dem Sperrbildschirm zeigt */
+function kvRel(a){if(!a)return;try{a.onended=null;a.pause();a.removeAttribute('src');a.load();}catch(e){}try{if('mediaSession' in navigator){navigator.mediaSession.metadata=null;navigator.mediaSession.playbackState='none';}}catch(e){}}
+function kvStop(){KV.tok++;if(KV.el){kvRel(KV.el);KV.el=null;}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
 function kvTts(t,done){
   try{if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){if(done)done();return;}
     var u=new SpeechSynthesisUtterance(t);u.lang='de-DE';u.rate=0.95;
@@ -3780,10 +3782,15 @@ function kidVoice(ids,done){
     var id=ids[i],next=function(){if(tok===KV.tok)setTimeout(function(){one(i+1);},250);};
     if(!EMB.hv){kvTts(KTXT[id],next);return;}
     var a=new Audio(EMB.hv+'hinweis-'+id+'.mp3'),fell=false,fb=function(){if(fell||tok!==KV.tok)return;fell=true;kvTts(KTXT[id],next);};
-    KV.el=a;a.onended=next;a.onerror=fb;
+    KV.el=a;a.onended=function(){if(KV.el===a){kvRel(a);KV.el=null;}next();};a.onerror=fb;
     var p=a.play();if(p&&p.catch)p.catch(function(e){if(!(e&&e.name==='NotAllowedError'))fb();});
   })(0);
 }
+
+/* Gesperrt oder App gewechselt: Stimme stoppen und Motorsound anhalten (geht beim nächsten Tippen weiter) */
+function kvQuiet(){kvStop();try{var d=Snd&&Snd._dbg&&Snd._dbg();if(d&&d.ac&&d.ac.state==='running')d.ac.suspend();}catch(e){}}
+document.addEventListener('visibilitychange',function(){if(document.hidden)kvQuiet();else{try{var d=Snd&&Snd._dbg&&Snd._dbg();if(d&&d.ac&&d.ac.state==='suspended')d.ac.resume().catch(function(){});}catch(e){}}});
+window.addEventListener('pagehide',kvQuiet);
 
 /* ---------- Mitmach-Anleitung: Ring um das Bedienelement, kurzer Satz, Stimme ---------- */
 function kidStore(k,set){try{var o=JSON.parse(localStorage.getItem('strip402.kid')||'{}');if(set){o[k]=1;localStorage.setItem('strip402.kid',JSON.stringify(o));}return !!o[k];}catch(e){return false;}}
