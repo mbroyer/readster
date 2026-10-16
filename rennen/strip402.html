@@ -597,6 +597,7 @@ body:not(.emb) .ktip{font:600 19px/1.2 var(--f-display);letter-spacing:.02em}
 .hrow .dash .box:not(.tbox){width:100px;box-sizing:border-box;flex:none}
 .hrow .box .val{font-variant-numeric:tabular-nums;white-space:nowrap}
 .hrow .pdl{transform:translateY(calc(var(--g,0)*5px)) scaleY(calc(1 - var(--g,0)*.08));transform-origin:50% 100%}
+.hrow{touch-action:none}
 </style>
 
 <div id="stage">
@@ -1689,7 +1690,7 @@ function makeCar(spec,x,isPlayer){
   c.tune=isPlayer?{g:tuneSel.g,t:tuneSel.t,p:Math.min(tuneSel.p,upStage(spec.id))}:{g:1,t:0,p:0};
   var sw=isPlayer?curSwap(spec.id):null,DA=isPlayer?null:aiParams();
   if(DA){c.tune={g:1,t:0,p:Math.min(2,DA.up||0)};if(DA.sw&&SWAPS[spec.id]&&SWAPS[spec.id][DA.sw-1])sw=SWAPS[spec.id][DA.sw-1];}
-  if(sw){var E0=ENG[spec.id];c.kw=sw.kw;c.nm=sw.nm;c.kg=spec.kg+sw.dkg;c.m=c.kg+75;c.eng={idle:sw.idle,rT:sw.rT,rP:sw.rP,red:sw.red,f0:sw.f0,fd:E0.fd*E0.red/sw.red,gr:E0.gr};c.sndV=sw.snd;c.swapN=sw.sub;c.swap=isPlayer?tuneSel.s:(DA.sw||0);}else c.swap=0;
+  if(sw){var E0=ENG[spec.id];c.kw=sw.kw;c.nm=sw.nm;c.kg=spec.kg+sw.dkg;c.m=c.kg+75;c.eng={idle:sw.idle,rT:sw.rT,rP:sw.rP,red:sw.red,f0:sw.f0,fd:E0.fd*E0.red/sw.red*(sw.fdK||1),gr:E0.gr};if(sw.trac)c.trac=Math.max(spec.trac,sw.trac);if(sw.hl!=null)c.hl=Math.min(spec.hl,sw.hl);c.sndV=sw.snd;c.swapN=sw.sub;c.swap=isPlayer?tuneSel.s:(DA.sw||0);}else c.swap=0;
   engInit(c);
   if(!isPlayer){var D=DA,rn=Math.random;c.quirk=D;c.who=D.who;c.heatT=D.heat[0]+rn()*(D.heat[1]-D.heat[0]);c.launchRpm=Math.max(c.e.idle+300,Math.min(c.e.red-200,c.zone[0]+(c.zone[1]-c.zone[0])*(D.u[0]+(D.u[1]-D.u[0])*rn())));c.aiShift=c.opt.map(function(o){return D.late?c.e.red-30:Math.min(c.e.red-30,o+(rn()-D.sb)*D.sn);});c.aiPow=D.pw;c.bl=D.bl==null?0.3:D.bl;c.thrIn=D.pw;c.willFoul=rn()<D.foulP;}
   return c;
@@ -1746,19 +1747,20 @@ var TNAMES=[['Kurz','Standard','Lang'],['Straße','Slick'],['Serie','Stage 1','S
   ['Straßenreifen: wenig Grip-Gewinn durch Burnout.','Slick: viel Grip, aber nur mit heißen Reifen (Burnout!), kalt rutscht er.'],
   ['Serienmotor.','Stage 1: +9 % Leistung, sicher.','Stage 2: +18 % Leistung, aber zu lange am Begrenzer = Motorschaden.']];
 function shortName(s){return (s.swapN?'':'')+s.name.replace(/^(Zuffler|Corsari|Taurino|Kaido|Liberty) /,'')+(s.swapN?' ('+s.swapN+')':'');}
+/* Version 76: der zweite Motortausch ist bei den älteren Autos ein Drag-Umbau (mehr Leistung, Breitreifen trac, weniger Luftverlust hl, eigene Achsübersetzung fdK), so dass jedes Auto voll getunt so schnell sein kann wie der Challenger (Ziel ~9,0 s) */
 var SWAPS={
   '911':[
     {n:'3,6 Biturbo',sub:'993 Turbo',kw:300,nm:540,dkg:45,idle:850,rT:3500,rP:5750,red:6800,f0:0.7,cost:14,snd:{tilt:0.7,sub:0.8,cut:0.95,seed:19}},
-    {n:'4,0 Saugmotor',sub:'GT3 RS 4.0',kw:368,nm:460,dkg:15,idle:900,rT:6250,rP:8250,red:9000,f0:0.55,cost:24,snd:{tilt:0.5,sub:0.4,cut:1.5,seed:21}}],
+    {n:'3,8 Biturbo',sub:'Drag-Umbau',kw:598,nm:748,fdK:1.15,trac:1.2,hl:0.1,dkg:15,idle:900,rT:6250,rP:8250,red:9000,f0:0.55,cost:24,snd:{tilt:0.5,sub:0.4,cut:1.5,seed:21}}],
   'testarossa':[
     {n:'5,5 V12',sub:'550 Maranello',kw:357,nm:568,dkg:-60,idle:800,rT:5000,rP:7000,red:7700,f0:0.62,cost:14,snd:{tilt:0.66,cut:1.4,seed:23}},
-    {n:'6,0 V12',sub:'599 GTB',kw:456,nm:608,dkg:-40,idle:800,rT:5600,rP:7600,red:8400,f0:0.6,cost:24,snd:{tilt:0.6,sub:0.4,cut:1.7,seed:29}}],
+    {n:'6,0 V12 Biturbo',sub:'Drag-Umbau',kw:703,nm:937,fdK:1.15,trac:1.2,hl:0.1,dkg:-40,idle:800,rT:5600,rP:7600,red:8400,f0:0.6,cost:24,snd:{tilt:0.6,sub:0.4,cut:1.7,seed:29}}],
   'countach':[
     {n:'5,2 V12',sub:'Diablo SV',kw:375,nm:580,dkg:-30,idle:900,rT:5200,rP:7100,red:7500,f0:0.6,cost:14,snd:{cut:1.25,seed:31}},
-    {n:'6,5 V12',sub:'Aventador',kw:515,nm:690,dkg:-10,idle:950,rT:5500,rP:8250,red:8500,f0:0.62,cost:24,snd:{tilt:0.55,sub:0.6,cut:1.6,seed:37}}],
+    {n:'6,5 V12 Biturbo',sub:'Drag-Umbau',kw:597,nm:799,fdK:1.15,trac:1.2,hl:0.1,dkg:-10,idle:950,rT:5500,rP:8250,red:8500,f0:0.62,cost:24,snd:{tilt:0.55,sub:0.6,cut:1.6,seed:37}}],
   'skyline':[
     {n:'2,6 Biturbo',sub:'RB26DETT',kw:206,nm:392,dkg:50,idle:900,rT:4400,rP:6800,red:8000,f0:0.5,cost:14,snd:{cut:1.15,sub:0.8,seed:41}},
-    {n:'3,8 V6 Biturbo',sub:'VR38 GT-R',kw:404,nm:628,dkg:110,idle:900,rT:3600,rP:6400,red:7000,f0:0.75,cost:24,snd:{p:3,tilt:0.62,sub:1.0,cut:1.0,seed:43}}],
+    {n:'3,8 V6 Biturbo',sub:'Drag-Umbau',kw:539,nm:838,fdK:0.6,trac:1.2,hl:0.1,dkg:110,idle:900,rT:3600,rP:6400,red:7000,f0:0.75,cost:24,snd:{p:3,tilt:0.62,sub:1.0,cut:1.0,seed:43}}],
   'challenger':[
     {n:'6,2 Kompressor',sub:'Demon',kw:626,nm:1044,dkg:10,idle:750,rT:4000,rP:6300,red:6500,f0:0.7,cost:14,snd:{cut:0.9,sub:1.1,seed:47}},
     {n:'7,0 Kompressor',sub:'Hellephant',kw:746,nm:1288,dkg:55,idle:750,rT:4000,rP:6000,red:6500,f0:0.72,cost:24,snd:{tilt:0.5,cut:0.85,sub:1.3,seed:53}}]
@@ -1809,7 +1811,7 @@ function setupStep(){
   h+=optRow(3,0,'Serienmotor','',Math.round(base.kw*1.35962)+' PS · '+base.nm+' Nm',0,tuneSel.s===0,false);
   (SWAPS[id]||[]).forEach(function(w,k){
     var own=swOwned(id,k+1);
-    h+=optRow(3,k+1,w.n,w.sub,Math.round(w.kw*1.35962)+' PS · '+w.nm+' Nm · '+(w.dkg>=0?'+':'−')+Math.abs(w.dkg)+' kg · '+dots(w.red)+' U/min',w.cost,tuneSel.s===k+1&&own,!own);
+    h+=optRow(3,k+1,w.n,w.sub,Math.round(w.kw*1.35962)+' PS · '+w.nm+' Nm · '+(w.dkg>=0?'+':'−')+Math.abs(w.dkg)+' kg · '+dots(w.red)+' U/min'+(w.trac?' · Breitreifen':''),w.cost,tuneSel.s===k+1&&own,!own);
   });
   /* Leistungsstufe */
   h+='<div class="msec">Leistungsstufe</div>';
@@ -1858,8 +1860,8 @@ function renderSheet(){
       '<button type="button" class="shelp" id="serHelp">So geht die Karriere</button>';
     $('serHelp').onclick=function(){serIntro(false);};
   }
-  $('recap').innerHTML='<b>'+shortName(SPECS[pIdx])+'</b> · '+(sw?sw.n+' '+sw.sub:'Serienmotor')+(tuneSel.p?' · Stage '+Math.min(tuneSel.p,upStage(id)):'')+(ser?'':' · gegen '+shortName(SPECS[oIdx]));
-  $('oppBtn').textContent='Gegner: '+shortName(SPECS[oIdx])+' ›';
+  $('recap').innerHTML='<b>'+shortName(SPECS[pIdx])+'</b> · '+(sw?sw.n+' '+sw.sub:'Serienmotor')+(tuneSel.p?' · Stage '+Math.min(tuneSel.p,upStage(id)):'')+(ser?'':' · gegen '+shortName(SPECS[oIdx])+(oIdx===pIdx&&typeof TWIN!=='undefined'?' ('+(TWIN[SPECS[oIdx].id]||[0,'blau'])[1]+')':''));
+  $('oppBtn').textContent='Gegner: '+shortName(SPECS[oIdx])+(oIdx===pIdx&&typeof TWIN!=='undefined'?' ('+(TWIN[SPECS[oIdx].id]||[0,'blau'])[1]+')':'')+' ›';
   var wd=(WX.wet?'Nass: weniger Grip, Slick kaum fahrbar, Bremsen blockieren.':(WX.n==='Kalt'?'Kalt: weniger Grip, Slick leidet, dichte Luft gibt Leistung.':'Trocken: beste Bedingungen.')),
     th=(HM.first?'<div class="first">Dein erstes Rennen: Unterwegs zeigen wir dir jeden Schritt.</div>':'')+
     '<button type="button" class="wxb" id="wxBtn" aria-expanded="false"><span class="wi" aria-hidden="true">'+(WX.wet?'☂':(WX.n==='Kalt'?'❄':'☀'))+'</span>'+WX.n+' · '+WX.t+' °C<span class="wm">Mehr</span></button>'+
@@ -1891,7 +1893,7 @@ function menuClick(e){
   var t=e.target.closest('[data-act]');if(!t||state!=='ready')return;
   var a=t.getAttribute('data-act');
   if(a==='mode'){mode=t.getAttribute('data-v')==='free'?'free':'series';try{localStorage.setItem('s402mode',mode);}catch(x){}reset();}
-  else if(a==='pick'){var i=+t.getAttribute('data-i'),s=SPECS[i];if(mode==='series'&&!owned(s.id))return;if(mode!=='series'&&i===oIdx)oIdx=pIdx;if(i!==pIdx){pIdx=i;tuneSel.s=0;}reset();}
+  else if(a==='pick'){var i=+t.getAttribute('data-i'),s=SPECS[i];if(mode==='series'&&!owned(s.id))return;if(mode!=='series'&&i!==pIdx&&i===oIdx)oIdx=pIdx;if(i!==pIdx){pIdx=i;tuneSel.s=0;}reset();}
   else if(a==='tune'){tuneTap(+t.getAttribute('data-r'),+t.getAttribute('data-v'));}
   else if(a==='cancel'){pend=null;renderMenu();}
   else if(a==='buy'&&pend){
@@ -1909,15 +1911,18 @@ $('mNext').onclick=function(){if(mstep==='car')garagePick();else showStep('race'
 $('bkCar').onclick=function(){if(state==='ready')showStep('car');};
 $('bkSetup').onclick=function(){if(state==='ready')showStep('setup');};
 
+/* Version 74→75: gleiches Auto als Gegner erlaubt, der Gegner bekommt dann eine andere Farbe */
+var TWIN={'911':['#2a5fc4','blau'],'testarossa':['#2a5fc4','blau'],'countach':['#e4e7ea','weiß'],'skyline':['#c8161d','rot'],'challenger':['#2a5fc4','blau']};
+function twinColor(c){var t=TWIN[c.id]||['#2a5fc4','blau'],sh=CarLab.shade;c.lab=Object.assign({},c.lab,{body:t[0],roof:sh(t[0],0.12),dark:sh(t[0],-0.45)});c.body=t[0];c.twin=t[1];}
 function reset(){
   if(mode==='series'){oIdx=carIdx(CHARS[CAREER[carLvl()].ch].car);if(!owned(SPECS[pIdx].id))pIdx=carIdx(SAVE.garage[0]);}
-  if(oIdx===pIdx&&mode!=='series')oIdx=(pIdx+1)%SPECS.length;
   if(tuneSel.p>upStage(SPECS[pIdx].id))tuneSel.p=upStage(SPECS[pIdx].id);
   if(tuneSel.s>0&&!swOwned(SPECS[pIdx].id,tuneSel.s))tuneSel.s=0;
   if(!EMB&&KT){KT=null;kidCoach(null);}
   player=makeCar(SPECS[pIdx],-LANE,true);
   if(!EMB){player.easy=AID>=1;player.autoBrake=AID>=1;player.auto=AID>=2;}
   opp=makeCar(SPECS[oIdx],LANE,false);
+  if(oIdx===pIdx)twinColor(opp);
   pickWx();cars=[player,opp];parts.length=0;
   Snd.brake(false,0);state='ready';seq=null;endAt=0;camY=0;gasLvl=0;fbT=-9;brakeTouch=false;kSpace=false;shakeUntil=0;Snd.end();
   slipEl.hidden=true;hudEl.hidden=true;$('abortBtn').hidden=true;
@@ -2252,6 +2257,8 @@ var Snd=(function(){
     old.forEach(function(v){try{v.out.gain.setTargetAtTime(0,t,quick?0.01:0.25);}catch(e){}});
     setTimeout(function(){old.forEach(function(v){v.src.forEach(function(s){try{s.stop();}catch(e){}});if(v.v2){try{v.n.disconnect();v.out.disconnect();}catch(e){}}});},quick?80:1500);
   };
+  /* Version 77: Ton beim ersten echten Tippen freischalten (iPhone/Safari zählt nur touchend/click, nicht pointerdown). true = war noch gesperrt */
+  S.unlock=function(){if(!init())return false;var was=ac.state==='running';if(!was){try{ac.resume();}catch(e){}}return !was;};
   S.setOn=function(o){S.on=o;if(master)master.gain.value=o?0.6:0;};
   S.update=function(){
     if(!ac||!vs.length)return;
@@ -2380,7 +2387,7 @@ var CAREER=[
  {ch:2,tier:'Amateur',reward:'countach',parts:3},
  {ch:3,tier:'Amateur',reward:'challenger',parts:4},
  {ch:4,tier:'Amateur',reward:null,parts:5,cup:true},
- {ch:0,tier:'Profi',reward:null,parts:5,up:2,sw:2},
+ {ch:0,tier:'Profi',reward:null,parts:5,up:2,sw:1},
  {ch:1,tier:'Profi',reward:null,parts:5,up:1,sw:1},
  {ch:2,tier:'Profi',reward:null,parts:6,up:2,sw:1},
  {ch:3,tier:'Profi',reward:null,parts:6,up:2,sw:1},
@@ -3273,7 +3280,14 @@ function gasFrom(e){var r=gasZone.getBoundingClientRect(),v=1-(e.clientY-r.top-1
 function gasAuto(){if(state==='run'&&player.launched&&!player.over){var r=gasZone._raw;gasZone._pk=Math.max(gasZone._pk||0,r);gasLvl=(r<0.25&&gasZone._pk-r>0.3)?0:1;if(r>=0.25)gasZone._pk=Math.max(r,gasZone._pk-0.0);}}
 gasZone.addEventListener('pointerdown',function(e){e.preventDefault();gasZone._pk=0;gasFrom(e);try{gasZone.setPointerCapture(e.pointerId);}catch(x){}gasZone._d=true;});
 gasZone.addEventListener('pointermove',function(e){if(gasZone._d)gasFrom(e);});
-['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){gasZone.addEventListener(ev,function(){gasZone._d=false;gasLvl=0;});});
+['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){gasZone.addEventListener(ev,function(){if(ev!=='pointerup'&&gasZone._t>0)return;gasZone._d=false;gasLvl=0;});});
+/* Version 78: iPhone: tippt ein zweiter Finger auf Los, bricht Safari den Gas-Finger manchmal ab (pointercancel). Darum zählen hier auch die Touch-Ereignisse:
+   solange ein Finger auf dem Pedal liegt, bleibt Gas aktiv, und das Pedal folgt dem Finger weiter. Außerdem keine Zoom-/Wischgesten in der Bedienleiste. */
+gasZone._t=0;
+function gasTouch(e){var t=e.targetTouches;gasZone._t=t.length;if(t.length){var f=t[0];if(!gasZone._d){gasZone._d=true;gasZone._pk=0;}gasFrom(f);}else if(gasZone._d){gasZone._d=false;gasLvl=0;}}
+['touchstart','touchmove','touchend','touchcancel'].forEach(function(ev){gasZone.addEventListener(ev,gasTouch,{passive:true});});
+(function(){var row=gasZone.parentNode;['touchstart','touchmove'].forEach(function(ev){row.addEventListener(ev,function(e){if(e.cancelable)e.preventDefault();},{passive:false});});
+  document.addEventListener('gesturestart',function(e){if(state==='run')e.preventDefault();});})();
 shBtn.addEventListener('pointerdown',function(e){e.preventDefault();if(player.over&&state==='run')brakeTouch=true;else tap();});
 ['pointerup','pointercancel'].forEach(function(ev){window.addEventListener(ev,function(){brakeTouch=false;});});
 function frame(now){
@@ -3311,7 +3325,7 @@ $('go').onclick=start;
 function diffTxt(){$('diffBtn').textContent='Stärke: '+DIFFS[diff].n;}
 diffTxt();
 $('diffBtn').onclick=function(){if(state!=='ready')return;diff=(diff+1)%3;try{localStorage.setItem('s402diff',String(diff));}catch(e){}diffTxt();reset();};
-$('oppBtn').onclick=function(){if(state!=='ready')return;do{oIdx=(oIdx+1)%SPECS.length;}while(oIdx===pIdx);reset();};
+$('oppBtn').onclick=function(){if(state!=='ready')return;oIdx=(oIdx+1)%SPECS.length;reset();};
 stage.addEventListener('pointerdown',function(e){if(e.target.closest('button,#gasZone'))return;if(player.over&&state==='run')brakeTouch=true;else tap();});
 window.addEventListener('keydown',function(e){
   if(e.code==='Space'||e.code==='Enter'){if(state==='run'){e.preventDefault();if(player.over)kSpace=true;else if(!e.repeat)tap();}}
@@ -3430,7 +3444,7 @@ function garageFoot(){
 }
 function garagePick(){
   if(gLocked(gIdx))return;
-  if(mode!=='series'&&gIdx===oIdx)oIdx=pIdx;
+  if(mode!=='series'&&gIdx!==pIdx&&gIdx===oIdx)oIdx=pIdx;
   if(gIdx!==pIdx){pIdx=gIdx;tuneSel.s=0;}
   mstep='race';reset();
 }
@@ -3439,7 +3453,7 @@ function wsCan(id){var u=upStage(id);if(u<2&&SAVE.parts>=TCOST[u+1])return true;
   return (SWAPS[id]||[]).some(function(w,k){return !swOwned(id,k+1)&&SAVE.parts>=w.cost;});}
 function garageWs(){
   if(gLocked(gIdx))return;
-  if(mode!=='series'&&gIdx===oIdx)oIdx=pIdx;
+  if(mode!=='series'&&gIdx!==pIdx&&gIdx===oIdx)oIdx=pIdx;
   if(gIdx!==pIdx){pIdx=gIdx;tuneSel.s=0;}
   mstep='setup';reset();
 }
@@ -3464,6 +3478,7 @@ function hmIdle(){if(homeEl.hidden||!Snd.on)return;try{hmCar=makeCar(SPECS[pIdx]
 function hmRev(){if(!hmCar)return;var c=hmCar,e=c.e,t0=performance.now();
   (function st(){if(c!==hmCar)return;var k=Math.min(1,(performance.now()-t0)/520);c.thrNow=1;c.rpm=e.idle+(e.red*0.93-e.idle)*Math.pow(k,0.65);if(k<1)requestAnimationFrame(st);})();}
 homeEl.addEventListener('pointerdown',function(){if(!hmOk){hmOk=true;hmIdle();}},true);
+['touchend','click'].forEach(function(ev){homeEl.addEventListener(ev,function(){var lk=Snd.unlock();if(!hmOk||lk){hmOk=true;hmIdle();}},true);});
 function treeIdle(){document.querySelectorAll('#hTree .b').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')==='0');});}
 function titleRender(){
   $('hTitle').classList.toggle('day',!night);
@@ -3496,6 +3511,7 @@ function hDone(){hHide();homeEl.classList.remove('fade');$('hHero').classList.re
 function startMode(m,btn){
   if(hBusy)return;hBusy=true;if(btn)btn.classList.add('hit');
   mode=m;try{localStorage.setItem('s402mode',m);}catch(e){}
+  if(m!=='series'&&oIdx===pIdx)oIdx=(pIdx+1)%SPECS.length;
   launchAnim(function(){mstep='car';reset();var sn=false;try{sn=!!localStorage.getItem('s402serIntro');}catch(e){}if(m==='series'&&!sn)serIntro(true);});
 }
 /* Version 67: geführte Erklärung der Rennserie, vor der Autowahl (beim ersten Mal) und über den Link auf der Rennkarte */
