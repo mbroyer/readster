@@ -2258,6 +2258,12 @@ var Snd=(function(){
     setTimeout(function(){old.forEach(function(v){v.src.forEach(function(s){try{s.stop();}catch(e){}});if(v.v2){try{v.n.disconnect();v.out.disconnect();}catch(e){}}});},quick?80:1500);
   };
   /* Version 77: Ton beim ersten echten Tippen freischalten (iPhone/Safari zählt nur touchend/click, nicht pointerdown). true = war noch gesperrt */
+  /* Version 79: App im Hintergrund oder iPhone gesperrt = Ton sofort aus, beim Zurückkommen wieder an */
+  S.sleep=function(h){if(!ac)return;try{if(h)ac.suspend();else if(S.on)ac.resume();}catch(e){}};
+  function vis(){S.sleep(document.hidden);if(document.hidden){try{speechSynthesis.cancel();}catch(e){}}}
+  document.addEventListener('visibilitychange',vis);
+  window.addEventListener('pagehide',function(){S.sleep(true);});
+  window.addEventListener('pageshow',function(){if(!document.hidden)S.sleep(false);});
   S.unlock=function(){if(!init())return false;var was=ac.state==='running';if(!was){try{ac.resume();}catch(e){}}return !was;};
   S.setOn=function(o){S.on=o;if(master)master.gain.value=o?0.6:0;};
   S.update=function(){
