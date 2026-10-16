@@ -3865,9 +3865,10 @@ function kidTick(dt){
     if(KT.step===2){var inz=c.rpm>=c.zone[0]&&c.rpm<=c.zone[1];KT.inz=inz?KT.inz+dt:Math.max(0,KT.inz-dt*0.5);
       if(KT.inz>1.2){KT.step=3;KT.hold=false;kidCoach('tree','Bei Grün: Los tippen!','rampel');}}
     if(KT.step===3&&T>=seq.g&&!c.launched){KT.step=4;kidCoach('shBtn','Jetzt Los! Gas oben lassen','rlosvoll');}
-    if(KT.step>=1&&KT.step<=4&&c.launched){KT.step=5;KT.t5=Date.now();if(!KO.auto)KT.slow=true;kidCoach('gasZone','Vollgas bis ins Ziel!',KO.auto?['rvollgas','rauto']:'rvollgas',3);}
+    /* Version 83: keine Zeitlupe mehr nach dem Start (Training und erstes Rennen wirkten dadurch unrealistisch langsam); Schalt-Zeitlupe nur noch im Readster-Kindermodus */
+    if(KT.step>=1&&KT.step<=4&&c.launched){KT.step=5;KT.t5=Date.now();kidCoach('gasZone','Vollgas bis ins Ziel!',KO.auto?['rvollgas','rauto']:'rvollgas',3);}
     if(KT.step===5&&!KO.auto&&KT.slow&&(Date.now()-KT.t5>1600||c.lim))KT.slow=false;
-    if(KT.step===5&&!KO.auto&&!KT.slow&&!c.over&&c.shiftT<=0&&c.gear<c.ng-1&&c.er-c.opt[c.gear]>=-130){KT.step=6;KT.slow=true;KT.t6=T;KT.ns=c.shifts.length;kidCoach('shBtn',c.easy?'Jetzt schalten!':'Gas los, dann Schalten tippen!','rschalt');}
+    if(KT.step===5&&!KO.auto&&!KT.slow&&!c.over&&c.shiftT<=0&&c.gear<c.ng-1&&c.er-c.opt[c.gear]>=-130){KT.step=6;KT.slow=!!EMB;KT.t6=T;KT.ns=c.shifts.length;kidCoach('shBtn',c.easy?'Jetzt schalten!':'Gas los, dann Schalten tippen!','rschalt');}
     if(KT.step===6&&(c.shifts.length>KT.ns||T-KT.t6>2.5||c.over)){KT.slow=false;KT.step=7;kidCoach(null);}
     if(!KO.brake&&c.over&&c.v>3&&!KT.br){KT.br=true;KT.slow=false;kidCoach('shBtn','Bremse gedrückt halten','rbrems',3);}
     if(KT.hold&&!KT.intro&&T-KT.lastSay>7)kidVoice(KT.vid);
