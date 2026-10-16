@@ -48,6 +48,10 @@ jobs:
           fi
           python3 vorlesen_elevenlabs.py --ordner ../audio --tempi "$TEMPI"
 
+      - name: Lautstärke der Hinweise angleichen
+        working-directory: quelle
+        run: python3 lautstaerke.py ../audio
+
       - name: Seite bauen
         working-directory: quelle
         run: AUDIO_DIR=../audio AUDIO_MODE=dateien OUT=../index.html python3 build.py

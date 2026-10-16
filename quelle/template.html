@@ -1699,11 +1699,11 @@ function startRound(){
   stopListen();plStop();R.phase='count';R.recTried=false;R.recOn=false;REC.want=true;renderCtl();
   var rr=R,n=3,tail=function(){return '<button class="link" data-a="cancel">Abbrechen</button>';};
   cdShow('<b>Gleich geht es los</b>'+tail());say('aufnahme');
-  var t00=Date.now();
-  recStart(true).then(function(ok){
-    /* Der Hinweis darf zu Ende gesprochen werden, bevor gezählt wird (sonst landet er in der Aufnahme) */
-    var wait=Math.max(0,(S.set.voice&&HINTS.aufnahme?3600:0)-(Date.now()-t00));
-    return new Promise(function(res){setTimeout(function(){res(ok);},wait);});
+  /* Mikrofon erst nach dem Hinweis einschalten: iOS dreht die Wiedergabe leiser, sobald das Mikrofon an ist,
+     dann klingt der Hinweis mittendrin leiser (und er landet nicht in der Aufnahme) */
+  var wait=S.set.voice&&HINTS.aufnahme?3600:0;
+  new Promise(function(res){setTimeout(res,wait);}).then(function(){
+    if(R!==rr||R.phase!=='count')return false;return recStart(true);
   }).then(function(ok){
     if(R!==rr||R.phase!=='count')return;R.recTried=true;R.recOn=ok;
     (function tick(){
@@ -2019,7 +2019,7 @@ document.addEventListener('click',function(e){
     case 'leave':recStop(false);stopListen();renderHome();show('home');break;
     case 'listen':listen(undefined,'a');break;
     case 'listenR':listen(undefined,'b');break;
-    case 'start':startRound();if(S.set.mit&&R&&(R.phase==='count'||R.phase==='timing'))liveStart();break; /* Spracherkennung direkt beim Tippen starten, iOS verlangt dafür eine Berührung */
+    case 'start':startRound();if(S.set.mit&&!S.set.voice&&R&&(R.phase==='count'||R.phase==='timing'))liveStart();break; /* Ohne Sprach-Hinweis gleich beim Tippen starten; sonst startet recGo sie nach dem Hinweis, damit er nicht leiser wird */
     case 'plr':plToggle(v);break;
     case 'plseek':plSeek(v,e.clientX);break;
     case 'ms':R.ms=v;renderCtl();window.scrollTo(0,0);break;
