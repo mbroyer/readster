@@ -590,7 +590,7 @@ TEXTS.forEach(function(t){
 });
 (function(){var ds=TEXTS.map(function(t){return t.diff;}).sort(function(a,b){return a-b;}),med=ds[Math.floor(ds.length/2)];TEXTS.forEach(function(t){t.stars=t.diff>=med?2:1;});})();
 /* ---------- Zustand ---------- */
-function defaults(){return {ts:0,whNote:'',xp:0,fuel:0,rcar:'',rbest:{},done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Lexend',lx:1,size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1,whv:0,voice:true,sfx:true,live:false},raceIntro:0,tour:0,tourSeen:{}};}
+function defaults(){return {ts:0,whNote:'',xp:0,fuel:0,rcar:'',rbest:{},done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Lexend',lx:1,size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1,whv:0,voice:true,sfx:true,mit:true},raceIntro:0,tour:0,tourSeen:{}};}
 function fixState(d){
   /* Ältere Stände: gesammelte Wörter in den Wort-Jäger übernehmen */
   Object.keys(d.stolper||{}).forEach(function(w){if(!d.wj[w])d.wj[w]={n:d.stolper[w],ok:[],done:false};});
@@ -1031,7 +1031,7 @@ function renderCtl(){
     h+='</div>';
   }
   c.innerHTML=h;setDock(dk);var rt=$('#rtop');if(rt)rt.innerHTML=top;
-  var rx=$('#rtext');if(rx)rx.classList.toggle('finger',R.phase==='timing');if(R.phase!=='timing'){fingClear();liveStop();}
+  var rx=$('#rtext');if(rx)rx.classList.toggle('finger',R.phase==='timing');if(R.phase!=='timing'){fingClear();if(R.phase!=='count')liveStop();}
   if(R.phase==='mark'){if(R.ms==='listen')fillRec($('#recm'),t.id,true);updateMarkInfo();}else{var os=document.querySelectorAll('#rtext .w.sug,#rtext .w.srm');for(var oi=0;oi<os.length;oi++)os[oi].classList.remove('sug','srm');}
 }
 /* Vorlesen */
@@ -1472,13 +1472,13 @@ function liveStart(){
       hw.forEach(function(h){for(var j=p;j<Math.min(LV.tw.length,p+5);j++){if(lvNear(h,LV.tw[j])){p=j+1;break;}}});
       if(p!==LV.p){LV.p=p;var o=document.querySelectorAll('#rtext .w.now');for(var k=0;k<o.length;k++)o[k].classList.remove('now');var w=$('#rtext .w[data-i="'+(p-1)+'"]');if(w)w.classList.add('now');}};
     r.onerror=function(ev){if(ev&&(ev.error==='not-allowed'||ev.error==='service-not-allowed')&&LV)LV.on=false;};
-    r.onend=function(){if(LV&&LV.on&&LV.rr===R&&R.phase==='timing')setTimeout(run,150);};
+    r.onend=function(){if(LV&&LV.on&&LV.rr===R&&(R.phase==='timing'||R.phase==='count'))setTimeout(run,150);};
     try{r.start();}catch(e){}
   }
   run();
 }
 function liveStop(){if(!LV)return;LV.on=false;try{LV.r&&LV.r.abort();}catch(e){}LV=null;var o=document.querySelectorAll('#rtext .w.now');for(var k=0;k<o.length;k++)o[k].classList.remove('now');}
-function recGo(){var r=REC.rec;if(r&&r.state==='inactive'){try{r.start();}catch(e){}}if(S.set.live)liveStart();}
+function recGo(){var r=REC.rec;if(r&&r.state==='inactive'){try{r.start();}catch(e){}}if(S.set.mit)liveStart();}
 function recStart(defer){
   REC.fail='';
   if(!S.set.rec)return Promise.resolve(false);
@@ -1887,7 +1887,7 @@ function renderSheet(){
   h+='<section class="sgrp"><h3>Aufnahme und Auswertung</h3>'+tg('rec','Aufnahme beim Lesen','Bleibt nur auf diesem Gerät.','<button class="link" id="delRecsBtn" data-a="delRecs">Alle Aufnahmen löschen</button>')+
     tg('wh','Stockstellen erkennen',(WH_SERVER?'Die Aufnahme geht kurz an Cloudflare und wird dort nicht gespeichert.':'Lädt einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB, danach läuft alles auf dem Gerät.'),'<span class="hint fb" id="whst">'+esc(s.wh?whStatus():'')+'</span>')+
     tg('nums','Tempo-Zahlen zeigen','Aus: nur „schneller als beim ersten Mal“.')+
-    tg('live','Mitlesen per Sprache (Test)',LIVE_OK?'Beim lauten Lesen markiert die App das Wort, bei dem das Kind gerade ist. Der Ton geht dafür an Apple oder Google.':'Dieser Browser kann das leider nicht.')+'</section>';
+    tg('mit','Mitlesen beim Lesen',LIVE_OK?'Beim lauten Lesen wandert die Markierung mit dem Kind mit. Der Ton geht dafür an Apple oder Google.':'Dieser Browser kann das leider nicht.')+'</section>';
   h+='<section class="sgrp"><h3>Hilfe</h3><details class="howto-d"><summary>So funktioniert Readster</summary><ul class="howto"><li>Zuhören, dann selbst laut lesen (mit Aufnahme).</li><li>Danach: Gesicht wählen, Tempo ansehen, sich selbst anhören und schwere Wörter antippen.</li><li>Zwei Fragen zum Text.</li><li>Jeder Text füllt den Tank. Drei Texte: ein Rennen. Neue Autos kommen mit der Zeit dazu.</li><li>Schwere Wörter landen im Wort-Jäger und werden an mehreren Tagen geübt.</li></ul></details><button class="link" data-a="tourAgain">Einführung nochmal zeigen</button></section>';
   /* Zum Ausprobieren der Rennen: Level springen und Tank füllen (ändert den echten Fortschritt dieses Codes) */
   var Lc=lvl(S.xp);
@@ -2010,7 +2010,7 @@ document.addEventListener('click',function(e){
     case 'leave':recStop(false);stopListen();renderHome();show('home');break;
     case 'listen':listen(undefined,'a');break;
     case 'listenR':listen(undefined,'b');break;
-    case 'start':startRound();break;
+    case 'start':startRound();if(S.set.mit&&R&&(R.phase==='count'||R.phase==='timing'))liveStart();break; /* Spracherkennung direkt beim Tippen starten, iOS verlangt dafür eine Berührung */
     case 'plr':plToggle(v);break;
     case 'plseek':plSeek(v,e.clientX);break;
     case 'ms':R.ms=v;renderCtl();window.scrollTo(0,0);break;
@@ -2049,7 +2049,7 @@ document.addEventListener('click',function(e){
     case 'card':var t=byId[v];openBox('#modal','<div class="card">'+cardHTML(t,true)+'<div class="cfbtns"><button class="btn ghost" data-a="closeModal">Schließen</button><button class="btn" data-a="nextread" data-v="'+t.id+'">Nochmal lesen</button></div></div>');break;
     case 'closeModal':stopListen();closeBox('#modal');break;
     case 'settings':renderSheet();break;
-    case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl'||k==='rec'||k==='nums'||k==='wh'||k==='voice'||k==='sfx'||k==='live')val=(v==='true');S.set[k]=val;save();if(k==='wh'&&val)whPreload();renderSheet();readStyle();break;
+    case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl'||k==='rec'||k==='nums'||k==='wh'||k==='voice'||k==='sfx'||k==='mit')val=(v==='true');S.set[k]=val;save();if(k==='wh'&&val)whPreload();renderSheet();readStyle();break;
     case 'sheetOk':closeBox('#sheet');break;
     case 'reset':renderReset();break;
     case 'dbgLv':S.xp=XPK*(+v-1)*(+v-1);var ds=RSTAGES[rankOf(+v)];if(ds.car)S.rcar=ds.car;save();renderSheet();renderHome();break;
