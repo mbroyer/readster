@@ -1176,14 +1176,17 @@ function playPart(id,pk,from,to,onIdx,onFail){
   el.onerror=function(){if(tok!==tts.tok||el.currentTime>0)return;stopListen();onFail();}; /* Datei fehlt oder kein Netz: Gerätestimme */
   var p=el.play();
   if(p&&p.catch)p.catch(function(){if(tok!==tts.tok)return;stopListen();onFail();});
-  (function tick(){
-    if(tok!==tts.tok)return;
+  /* Markierung nachführen: pro Bild und zusätzlich bei jedem timeupdate (falls Safari die Bild-Schleife drosselt) */
+  function upd(){
+    if(tok!==tts.tok)return false;
     var ms=el.currentTime*1000,i=-1;
-    if(!el.paused||tts.paused){var k=0;while(k+1<tl.length&&tl[k+1][0]<=ms)k++;if(ms>=tl[0][0])i=base+Math.max(k,li);
-      if(to!=null&&to-base<tl.length&&ms>=tl[to-base][0]-30){stopListen();onIdx(-1);return;}}
+    if(!el.paused||tts.paused||ms>0){var k=0;while(k+1<tl.length&&tl[k+1][0]<=ms)k++;if(ms>=tl[0][0])i=base+Math.max(k,li);
+      if(to!=null&&to-base<tl.length&&ms>=tl[to-base][0]-30){stopListen();onIdx(-1);return false;}}
     if(i!==cur){cur=i;onIdx(i);}
-    tts.raf=requestAnimationFrame(tick);
-  })();
+    return true;
+  }
+  el.addEventListener('timeupdate',upd);
+  (function tick(){if(upd())tts.raf=requestAnimationFrame(tick);})();
 }
 function listen(from,part,to){
   var T=R.t;
