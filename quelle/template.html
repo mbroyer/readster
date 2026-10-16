@@ -109,6 +109,23 @@ button,input{font:inherit;color:inherit}
 .hero .info{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
 .stagename{font-family:var(--f-display);font-weight:600;font-size:1.7rem;line-height:1.05}
 .week{gap:14px}
+/* Einstellungen für Erwachsene: Gruppen mit Schaltern */
+.sgrp{display:flex;flex-direction:column;gap:2px;background:var(--bg);border-radius:16px;padding:12px 14px}.sgrp h3{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 4px}
+.sgrp .sgh{color:var(--muted);font-size:.85rem;margin-bottom:6px}.sgrp .link{align-self:flex-start;padding:6px 0;font-size:.95rem}.link.danger{color:#ff9b8a}
+.tgrow{display:flex;flex-direction:column;gap:2px;padding:6px 0;border-top:1px solid var(--line)}.sgrp h3+.tgrow,.sgrp h3+.tgrow.sg{border-top:0}
+.tgrow.sg{gap:6px;padding:8px 0}.tgrow.sg b{font-weight:500;font-size:.95rem}
+.seg.sm{flex-wrap:nowrap;gap:4px}.seg.sm button{flex:1 1 0;min-height:34px;padding:4px 10px;font-size:.85rem;border-radius:10px;border-width:1.5px}
+.tgl{all:unset;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}.tgt{display:flex;flex-direction:column;gap:1px}.tgt b{font-weight:500;font-size:.95rem}.tgt small{color:var(--muted);font-size:.8rem;line-height:1.3}
+.sw{flex:none;width:46px;height:28px;border-radius:14px;background:var(--line);position:relative;transition:background .15s}.sw i{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--ink);transition:transform .15s}
+.tgl[aria-checked="true"] .sw{background:var(--accent)}.tgl[aria-checked="true"] .sw i{transform:translateX(18px);background:var(--accent-ink)}
+.tgl:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:8px}
+.chip{background:var(--surface);border:1.5px solid var(--line);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:.85rem;font-weight:500;cursor:pointer;min-height:34px}.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.fuelchip{align-self:flex-start;margin-top:8px;display:inline-flex;align-items:center;gap:6px}.fuelchip svg{width:16px;height:16px}
+.howto-d summary{cursor:pointer;font-size:.95rem;font-weight:500;padding:6px 0;min-height:32px}.howto-d ul{margin:4px 0 6px}
+.btn.acc{background:var(--accent);color:var(--accent-ink);box-shadow:0 5px 0 color-mix(in srgb,var(--accent) 55%,#000)}
+details.adult.set[open]>div{gap:12px!important}
+/* Safari färbt seine untere Leiste nach dem, was unten am Rand liegt: dort einen ruhigen dunklen Streifen setzen */
+.cfbox::after{content:'';position:fixed;left:0;right:0;bottom:0;height:6px;background:#03090c;pointer-events:none}
 .setgrp{font-size:1rem;font-weight:600;margin:6px 0 -6px;padding-top:12px;border-top:2px solid var(--line)}details.adult.set>div>.setgrp:first-child{border-top:0;padding-top:0}.setrow .link{align-self:flex-start;padding-left:0}
 .nxt{gap:12px;padding:16px}.nxt h2{font-size:1.3rem;margin:2px 0 0}
 .nxth{display:flex;align-items:center;gap:14px}.nxth .eyebrow{color:var(--c)}
@@ -340,6 +357,17 @@ details.tip summary{cursor:pointer;font-weight:500}details.tip ul{margin:8px 0 0
 .rb.best i{background:var(--xp)}
 .qa{display:flex;flex-direction:column;gap:8px;background:var(--bg);border-radius:16px;padding:14px 16px}
 .qa p{font-weight:500}
+.tacho{position:relative;width:100%;max-width:330px;align-self:center;margin:4px 0 -6px}.tacho svg{width:100%;height:auto;display:block}
+.tacho .trk,.tacho .val{fill:none;stroke-width:14;stroke-linecap:round}.tacho .trk{stroke:var(--surface)}.tacho .val{stroke:var(--xp);stroke-dasharray:0 200;opacity:0;transition:stroke-dasharray 1.1s cubic-bezier(.3,1.25,.5,1)}
+.tacho.go .val{stroke-dasharray:var(--pct) 200;opacity:1}.tacho .tks line{stroke:var(--muted);stroke-width:2.5;stroke-linecap:round;opacity:.6}.tacho .tks text{fill:var(--muted);font-size:11px;font-weight:500;text-anchor:middle;font-family:var(--f-body)}
+.tacho .ndl{transform-origin:120px 112px;transform:rotate(-135deg);transition:transform 1.1s cubic-bezier(.3,1.35,.5,1)}.tacho.go .ndl{transform:rotate(var(--ang))}.tacho .ndl line{stroke:var(--cta);stroke-width:5;stroke-linecap:round}.tacho .ndl circle{fill:var(--cta)}
+.tacho .pvm{fill:var(--accent)}
+.tnum{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:0}.tnum b{font-family:var(--f-display);font-size:2.6rem;line-height:1;color:var(--xp)}.tnum span{font-size:.85rem;color:var(--muted);font-weight:500}.tnum small{font-size:.75rem;color:var(--accent);font-weight:500;margin-top:2px}
+.result-card .tiles .tile b{font-size:1.5rem}
+.rhist{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:12px 14px}
+.hrow{display:grid;grid-template-columns:92px 1fr 36px;align-items:center;gap:10px;font-size:.85rem;color:var(--muted);font-weight:500}.hrow i{height:10px;border-radius:5px;background:var(--bg);overflow:hidden}.hrow i b{display:block;height:100%;border-radius:5px;background:var(--muted);opacity:.6}
+.hrow em{font-style:normal;text-align:right;font-variant-numeric:tabular-nums}.hrow.now{color:var(--ink)}.hrow.now i b{background:var(--xp);opacity:1}
+@media (prefers-reduced-motion:reduce){.tacho .ndl,.tacho .val{transition:none}}
 .result-card{display:flex;flex-direction:column;gap:12px}.result-card .rhead{font-family:var(--f-display);font-size:1.45rem;font-weight:500;line-height:1.2}
 .flat{display:flex;flex-direction:column;gap:14px;padding-top:8px}#qcard .qa{background:none;padding:0;gap:12px}#qcard .qa p{font-size:1.3rem;line-height:1.35}.result-card .rhead{font-size:1.7rem}.tile .was{font-size:.75rem;color:var(--ink);opacity:.8;margin-top:4px}
 .result-card .bars{display:flex;flex-direction:column;gap:6px}
@@ -549,7 +577,7 @@ TEXTS.forEach(function(t){
 });
 (function(){var ds=TEXTS.map(function(t){return t.diff;}).sort(function(a,b){return a-b;}),med=ds[Math.floor(ds.length/2)];TEXTS.forEach(function(t){t.stars=t.diff>=med?2:1;});})();
 /* ---------- Zustand ---------- */
-function defaults(){return {ts:0,whNote:'',xp:0,fuel:0,rcar:'',rbest:{},done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Lexend',lx:1,size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1,whv:0,voice:true},raceIntro:0,tour:0,tourSeen:{}};}
+function defaults(){return {ts:0,whNote:'',xp:0,fuel:0,rcar:'',rbest:{},done:{},stolper:{},wj:{},opa:[],name:'',days:{},last:null,col:'#2fd6d0',recN:{},log:[],set:{font:'Lexend',lx:1,size:1,line:1,space:0,syl:true,speed:'normal',rec:true,nums:true,wh:false,whm:-1,whv:0,voice:true,sfx:true},raceIntro:0,tour:0,tourSeen:{}};}
 function fixState(d){
   /* Ältere Stände: gesammelte Wörter in den Wort-Jäger übernehmen */
   Object.keys(d.stolper||{}).forEach(function(w){if(!d.wj[w])d.wj[w]={n:d.stolper[w],ok:[],done:false};});
@@ -563,6 +591,7 @@ function merge(j){
   var d=defaults();
   if(j&&typeof j==='object'){for(var k in d){if(j[k]!==undefined&&k!=='set')d[k]=j[k];}
     for(var q in d.set){if(j.set&&j.set[q]!==undefined)d.set[q]=j.set[q];}
+    ['voice','sfx'].forEach(function(q){if(typeof d.set[q]==='string')d.set[q]=d.set[q]==='true';}); /* früher als Text gespeichert */
     if(!(j.set&&j.set.lx)){d.set.font='Lexend';d.set.lx=1;}} /* Lexend ist jetzt die Standard-Leseschrift */
   return fixState(d);
 }
@@ -706,7 +735,7 @@ var IC_DUO='<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><cir
 var MODE=null;
 /* Sprach-Hinweise: die App sagt, was zu tun ist, statt es hinzuschreiben (MP3 von ElevenLabs, sonst Gerätestimme) */
 var HINTS=__HINTS__,HQ={el:null,tok:0,t:0};
-function sayStop(){HQ.tok++;clearTimeout(HQ.t);if(HQ.el){try{HQ.el.pause();}catch(e){}HQ.el=null;}try{if(window.speechSynthesis&&HQ.sp){window.speechSynthesis.cancel();HQ.sp=false;}}catch(e){}}
+function sayStop(){HQ.tok++;clearTimeout(HQ.t);if(HQ.el){relA(HQ.el);HQ.el=null;}try{if(window.speechSynthesis&&HQ.sp){window.speechSynthesis.cancel();HQ.sp=false;}}catch(e){}}
 function say(id,delay){
   var h=HINTS[id];if(!h||!S.set.voice)return;
   sayStop();var tok=HQ.tok;
@@ -714,7 +743,7 @@ function say(id,delay){
     if(tok!==HQ.tok)return;
     function fallback(){try{if(!window.speechSynthesis||!window.SpeechSynthesisUtterance)return;var u=new SpeechSynthesisUtterance(h.t);u.lang='de-DE';u.rate=0.9;var v=pickVoice();if(v)u.voice=v;HQ.sp=true;window.speechSynthesis.speak(u);}catch(e){}}
     if(!h.u){fallback();return;}
-    var a=new Audio(h.u);HQ.el=a;a.onerror=function(){if(tok===HQ.tok)fallback();};
+    var a=new Audio(h.u);HQ.el=a;a.onerror=function(){if(tok===HQ.tok)fallback();};a.onended=function(){if(HQ.el===a){relA(a);HQ.el=null;mediaOff();}};
     var pr=a.play();if(pr&&pr.catch)pr.catch(function(){});
   },delay||0);
 }
@@ -960,8 +989,12 @@ function renderCtl(){
     }else if(ms==='nums'){
       dk='<button class="btn wide" data-a="ms" data-v="listen">Weiter</button>';sayOnce('nums','zahlen',300);
       var pv=R.prev&&R.prev.length?R.prev[0].wpm:0;
-      top='<div class="flat result-card"><b class="rhead" id="rhead">'+esc(R.head||'')+'</b>'+
-        '<div class="tiles">'+(S.set.nums?'<div class="tile"><b>'+w+'</b><span>Wörter pro Minute</span>'+(pv?'<span class="was">Beim ersten Mal: '+pv+'</span>':'')+'</div>':'')+'<div class="tile"><b>'+fmtSec(R.sec)+'</b><span>Lesezeit</span></div><div class="tile" id="sugtile"'+(R.sugState&&R.sugState!=='none'?'':' hidden')+'>'+sugTile()+'</div></div></div>';
+      var mx=Math.max(150,Math.ceil(w/50)*50),hist=(R.prev||[]).slice(-3).map(function(x){return x.wpm;}).concat([w]);
+      top='<div class="flat result-card"><b class="rhead" id="rhead">'+esc(R.head||'')+'</b>'+tacho(w,pv,mx,S.set.nums)+
+        '<div class="tiles"><div class="tile"><b>'+fmtSec(R.sec)+'</b><span>Lesezeit</span></div><div class="tile"><b>'+R.t.rs+'</b><span>Wörter gelesen</span></div><div class="tile" id="sugtile"'+(R.sugState&&R.sugState!=='none'?'':' hidden')+'>'+sugTile()+'</div></div>'+
+        (S.set.nums&&hist.length>1?'<div class="rhist"><span class="eyebrow">Dieser Text</span>'+hist.map(function(v,i){var now=i===hist.length-1;return '<div class="hrow'+(now?' now':'')+'"><span>'+(now?'Jetzt':(hist.length-1-i===1?'Letztes Mal':'Davor'))+'</span><i><b style="width:'+Math.max(6,Math.round(v/mx*100))+'%"></b></i><em>'+v+'</em></div>';}).join('')+'</div>':'')+
+        '</div>';
+      if(!R.revved){R.revved=1;setTimeout(function(){var g=document.querySelector('#rtop .tacho');if(g)g.classList.add('go');sfxRev(1);},250);}
     }else{
       dk='<div class="row">'+(R.round<3?'<button class="btn ghost" data-a="again">Nochmal lesen</button>':'')+'<button class="btn" data-a="check">Zu den Fragen</button></div>';
       top='<div id="recm"></div><div class="flat tapword"><span class="ticon">'+IC_TAP+'</span><h2>Schwere Wörter antippen</h2></div>';
@@ -994,7 +1027,7 @@ function stopListen(){
   tts.tok++;tts.on=false;tts.paused=false;tts.gapK=null;clearTimeout(tts.timer);clearTimeout(tts.gap);
   if(tts.raf){cancelAnimationFrame(tts.raf);tts.raf=0;}
   if(tts.srcs){tts.srcs.forEach(function(s){try{s.onended=null;s.stop();}catch(e){}});tts.srcs=null;}
-  if(tts.el){try{tts.el.onended=null;tts.el.pause();}catch(e){}tts.el=null;}
+  if(tts.el){relA(tts.el);tts.el=null;mediaOff();}
   try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
   var n=document.querySelectorAll('.w.now');for(var i=0;i<n.length;i++)n[i].classList.remove('now');
   setBtn();
@@ -1063,16 +1096,47 @@ function pickAudio(id,pk){
   if(A.s&&A.s[pk])return {sp:'s',rate:1};
   return null;
 }
-function chime(ac,at){
-  /* Zwei weiche Glockentöne wie im Flugzeug: hoch, dann tiefer */
-  [[988,0],[740,0.42]].forEach(function(n){
-    [[1,0.34,1.5],[2,0.12,0.9]].forEach(function(p){
-      try{var o=ac.createOscillator(),g=ac.createGain(),s=at+n[1];o.type='sine';o.frequency.value=n[0]*p[0];o.connect(g);g.connect(ac.destination);
-        g.gain.setValueAtTime(0.0001,s);g.gain.exponentialRampToValueAtTime(p[1],s+0.015);g.gain.exponentialRampToValueAtTime(0.0001,s+p[2]);
-        o.start(s);o.stop(s+p[2]+0.05);}catch(e){}
-    });
-  });
-}
+/* ---------- Töne und Beats: mit Web Audio erzeugt, ohne Dateien. So erscheint nichts auf dem Sperrbildschirm. ---------- */
+var SFX={g:null,nb:null};
+function sfxOn(){return S.set.sfx!==false;}
+function sfxAC(){var ac=getAC();if(ac&&ac.state==='suspended'){try{ac.resume();}catch(e){}}return ac;}
+function sfxOut(ac){if(!SFX.g){var c=ac.createDynamicsCompressor();SFX.g=ac.createGain();SFX.g.gain.value=0.55;SFX.g.connect(c);c.connect(ac.destination);}return SFX.g;}
+function sfxEnv(ac,t,d,vol){var g=ac.createGain();g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+0.006);g.gain.exponentialRampToValueAtTime(0.0001,t+d);g.connect(sfxOut(ac));return g;}
+function sfxTone(ac,f,t,d,vol,type,f2,cut){var o=ac.createOscillator(),g=sfxEnv(ac,t,d,vol);o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
+  if(cut){var lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=cut;o.connect(lp);lp.connect(g);}else o.connect(g);o.start(t);o.stop(t+d+0.03);}
+function sfxNoise(ac,t,d,vol,type,freq){if(!SFX.nb){var n=ac.sampleRate,b=ac.createBuffer(1,n,n),x=b.getChannelData(0);for(var i=0;i<n;i++)x[i]=Math.random()*2-1;SFX.nb=b;}
+  var s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=sfxEnv(ac,t,d,vol);s.buffer=SFX.nb;f.type=type;f.frequency.value=freq;s.connect(f);f.connect(g);s.start(t);s.stop(t+d+0.03);}
+function sfxKick(ac,t){sfxTone(ac,150,t,0.32,0.9,'sine',42);}
+function sfxSnare(ac,t){sfxNoise(ac,t,0.16,0.45,'bandpass',1900);sfxTone(ac,200,t,0.09,0.25,'triangle',150);}
+function sfxHat(ac,t,v){sfxNoise(ac,t,0.045,v||0.18,'highpass',7500);}
+/* Kurzer Klick für Knöpfe */
+function sfxClick(big){if(!sfxOn())return;var ac=sfxAC();if(!ac)return;var t=ac.currentTime+0.005;
+  try{if(big)sfxTone(ac,520,t,0.09,0.22,'sine',880);else sfxTone(ac,1100,t,0.04,0.1,'sine',900);}catch(e){}}
+/* Richtig: zwei helle Töne nach oben */
+function sfxGood(){if(!sfxOn())return;var ac=sfxAC();if(!ac)return;var t=ac.currentTime+0.01;
+  try{sfxTone(ac,784,t,0.16,0.28,'triangle');sfxTone(ac,1175,t+0.11,0.3,0.28,'triangle');}catch(e){}}
+/* Motor: Drehzahl hoch und wieder runter, passt zum Tacho */
+function sfxRev(dur){if(!sfxOn())return;var ac=sfxAC();if(!ac)return;var t=ac.currentTime+0.02,d=dur||0.9;
+  try{var o=ac.createOscillator(),lp=ac.createBiquadFilter(),g=ac.createGain();o.type='sawtooth';lp.type='lowpass';lp.frequency.setValueAtTime(500,t);lp.frequency.linearRampToValueAtTime(1600,t+d*0.75);
+    o.frequency.setValueAtTime(55,t);o.frequency.exponentialRampToValueAtTime(190,t+d*0.75);o.frequency.exponentialRampToValueAtTime(95,t+d+0.35);
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.16,t+0.08);g.gain.setValueAtTime(0.16,t+d*0.75);g.gain.exponentialRampToValueAtTime(0.0001,t+d+0.4);
+    o.connect(lp);lp.connect(g);g.connect(sfxOut(ac));o.start(t);o.stop(t+d+0.45);}catch(e){}}
+/* Beat nach einer geschafften Übung: ein Takt Schlagzeug mit Bass, Melodie nach oben, Schlussakkord */
+function sfxBeat(){if(!sfxOn())return 0;var ac=sfxAC();if(!ac)return 0;var t0=ac.currentTime+0.08,e=60/128/2;
+  try{
+    [0,3,4,7].forEach(function(i){sfxKick(ac,t0+i*e);});
+    [2,6].forEach(function(i){sfxSnare(ac,t0+i*e);});
+    for(var i=0;i<8;i++)sfxHat(ac,t0+i*e,i%2?0.12:0.2);
+    sfxNoise(ac,t0+7.5*e,0.12,0.3,'bandpass',2400);
+    [65.4,65.4,98,65.4,87.3,87.3,98,116.5].forEach(function(f,i){sfxTone(ac,f,t0+i*e,e*0.9,0.35,'sawtooth',null,700);});
+    [523.3,659.3,784,1046.5].forEach(function(f,i){sfxTone(ac,f,t0+(4+i)*e,e*0.9,0.16,'square',null,2600);});
+    var te=t0+8*e;sfxKick(ac,te);sfxNoise(ac,te,1.1,0.22,'highpass',5000);
+    [261.6,329.6,392,523.3].forEach(function(f){sfxTone(ac,f,te,1.2,0.12,'sawtooth',null,1800);});
+  }catch(err){}
+  return Math.round((8*e+1.2)*1000);}
+/* Medien freigeben, damit iOS sie nicht auf dem Sperrbildschirm anzeigt */
+function relA(a){if(!a)return;try{a.onended=null;a.pause();a.removeAttribute('src');a.load();}catch(e){}}
+function mediaOff(){try{if('mediaSession' in navigator){navigator.mediaSession.metadata=null;navigator.mediaSession.playbackState='none';}}catch(e){}}
 /* Spielt einen Teil (a = Geschichte, b = Rätsel) ab Wort "from" bis vor Wort "to". onIdx bekommt das gerade gesprochene Wort. */
 function playPart(id,pk,from,to,onIdx,onFail){
   var pa=pickAudio(id,pk);if(!pa){onFail();return;}
@@ -1214,6 +1278,17 @@ function feedback(t,wpm,prev,sug){
 }
 function fmtSec(x){x=Math.round(x||0);return Math.floor(x/60)+':'+('0'+x%60).slice(-2);}
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),x=a[i];a[i]=a[j];a[j]=x;}return a;}
+/* Tacho für das Lesetempo: Nadel und Bogen laufen hoch, passend zum Auto-Thema */
+function tacho(w,pv,mx,nums){
+  var cx=120,cy=112,r=92;function pt(rr,v){var th=(-135+270*Math.min(1,v/mx))*Math.PI/180;return [(cx+rr*Math.sin(th)).toFixed(1),(cy-rr*Math.cos(th)).toFixed(1)];}
+  var p0=pt(r,0),p1=pt(r,mx),arc='M'+p0[0]+' '+p0[1]+' A'+r+' '+r+' 0 1 1 '+p1[0]+' '+p1[1];
+  var ticks='';for(var v=0;v<=mx;v+=mx/6){var a=pt(r-14,v),b=pt(r-24,v);ticks+='<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"/>';if(nums){var l=pt(r-38,v);ticks+='<text x="'+l[0]+'" y="'+(+l[1]+4)+'">'+Math.round(v)+'</text>';}}
+  var pm='';if(pv&&nums){var q=pt(r+11,pv);pm='<circle class="pvm" cx="'+q[0]+'" cy="'+q[1]+'" r="5"/>';}
+  var ang=-135+270*Math.min(1,w/mx),pct=Math.min(100,w/mx*100).toFixed(1);
+  return '<div class="tacho'+(R&&R.revved?' go':'')+'" style="--ang:'+ang+'deg;--pct:'+pct+'"><svg viewBox="0 0 240 210" aria-hidden="true"><path class="trk" d="'+arc+'" pathLength="100"/><path class="val" d="'+arc+'" pathLength="100"/><g class="tks">'+ticks+'</g>'+pm+
+    '<g class="ndl"><line x1="'+cx+'" y1="'+cy+'" x2="'+cx+'" y2="'+(cy-74)+'"/><circle cx="'+cx+'" cy="'+cy+'" r="9"/></g></svg>'+
+    '<div class="tnum">'+(nums?'<b>'+w+'</b><span>Wörter pro Minute</span>'+(pv?'<small>Beim ersten Mal: '+pv+'</small>':''):'<span>Dein Tempo</span>')+'</div></div>';
+}
 function sugTile(){
   if(R.sugState==='wait')return '<b>…</b><span>Stockstellen</span>';
   if(R.sugState==='done'){var n=R.entry&&R.entry.sug!=null?R.entry.sug:0;return '<b>'+n+'</b><span>'+(n===1?'Stockstelle':'Stockstellen')+'</span>';}
@@ -1372,7 +1447,7 @@ function plAudio(el){
   if(el._a)return el._a;var a=new Audio();a.preload='metadata';a.src=el.dataset.u;el._a=a;
   a.addEventListener('loadedmetadata',function(){if(a.duration===Infinity){a._fix=true;a.currentTime=1e7;}});
   a.addEventListener('timeupdate',function(){if(a._fix){a._fix=false;a.currentTime=0;return;}plUpd(el,a);});
-  a.addEventListener('ended',function(){if(PL.a===a)plStop();a.currentTime=0;plUpd(el,a);});
+  a.addEventListener('ended',function(){if(PL.a===a)plStop();a.currentTime=0;plUpd(el,a);relA(a);el._a=null;mediaOff();});
   return a;
 }
 function plToggle(id){
@@ -1569,7 +1644,7 @@ function stopRound(){
   var sec=(Date.now()-R.t0)/1000,t=R.t,minSec=Math.max(8,t.rs/4),keep=sec>=minSec,p=recStop(keep);
   if(!keep){R.phase='read';R.msg='Das ging sehr schnell. Hast du den ganzen Text gelesen? Lies ihn einmal ganz laut und tippe dann auf „Fertig gelesen“.';renderCtl();R.msg='';window.scrollTo(0,0);return;}
   var wpm=Math.max(1,Math.round(R.t.rs/(sec/60)));
-  R.round++;R.rounds.push(wpm);R.marks={};R.phase='mark';R.ms='self';R.sug=[];R.sec=sec;R.sugState=R.recOn?'wait':'none';R.chk=null;
+  R.round++;R.rounds.push(wpm);R.marks={};R.revved=0;R.phase='mark';R.ms='self';R.sug=[];R.sec=sec;R.sugState=R.recOn?'wait':'none';R.chk=null;
   var prev=S.log.filter(function(x){return x.id===t.id&&x.wpm;}),ent={ts:Date.now(),id:t.id,wpm:wpm,sug:null,marked:null,self:null};
   R.prev=prev;R.entry=ent;R.head=headline(wpm,prev);R.fb=feedback(t,wpm,prev,null);
   S.log.push(ent);if(S.log.length>600)S.log.shift();save();
@@ -1646,17 +1721,16 @@ function showReward(t,first,gain,list){
   h+='<div class="rwt tankrow">'+carImg(curCar()?curCar().car:RSTAGES[rankOf(lvl(S.xp))].img,'')+'<div class="tankin">'+(hasCar()?tankPips(true,before):'<div class="bar"><i style="width:'+stageProg().pct+'%"></i></div>')+'<b>'+esc(tankLine())+'</b></div></div>';
   if(full)h+='<button class="btn wide race-go" data-a="race">'+IC_FLAG+'Rennen fahren</button>';
   h+='<button class="btn wide'+(full?' ghost':'')+'" data-a="home2">Zur Übersicht</button>';
-  say(tankHint(),900);
+  var bl=sfxBeat();say(tankHint(),bl?bl+200:900);
   if(sg)h+='<button class="link" data-a="nextread" data-v="'+sg.t.id+'">Gleich den nächsten Text lesen</button>';
   h+='</div>';
   openBox('#modal',h);readStyle();burst();
-  try{var A0=typeof AUDIO!=='undefined'&&AUDIO[t.id];if(A0&&(A0.n||A0.s)){var cx=getAC();if(cx){cx.resume();chime(cx,cx.currentTime+0.6);}}}catch(e){}
 }
 function showEvolve(a,b,done){
   var s=RSTAGES[b];
   var h='<div class="card"><span class="eyebrow">Level '+s.lv+' · '+(s.car?'Neues Auto!':'Deine Garage')+'</span><div class="evo">'+stageHTML(a,'evo-old')+'<span class="evo-ar">➜</span>'+stageHTML(b,'evo-new')+'</div><h2>'+esc(s.car?s.full:'Die Plane rutscht!')+'</h2><p class="hint">'+esc(s.neu||growText())+'</p>'+(b===CAR0?'<p class="hint">Dein Tank ist voll. Du kannst gleich losfahren!</p>':'')+'<button class="btn wide" data-a="evoOk">Weiter</button></div>';
   if(s.car)S.rcar=s.car;save();
-  openBox('#modal',h);burst();R.afterEvo=done;
+  openBox('#modal',h);burst();sfxBeat();R.afterEvo=done;
 }
 /* ---------- Wort-Jäger: schwere Wörter in Silben üben ---------- */
 var W=null;
@@ -1710,7 +1784,7 @@ function wjEnd(){
     if(done)h+='<p class="hint fb">'+done+(done===1?' Wort ist':' Wörter sind')+' jetzt ganz geschafft!</p>';
     if(fuelFull())h+='<button class="btn wide" data-a="race">Rennen fahren</button>';
     h+='<button class="btn wide'+(fuelFull()?' ghost':'')+'" data-a="home2">Zur Übersicht</button></div>';
-    openBox('#modal',h);burst();
+    openBox('#modal',h);burst();sfxBeat();
   }
   var nowRank=rankOf(lvl(S.xp));
   if(nowRank!==wasRank){R=R||{};showEvolve(wasRank,nowRank,show2);}else show2();
@@ -1737,21 +1811,23 @@ function renderSheet(){
   h+='<div class="setrow"><span class="eyebrow">Größe</span>'+seg('size',[[0,'Normal'],[1,'Groß'],[2,'Sehr groß']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Silben in zwei Farben</span>'+seg('syl',[[true,'An'],[false,'Aus']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Vorlese-Tempo</span>'+seg('speed',[['slow','Langsam'],['normal','Normal']])+'</div>';
+  /* Für Erwachsene: kurze Zeilen mit Schalter statt großer Knöpfe, in Gruppen */
+  function tg(key,label,hint,extra){var on=!!s[key];return '<div class="tgrow"><button class="tgl" data-a="set" data-k="'+key+'" data-v="'+(!on)+'" role="switch" aria-checked="'+on+'"><span class="tgt"><b>'+label+'</b>'+(hint?'<small>'+hint+'</small>':'')+'</span><span class="sw" aria-hidden="true"><i></i></span></button>'+(extra||'')+'</div>';}
+  function sseg(key,label,opts){return '<div class="tgrow sg"><b>'+label+'</b><div class="seg sm">'+opts.map(function(o){return '<button data-a="set" data-k="'+key+'" data-v="'+o[0]+'" aria-pressed="'+(String(s[key])===String(o[0]))+'">'+o[1]+'</button>';}).join('')+'</div></div>';}
   h+='<details class="adult set"'+(wasOpen?' open':'')+'><summary>Für Erwachsene</summary><div>';
-  h+='<h3 class="setgrp">Text</h3><div class="setrow"><span class="eyebrow">Zeilenabstand</span>'+seg('line',[[0,'Eng'],[1,'Normal'],[2,'Weit']])+'</div>';
-  h+='<div class="setrow"><span class="eyebrow">Buchstabenabstand</span>'+seg('space',[[0,'Normal'],[1,'Mehr'],[2,'Viel']])+'</div>';
-  h+='<div class="setrow"><span class="eyebrow">Sprach-Hinweise</span>'+seg('voice',[[true,'An'],[false,'Aus']])+'<span class="hint">Die Stimme sagt auf jedem Bildschirm, was zu tun ist.</span></div>';
-  h+='<h3 class="setgrp">Aufnahme und Auswertung</h3><div class="setrow"><span class="eyebrow">Aufnahme beim Lesen</span>'+seg('rec',[[true,'An'],[false,'Aus']])+'<span class="hint">Die Aufnahmen bleiben nur auf diesem Gerät.</span><button class="link" id="delRecsBtn" data-a="delRecs">Alle Aufnahmen löschen</button></div>';
-  h+='<div class="setrow"><span class="eyebrow">Stockstellen erkennen</span>'+seg('wh',[[true,'An'],[false,'Aus']])+'<span class="hint">Markiert nach dem Lesen Wörter, bei denen du hängen geblieben bist. '+(WH_SERVER?'Die Aufnahme geht dafür kurz an Cloudflare und wird dort nicht gespeichert.':'Beim ersten Einschalten werden einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB geladen, am besten im WLAN. Danach läuft alles auf diesem Gerät, der Ton verlässt es nicht.')+'</span><span class="hint fb" id="whst">'+esc(S.set.wh?whStatus():'')+'</span></div>';
-  h+='<div class="setrow"><span class="eyebrow">Tempo-Zahlen zeigen</span>'+seg('nums',[[true,'An'],[false,'Aus']])+'<span class="hint">Aus: Es gibt nur „schneller als beim ersten Mal“, keine Wörter pro Minute.</span></div>';
-  h+='<h3 class="setgrp">So funktioniert Readster</h3><div class="setrow"><ul class="howto"><li>Zuhören, dann selbst laut lesen (mit Aufnahme).</li><li>Danach: Gesicht wählen, Tempo ansehen, sich selbst anhören und schwere Wörter antippen.</li><li>Zwei Fragen zum Text.</li><li>Jeder Text füllt den Tank. Drei Texte: ein Rennen. Neue Autos kommen mit der Zeit dazu (Garage: aufs Auto tippen).</li><li>Schwere Wörter landen im Wort-Jäger und werden an mehreren Tagen geübt.</li></ul><button class="btn ghost sm" data-a="tourAgain">Einführung nochmal zeigen</button></div>';
+  h+='<section class="sgrp"><h3>Text</h3>'+sseg('line','Zeilenabstand',[[0,'Eng'],[1,'Normal'],[2,'Weit']])+sseg('space','Buchstabenabstand',[[0,'Normal'],[1,'Mehr'],[2,'Viel']])+'</section>';
+  h+='<section class="sgrp"><h3>Ton</h3>'+tg('voice','Sprach-Hinweise','Die Stimme sagt, was zu tun ist.')+tg('sfx','Töne und Musik','Klicks auf Knöpfen, Beat nach jeder geschafften Übung.')+'</section>';
+  h+='<section class="sgrp"><h3>Aufnahme und Auswertung</h3>'+tg('rec','Aufnahme beim Lesen','Bleibt nur auf diesem Gerät.','<button class="link" id="delRecsBtn" data-a="delRecs">Alle Aufnahmen löschen</button>')+
+    tg('wh','Stockstellen erkennen',(WH_SERVER?'Die Aufnahme geht kurz an Cloudflare und wird dort nicht gespeichert.':'Lädt einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB, danach läuft alles auf dem Gerät.'),'<span class="hint fb" id="whst">'+esc(s.wh?whStatus():'')+'</span>')+
+    tg('nums','Tempo-Zahlen zeigen','Aus: nur „schneller als beim ersten Mal“.')+'</section>';
+  h+='<section class="sgrp"><h3>Hilfe</h3><details class="howto-d"><summary>So funktioniert Readster</summary><ul class="howto"><li>Zuhören, dann selbst laut lesen (mit Aufnahme).</li><li>Danach: Gesicht wählen, Tempo ansehen, sich selbst anhören und schwere Wörter antippen.</li><li>Zwei Fragen zum Text.</li><li>Jeder Text füllt den Tank. Drei Texte: ein Rennen. Neue Autos kommen mit der Zeit dazu.</li><li>Schwere Wörter landen im Wort-Jäger und werden an mehreren Tagen geübt.</li></ul></details><button class="link" data-a="tourAgain">Einführung nochmal zeigen</button></section>';
   /* Zum Ausprobieren der Rennen: Level springen und Tank füllen (ändert den echten Fortschritt dieses Codes) */
   var Lc=lvl(S.xp);
-  h+='<h3 class="setgrp">Rennen testen</h3><div class="setrow"><span class="hint">Jetzt: Level '+Lc+', Tank '+(fuelFull()?'voll':Math.round((S.fuel||0)/XP_RACE*100)+' %')+'. Ändert den Fortschritt dieses Codes.</span><div class="dbg">'+
-    RSTAGES.map(function(s){return '<button class="btn ghost sm'+(rankOf(Lc)===RSTAGES.indexOf(s)?' on':'')+'" data-a="dbgLv" data-v="'+s.lv+'">'+s.lv+' · '+esc(s.n)+'</button>';}).join('')+
-    '</div><button class="btn sm" data-a="dbgFuel">Tank füllen</button></div>';
-  h+='<h3 class="setgrp">Dein Code</h3><div class="setrow">'+(CODE?'<span class="hint">Angemeldet mit <b>'+esc(CODE)+'</b>. Der Fortschritt wird automatisch gespeichert und ist auf jedem Gerät mit diesem Code da.</span><button class="link" data-a="login">Anderen Code nutzen</button>':'<button class="link" data-a="login">Mit Code anmelden</button>')+'<button class="link" data-a="reset">Fortschritt zurücksetzen</button></div></div></details>';
-  h+='<button class="btn wide" data-a="sheetOk">Fertig</button></div>';
+  h+='<section class="sgrp"><h3>Rennen testen</h3><small class="sgh">Level '+Lc+', Tank '+(fuelFull()?'voll':Math.round((S.fuel||0)/XP_RACE*100)+' %')+'. Ändert den Fortschritt dieses Codes.</small><div class="dbg">'+
+    RSTAGES.map(function(st){return '<button class="chip'+(rankOf(Lc)===RSTAGES.indexOf(st)?' on':'')+'" data-a="dbgLv" data-v="'+st.lv+'">'+st.lv+' · '+esc(st.n)+'</button>';}).join('')+
+    '</div><button class="chip fuelchip" data-a="dbgFuel">'+IC_PUMP+'Tank füllen</button></section>';
+  h+='<section class="sgrp"><h3>Dein Code</h3>'+(CODE?'<small class="sgh">Angemeldet mit <b>'+esc(CODE)+'</b>. Der Fortschritt wird automatisch gespeichert.</small><button class="link" data-a="login">Anderen Code nutzen</button>':'<button class="link" data-a="login">Mit Code anmelden</button>')+'<button class="link danger" data-a="reset">Fortschritt zurücksetzen</button></section></div></details>';
+  h+='<button class="btn wide acc" data-a="sheetOk">Fertig</button></div>';
   openBox('#sheet',h);$('#sheet').scrollTop=sc;
 }
 /* Sichern und Laden: der ganze Fortschritt als Code oder Datei (ohne Aufnahmen) */
@@ -1888,7 +1964,7 @@ document.addEventListener('click',function(e){
       if(MODE&&S.tour&&!S.tourSeen[MODE]&&$('#modal').hidden)tourOpen(0,tourMid());break;
     case 'again':R.phase='read';renderCtl();window.scrollTo(0,0);break;
     case 'check':R.phase='check';R.qi=0;renderCtl();window.scrollTo(0,0);break;
-    case 'pick':var pq=v.split('-'),qi=+pq[0],oj=+pq[1];if(R.pick[qi]===null){R.pick[qi]=oj;R.qs[qi]=R.opts[qi][oj]===R.t.q[qi].a?1:0;renderCtl();}break;
+    case 'pick':var pq=v.split('-'),qi=+pq[0],oj=+pq[1];if(R.pick[qi]===null){R.pick[qi]=oj;R.qs[qi]=R.opts[qi][oj]===R.t.q[qi].a?1:0;if(R.qs[qi])sfxGood();renderCtl();}break;
     case 'finish':finish();break;
     case 'nextQ':R.qi=(R.qi||0)+1;renderCtl();window.scrollTo(0,0);break;
     case 'garage':renderGarage();break;
@@ -1905,7 +1981,7 @@ document.addEventListener('click',function(e){
     case 'card':var t=byId[v];openBox('#modal','<div class="card">'+cardHTML(t,true)+'<div class="cfbtns"><button class="btn ghost" data-a="closeModal">Schließen</button><button class="btn" data-a="nextread" data-v="'+t.id+'">Nochmal lesen</button></div></div>');break;
     case 'closeModal':stopListen();closeBox('#modal');break;
     case 'settings':renderSheet();break;
-    case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl'||k==='rec'||k==='nums'||k==='wh')val=(v==='true');S.set[k]=val;save();if(k==='wh'&&val)whPreload();renderSheet();readStyle();break;
+    case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl'||k==='rec'||k==='nums'||k==='wh'||k==='voice'||k==='sfx')val=(v==='true');S.set[k]=val;save();if(k==='wh'&&val)whPreload();renderSheet();readStyle();break;
     case 'sheetOk':closeBox('#sheet');break;
     case 'reset':renderReset();break;
     case 'dbgLv':S.xp=XPK*(+v-1)*(+v-1);var ds=RSTAGES[rankOf(+v)];if(ds.car)S.rcar=ds.car;save();renderSheet();renderHome();break;
@@ -1942,6 +2018,17 @@ syncStart();
 (function(){var m=/[?&]code=([^&#]+)/i.exec(location.search);if(!m)return;var c=normCode(decodeURIComponent(m[1]));
   try{history.replaceState(null,'',location.pathname+location.hash);}catch(e){}
   if(c&&c!==CODE)codeGo(c);})();
+/* Klick-Töne auf Knöpfen (nicht während der Aufnahme, nicht bei Antworten: die haben eigene Töne) */
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('button');if(!b||b.disabled)return;
+  if(R&&(R.phase==='timing'||R.phase==='count'))return;
+  var a=b.dataset.a;if(a==='pick'||a==='start'||a==='stop'||a==='set'&&b.dataset.k==='sfx')return;
+  sfxClick(b.classList.contains('btn')&&!b.classList.contains('ghost'));
+},true);
+/* Telefon gesperrt oder App gewechselt: alles anhalten und freigeben, damit nichts auf dem Sperrbildschirm bleibt */
+function goQuiet(){sayStop();if(typeof stopListen==='function')stopListen();if(typeof plStop==='function')plStop();var ps=document.querySelectorAll('.plr');for(var i=0;i<ps.length;i++){if(ps[i]._a){relA(ps[i]._a);ps[i]._a=null;}}mediaOff();try{if(AC&&AC.state==='running')AC.suspend();}catch(e){}}
+document.addEventListener('visibilitychange',function(){if(document.hidden)goQuiet();});
+window.addEventListener('pagehide',goQuiet);
 })();
 </script>
 </body>
