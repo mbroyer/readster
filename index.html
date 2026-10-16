@@ -291,6 +291,8 @@ ul.howto{margin:0;padding-left:1.2em;color:var(--muted);font-weight:500;font-siz
 .rtext .w{border-radius:8px;padding:2px 3px;margin-inline:-3px;transition:background .15s}
 .rtext.syl-on .sy.s0{color:var(--sy-a)}
 .rtext.syl-on .sy.s1{color:var(--sy-b)}
+/* Nur lange Wörter (ab drei Silben) bunt */
+.rtext.syl-lang .w:not(.wlang) .sy{color:inherit}
 .rtext .w.now{background:var(--warn-bg);box-shadow:0 0 0 3px var(--accent)}
 .rtext{position:relative;isolation:isolate}.rtext.finger{touch-action:none;-webkit-user-select:none;user-select:none}
 .rtext .w.fw{background:color-mix(in srgb,var(--xp) 30%,transparent);box-shadow:inset 0 -4px 0 var(--xp)}
@@ -1088,7 +1090,7 @@ function wordsHTML(t,s,e){
   var a=[];
   for(var i=s;i<e;i++){
     var w=t.words[i],sy=w.sy.map(function(x,k){return '<span class="sy s'+(k%2)+'">'+esc(x)+'</span>';}).join('');
-    a.push('<span class="w" data-i="'+i+'">'+esc(w.pre)+sy+esc(w.post)+'</span>');
+    a.push('<span class="w'+(w.sy.length>=3?' wlang':'')+'" data-i="'+i+'">'+esc(w.pre)+sy+esc(w.post)+'</span>');
   }
   return a.join(' ');
 }
@@ -1102,7 +1104,7 @@ function readStyle(){
   var els=document.querySelectorAll('.rtext');
   for(var i=0;i<els.length;i++){var el=els[i];
     el.style.setProperty('--rf',"'"+s.font+"'");el.style.setProperty('--rsize',sz+'rem');el.style.setProperty('--rline',ln);el.style.setProperty('--rsp',sp+'em');
-    el.classList.toggle('syl-on',!!s.syl);}
+    el.classList.toggle('syl-on',!!s.syl);el.classList.toggle('syl-lang',s.syl==='lang');}
 }
 function openText(id){
   var t=byId[id];
@@ -1634,7 +1636,6 @@ function lvSent(p){var ss=R.t.sents,k=ss.length-1;for(var i=0;i<ss.length;i++){i
 function lvShow(k){
   if(!LV||LV.k===k)return;LV.k=k;var o=document.querySelectorAll('#rtext .sent');
   for(var i=0;i<o.length;i++){o[i].classList.toggle('done',i<k);o[i].classList.toggle('cur',i===k);o[i].classList.toggle('todo',i>k);}
-  var c=$('#rtext .sent.cur');try{if(c&&k>0)c.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}
 }
 function liveStart(){
   if(!LIVE_OK||LV||!R||!R.t)return;var C=window.SpeechRecognition||window.webkitSpeechRecognition,t=R.t;
@@ -2055,7 +2056,7 @@ function renderSheet(){
   h+='<div class="rtext syl-on prev" style="--rf:\''+esc(s.font)+'\';--rsize:'+[1.25,1.5,1.8][s.size]+'rem;--rline:'+[1.7,2,2.35][s.line]+';--rsp:'+[0,.04,.08][s.space]+'em;background:var(--bg);border-radius:14px;padding:12px 14px"><span class="w"><span class="sy s0">Ge</span><span class="sy s1">cko</span></span> <span class="w"><span class="sy s0">läuft</span></span> <span class="w"><span class="sy s0">an</span></span> <span class="w"><span class="sy s0">der</span></span> <span class="w"><span class="sy s0">Wand</span></span>.</div>';
   h+='<div class="setrow"><span class="eyebrow">Schrift</span>'+seg('font',[['Lexend','Lexend'],['Atkinson Hyperlegible','Klar'],['Nunito','Rund']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Größe</span>'+seg('size',[[0,'Normal'],[1,'Groß'],[2,'Sehr groß']])+'</div>';
-  h+='<div class="setrow"><span class="eyebrow">Silben in zwei Farben</span>'+seg('syl',[[true,'An'],[false,'Aus']])+'</div>';
+  h+='<div class="setrow"><span class="eyebrow">Silben in zwei Farben</span>'+seg('syl',[[true,'An'],['lang','Lange Wörter'],[false,'Aus']])+'</div>';
   h+='<div class="setrow"><span class="eyebrow">Vorlese-Tempo</span>'+seg('speed',[['slow','Langsam'],['normal','Normal']])+'</div>';
   /* Für Erwachsene: kurze Zeilen mit Schalter statt großer Knöpfe, in Gruppen */
   function tg(key,label,hint,extra){var on=!!s[key];return '<div class="tgrow"><button class="tgl" data-a="set" data-k="'+key+'" data-v="'+(!on)+'" role="switch" aria-checked="'+on+'"><span class="tgt"><b>'+label+'</b>'+(hint?'<small>'+hint+'</small>':'')+'</span><span class="sw" aria-hidden="true"><i></i></span></button>'+(extra||'')+'</div>';}
@@ -2228,7 +2229,7 @@ document.addEventListener('click',function(e){
     case 'card':var t=byId[v];openBox('#modal','<div class="card">'+cardHTML(t,true)+'<div class="cfbtns"><button class="btn ghost" data-a="closeModal">Schließen</button><button class="btn" data-a="nextread" data-v="'+t.id+'">Nochmal lesen</button></div></div>');break;
     case 'closeModal':stopListen();closeBox('#modal');break;
     case 'settings':renderSheet();break;
-    case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl'||k==='rec'||k==='nums'||k==='wh'||k==='voice'||k==='sfx'||k==='mit')val=(v==='true');S.set[k]=val;save();if(k==='wh'&&val)whPreload();renderSheet();readStyle();break;
+    case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl')val=v==='lang'?'lang':v==='true';else if(k==='rec'||k==='nums'||k==='wh'||k==='voice'||k==='sfx'||k==='mit')val=(v==='true');S.set[k]=val;save();if(k==='wh'&&val)whPreload();renderSheet();readStyle();break;
     case 'sheetOk':closeBox('#sheet');break;
     case 'reset':renderReset();break;
     case 'dbgLv':S.xp=XPK*(+v-1)*(+v-1);var ds=RSTAGES[rankOf(+v)];if(ds.car)S.rcar=ds.car;save();renderSheet();renderHome();break;
