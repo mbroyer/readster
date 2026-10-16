@@ -47,6 +47,9 @@
     "tour7": "Ist der Tank voll, fährst du ein Beschleunigungsrennen. Zwei Autos stehen an der Startlinie. Bei Grün geht es los. Wer als Erster die Viertelmeile schafft, gewinnt!",
     "tourp1": "Zu zweit geht es Satz für Satz. Zuerst liest dein Partner einen Satz ruhig vor, und du hörst gut zu.",
     "tourp2": "Dann liest du denselben Satz laut nach. Danach kommt der nächste Satz.",
-    "tourp3": "Tippt zusammen auf die Wörter, die schwer waren. Die übst du später im Wort-Jäger."
+    "tourp3": "Tippt zusammen auf die Wörter, die schwer waren. Die übst du später im Wort-Jäger.",
+    "wjsilben": "Tippe jede Silbe an und sprich sie dabei laut.",
+    "wjlesen": "Jetzt liest du das ganze Wort laut. Nach jedem Lesen tippst du auf die nächste Zahl. Eins, zwei, drei.",
+    "wjgut": "Wie gut kannst du das Wort schon? Tippe auf Kann ich oder auf Morgen nochmal."
   }
 }
