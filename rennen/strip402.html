@@ -2002,7 +2002,7 @@ function engInit(c){
   c.wtK=(hh[c.id]||0.5)/c.wb/(rs[c.id]||0.56);
 }
 function launch(c){
-  c.launched=true;c.t=0;c.launchT=T;
+  c.launched=true;c.t=0;c.launchT=T;c.cf=null;c.wrP=0;
   c.launchRpm=c.isPlayer?c.rpm:c.launchRpm;
   c.er=c.launchRpm;c.dr=c.launchRpm;
   c.heatL=c.heat||0;c.ty=c.heatL;c.thrL=0.5;c.wt=0.3;
@@ -2042,7 +2042,8 @@ function physics(c,dt){
   else if(!c.over){
     var sk=0;
     /* Version 81: Kupplung schleift beim Start, bis die Räder die Drehzahl einholen: Motor sackt nur leicht ab statt auf Leerlauf (vorher wirkte das Anfahren wie Zeitlupe) */
-    if(c.gear===0&&!c.over)er=Math.max(wr,c.launchRpm*(1-0.2*Math.min(1,c.t/0.18)));
+    /* Version 82: nach dem kurzen Absacken steigt die Drehzahl gleich wieder (mit gut einem Drittel des Raddrehzahl-Anstiegs), bis die Räder sie einholen; kein Stillstand der Nadel mehr */
+    if(c.gear===0&&!c.over){if(c.t<0.18){c.cf=c.launchRpm*(1-0.2*c.t/0.18);}else{if(c.cf==null)c.cf=c.launchRpm*0.8;c.cf+=0.35*Math.max(0,wr-(c.wrP||0));}c.wrP=wr;er=Math.max(wr,c.cf);}
     er=Math.max(c.e.idle,er);
     if(er>=c.e.red){er=c.e.red;c.lim=true;}
     var Fw=torque(c,er)*c.eff*Rt/RW*(1+0.6*(WX.rho/1.2-1))*(1-(c.hl||0)*Math.pow(c.v/60,2));
