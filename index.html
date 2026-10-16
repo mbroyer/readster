@@ -1608,7 +1608,7 @@ var FG={w:null,bar:null};
 function fingClear(){if(FG.w)FG.w.classList.remove('fw');FG.w=null;if(FG.bar){FG.bar.remove();FG.bar=null;}}
 function fingAt(x,y){
   var tx=$('#rtext');if(!tx||!tx.classList.contains('finger'))return;
-  var w=null;[0,-18,-34,12].some(function(d){var e=document.elementFromPoint(x,y+d);w=e&&e.closest&&e.closest('#rtext .w');return !!w;});
+  var w=null;/* Der Finger liegt beim Lesen leicht unter dem Wort: zuerst ein Stück oberhalb des Berührungspunkts suchen */[-28,-42,-14,0].some(function(d){var e=document.elementFromPoint(x,y+d);w=e&&e.closest&&e.closest('#rtext .w');return !!w;});
   if(!w||w===FG.w)return;
   if(FG.w)FG.w.classList.remove('fw');FG.w=w;w.classList.add('fw');
   if(!FG.bar||!FG.bar.isConnected){FG.bar=document.createElement('i');FG.bar.className='lruler';tx.appendChild(FG.bar);}
