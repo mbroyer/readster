@@ -707,10 +707,13 @@ var RSTAGES=[
  {lv:1,n:'Unter der Plane',img:'plane_voll'},
  {lv:2,n:'Die Plane rutscht',img:'plane_halb',neu:'Man sieht schon die Räder. Lies weiter, dann ziehst du die Plane ganz weg.'},
  {lv:3,n:'Kaido Soraline',full:'Kaido Soraline 2000 GTX',car:'skyline',kurz:'Dein erstes Rennen',neu:'Du gibst Gas und startest bei Grün. Schalten und Bremsen macht das Auto allein.',r:{auto:1,brake:1,night:0,wx:0,diff:0}},
+ {lv:4,n:'Brixton Terrier',full:'Brixton Terrier 1380 S',car:'brixton',kurz:'Ein kleiner Flitzer',neu:'Klein und leicht. Beim Start drehen die Vorderräder gern durch, also gib gefühlvoll Gas.',r:{auto:1,brake:1,night:0,wx:0,diff:0}},
  {lv:5,n:'Zuffler Elfer',full:'Zuffler Elfer RS',car:'911',kurz:'Neu: selbst schalten',neu:'Jetzt schaltest du selbst. Leuchtet der Knopf gelb, tippst du auf Schalten.',r:{auto:0,brake:1,night:0,wx:0,diff:0}},
  {lv:6,n:'Corsari Caporossa',full:'Corsari Caporossa',car:'testarossa',kurz:'Neu: Rennen bei Nacht',neu:'Manche Rennen sind jetzt nachts. Und nach dem Ziel bremst du selbst.',r:{auto:0,brake:0,night:.5,wx:0,diff:1}},
  {lv:7,n:'Taurino Accidenti',full:'Taurino Accidenti QV',car:'countach',kurz:'Neu: Rivalen mit Namen',neu:'Gegner mit Namen und eigenen Tricks. Manchmal ist es kalt oder nass.',r:{auto:0,brake:0,night:.5,wx:'',diff:1,rival:1}},
- {lv:8,n:'Liberty Hellhound',full:'Liberty Contender Hellhound',car:'challenger',kurz:'Das stärkste Auto',neu:'Das stärkste Auto. Die Rivalen fahren jetzt richtig schnell.',r:{auto:0,brake:0,night:.5,wx:'',diff:2,rival:1}}
+ {lv:8,n:'Liberty Hellhound',full:'Liberty Contender Hellhound',car:'challenger',kurz:'Neu: schnelle Rivalen',neu:'Ein Muskelauto mit riesiger Kraft. Die Rivalen fahren jetzt richtig schnell.',r:{auto:0,brake:0,night:.5,wx:'',diff:2,rival:1}},
+ {lv:9,n:'Voltaris Model P',full:'Voltaris Model P',car:'voltaris',kurz:'Neu: ein Elektroauto',neu:'Ein Elektroauto hat nur einen Gang. Du musst nicht schalten, nur Gas geben und gut starten.',r:{auto:0,brake:0,night:.5,wx:'',diff:2,rival:1}},
+ {lv:10,n:'Alsatia Vento',full:'Alsatia Vento W16',car:'vento',kurz:'Das schnellste Auto',neu:'Das schnellste Auto mit Allrad. Alle vier Räder ziehen, so startet es fast ohne Durchdrehen.',r:{auto:0,brake:0,night:.5,wx:'',diff:2,rival:1}}
 ];
 var CAR0=2; /* ab diesem Index gibt es Autos */
 function rankOf(L){var r=0;RSTAGES.forEach(function(s,i){if(L>=s.lv)r=i;});return r;}
