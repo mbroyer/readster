@@ -65,11 +65,6 @@ button:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .msg.bad{background:#ff3347;border-color:transparent;color:#fff}
 
 .hud{position:absolute;left:12px;right:12px;bottom:10px;display:flex;flex-direction:column;align-items:stretch;gap:8px;pointer-events:none}
-.tjb{position:absolute;left:0;right:0;bottom:calc(100% + 8px);height:44px;border-radius:12px;border:1px solid rgba(140,200,255,.55);background:rgba(10,18,32,.92);color:#cfe6ff;font:700 15px/1 inherit;letter-spacing:.04em;text-transform:uppercase;overflow:hidden;pointer-events:auto;touch-action:manipulation}
-.tjb i{position:absolute;left:0;top:0;bottom:0;width:var(--f,0%);background:linear-gradient(90deg,rgba(60,120,220,.55),rgba(140,200,255,.75))}
-.tjb span{position:relative}
-.tjb.on{border-color:#bfe3ff;color:#fff;box-shadow:0 0 18px rgba(120,190,255,.85);animation:tjp .7s ease-in-out infinite alternate}
-@keyframes tjp{to{box-shadow:0 0 30px rgba(160,215,255,1)}}
 .dash{position:relative;display:grid;grid-template-columns:1fr var(--tw) 1fr;gap:6px;align-items:end}
 #tach{width:var(--tw);height:var(--tw);display:block}
 .ctl{display:flex;gap:10px;pointer-events:auto;margin-left:calc((100% - var(--tw) - 12px)/2 + 6px)}
@@ -628,7 +623,6 @@ html,body{touch-action:manipulation}
     <div class="hrow">
     <div class="gaszone" id="gasZone"><div class="pedalwrap"><div class="pdl" id="pdl"><i></i><i></i><i></i><i></i><i></i></div></div><span class="kcap" aria-hidden="true">W</span><div class="gs" id="gasPct">Gas 0 %</div></div>
     <div class="dash">
-      <button class="tjb" id="tjBtn" type="button" hidden><i></i><span>Zeitsprung</span></button>
       <canvas id="tach" width="190" height="190" aria-label="Drehzahlmesser"></canvas>
       <div class="box tbox"><div class="lab">Tempo</div><div class="val"><span id="spd">0</span><span class="unit">km/h</span></div></div>
       <div class="box"><div class="lab" id="etLab">Zeit</div><div class="val"><span id="et">0,000</span><span class="unit">s</span></div></div>
@@ -1980,7 +1974,7 @@ CARS.push({
   tF:0.2,tR:0.24,trF:0.8,trR:0.8,axF:-1.33,axR:1.12,
   body:'#c9ccd0',smooth:false,px:{s:S,cx:CX,cy:CY},
   outline:SIL.map(m),
-  special:{name:'Zeitsprung',text:'Der Fluxkompensator lädt sich beim Fahren auf, saubere Schaltvorgänge laden extra. Voll geladen tippt man auf Zeitsprung: Das Auto verschwindet im Blitz und taucht 88 Meter weiter vorn wieder auf, zwei Feuerspuren bleiben auf der Strecke.'},
+  special:{name:'Zeitsprung',text:'Beim ersten perfekten Schaltvorgang springt der Fluxkompensator an: Das Auto verschwindet im Blitz und taucht 180 Meter weiter vorn wieder auf, zwei Feuerspuren bleiben auf der Strecke.'},
   cues:['Unlackierte Edelstahl-Karosserie mit Flügeltüren','Zeitmaschinen-Umbau: Kabel an den Kotflügeln','Offener Motorraum mit Reaktor und Kühlrohren','Zwei große Abluftschächte am Heck','Bei 88 Meilen pro Stunde geht es los'],
   head:[{x:-0.62,y:-2.25,w:0.3,h:0.04,skipDay:1},{x:0.32,y:-2.25,w:0.3,h:0.04,skipDay:1}],
   tail:[{x:-0.85,y:2.0,w:0.32,h:0.04,skipDay:1},{x:0.53,y:2.0,w:0.32,h:0.04,skipDay:1}],
@@ -2461,8 +2455,8 @@ var SWAPS={
     {n:'5,4 Zwölfzylinder',sub:'Sarthe 5.4',kw:480,nm:560,dkg:10,idle:1100,rT:6000,rP:8300,red:8600,f0:0.55,cost:14,snd:{cut:1.1,seed:73}},
     {n:'5,4 Biturbo',sub:'Drag-Umbau',kw:450,nm:900,fdK:1.1,trac:1.07,hl:0.1,dkg:40,idle:1100,rT:5800,rP:8000,red:8600,f0:0.55,cost:24,snd:{cut:1.3,sub:0.7,seed:79}}],
   'chronos':[
-    {n:'3,0 V6 Turbo',sub:'Chronos Turbo',kw:220,nm:360,dkg:30,idle:800,rT:3200,rP:5800,red:6500,f0:0.55,cost:14,snd:{cut:1.1,seed:83}},
-    {n:'5,0 V8 Biturbo',sub:'Drag-Umbau',kw:300,nm:700,fdK:1.0,trac:1.1,hl:0.1,dkg:90,idle:800,rT:3600,rP:6400,red:7000,f0:0.6,cost:24,snd:{p:4,cut:1.0,sub:1.0,seed:89}}]
+    {n:'3,0 V6 Turbo',sub:'Chronos Turbo',kw:130,nm:280,dkg:30,idle:800,rT:3200,rP:5800,red:6500,f0:0.55,cost:14,snd:{cut:1.1,seed:83}},
+    {n:'5,0 V8 Biturbo',sub:'Drag-Umbau',kw:200,nm:380,fdK:1.0,trac:0.9,hl:0.1,dkg:90,idle:800,rT:3600,rP:6400,red:7000,f0:0.6,cost:24,snd:{p:4,cut:1.0,sub:1.0,seed:89}}]
 };
 function swOwned(id,k){return ((SAVE.sw||{})[id]||[]).indexOf(k)>=0;}
 function curSwap(id){var l=SWAPS[id];return (tuneSel.s>0&&l&&swOwned(id,tuneSel.s))?l[tuneSel.s-1]:null;}
@@ -2733,7 +2727,8 @@ function doShift(c,lift){
   c.gear++;c.shiftT=lift?SHIFT_T:SHIFT_T*1.7;
   var sw=lift&&!c.lim&&d>=-130&&d<=70;
   if(sw){c.bStk=Math.min(4,(c.bStk||0)+1);c.bStr=0.14+0.05*(c.bStk-1);c.boostT=2.2;c.nBoost=(c.nBoost||0)+1;}
-  if(c.id==='chronos'&&!c.tjUsed)c.flux=Math.min(1,c.flux+(sw?0.3:(g===0?0.15:0)));
+  /* Version 88: der Zeitsprung kommt von selbst beim ersten perfekten Schaltvorgang (Mark) */
+  if(c.id==='chronos'&&!c.tjUsed&&lift&&g===0){c.flux=1;c.tjGo=true;}
   else c.bStk=0;
   return {grade:g,d:d,lift:lift,boost:sw,stk:c.bStk};
 }
@@ -2744,8 +2739,8 @@ function revStep(c,dt,thr){
   c.rpm=Math.max(e.idle,Math.min(e.red,c.rpm));
   c.lim=c.rpm>=e.red-1;
 }
-/* Version 87: Zeitsprung. Funken, Blitz, das Auto taucht 88 m weiter vorn mit gleichem Tempo wieder auf, zwei Feuerspuren bleiben zurück */
-var TJ_CHARGE=6.5,TJ_DIST=88;
+/* Version 87: Zeitsprung (seit Version 88: 180 m, automatisch beim ersten perfekten Schalten). Funken, Blitz, das Auto taucht weiter vorn mit gleichem Tempo wieder auf, zwei Feuerspuren bleiben zurück */
+var TJ_DIST=180;
 function tjFire(c){
   if(c.id!=='chronos'||c.flux<1||c.tjUsed||!c.launched||c.over||c.crashed)return false;
   c.tjUsed=true;c.flux=0;c.tj={t:0,y0:null};
@@ -2772,8 +2767,6 @@ function physics(c,dt){
   c.over=c.y>FIN+8;c.braking=c.over&&(c.isPlayer?!!c.brakeIn:true);
   /* Version 87: der Top-Fuel-Dragster zieht hinter dem Ziel automatisch zwei Bremsfallschirme */
   if(c.e.chute&&c.over){c.braking=true;c.chute=Math.min(1,c.chute+dt/0.5);}
-  /* Version 87: Zeitsprung (Chronos 88): der Fluxkompensator lädt sich beim Fahren auf */
-  if(c.id==='chronos'&&!c.tjUsed&&!c.over)c.flux=Math.min(1,c.flux+dt/TJ_CHARGE*(0.4+0.6*(c.thrNow||0)));
   c.slip=false;c.lim=false;
   if(c.shiftT>0){c.shiftT-=dt;er=Math.max(c.e.idle,wr);}
   else if(!c.over){
@@ -3272,8 +3265,7 @@ function simStep(dt){
   if(player.auto&&player.launched&&player.shiftT<=0&&player.gear<player.ng-1&&!player.over&&player.er>=player.opt[player.gear]+90)doShift(player,true);
   physics(player,dt);physics(opp,dt);
   tjStep(player,dt);tjStep(opp,dt);
-  if(opp.id==='chronos'&&opp.flux>=1&&!opp.tjUsed&&!opp.over){if(opp.tjAt==null)opp.tjAt=T+0.3+Math.random()*0.9;else if(T>=opp.tjAt)tjFire(opp);}
-  if(KT&&player.id==='chronos'&&player.flux>=1&&!player.tjUsed&&!player.over&&!KT.tjSaid&&player.shiftT<=0){KT.tjSaid=1;kidCoach('tjBtn','Jetzt Zeitsprung!',null,3);}
+  [player,opp].forEach(function(c){if(c.tjGo){c.tjGo=false;tjFire(c);}});
   if(player.crashed&&!player.crashFx){
     player.crashFx=1;Snd.crash();vib([120,40,120,40,220]);shakeUntil=T+0.6;say('CRASH! Mauer · +0,5 s Strafe','bad');
     for(var ci=0;ci<12;ci++)parts.push({x:player.x+(Math.random()-0.5)*1.8,y:FIN+300+0.2,vx:(Math.random()-0.5)*6,vy:-(Math.random()*5),r:0.5,life:1.0+Math.random()*0.8,age:0,a:0.45});
@@ -4059,22 +4051,12 @@ function updateCtl(){
   if(!shBtn._i){shBtn.innerHTML='<i class="led"></i><span class="gt"></span><b></b>';shBtn._i=1;}
   if(t+bb+cls!==shTxt){shTxt=t+bb+cls;shBtn.children[1].textContent=t;shBtn.children[2].textContent=bb;shBtn.className=cls;}
   var lw=Math.round(led*80);if(lw!==shBtn._l){shBtn._l=lw;shBtn.children[0].style.width=lw+'%';shBtn.style.setProperty('--led',(lw/80).toFixed(3));}
-  ctlEl.classList.toggle('run',player.launched);updTJ();
+  ctlEl.classList.toggle('run',player.launched);
   spdEl.parentNode.parentNode.style.visibility='hidden';
   pdlEl.style.setProperty('--g',gasLvl.toFixed(3));
   var full=gasLvl>=0.995;if(full!==gasZone._f){gasZone._f=full;gasZone.classList.toggle('full',full);if(full&&state==='run')vib(12);}
   var nl=Math.round(gasLvl*5);if(nl!==gasZone._n){gasZone._n=nl;[].forEach.call(pdlEl.children,function(el,i){el.classList.toggle('on',4-i<nl);});}$('gasPct').textContent=full?'Vollgas':'Gas '+Math.round(gasLvl*100)+' %';
 }
-var tjBtn=$('tjBtn');
-function updTJ(){
-  var on=state==='run'&&player.id==='chronos'&&!player.tjUsed&&!player.over;
-  if(tjBtn.hidden===on)tjBtn.hidden=!on;
-  if(!on)return;
-  var f=Math.round(player.flux*100),rd=player.flux>=1&&player.launched;
-  if(f!==tjBtn._f){tjBtn._f=f;tjBtn.style.setProperty('--f',f+'%');}
-  if(rd!==tjBtn._r){tjBtn._r=rd;tjBtn.classList.toggle('on',rd);tjBtn.children[1].textContent=rd?'Zeitsprung!':'Fluxkompensator';}
-}
-tjBtn.addEventListener('pointerdown',function(e){e.preventDefault();e.stopPropagation();if(state==='run')tjFire(player);});
 function drawTach(){
   var cs=tach.clientWidth||190,s=Math.round(cs*dpr);if(tach.width!==s){tach.width=tach.height=s;}
   var g=tg,c=player,e=c.e,cx=95,cy=95,mx=Math.ceil((e.red+300)/1000)*1000;
@@ -4239,7 +4221,7 @@ function fitAllWb(){fitWb($('hWbS'),Math.max(160,$('hSplash').clientHeight-250))
 
 /* ---------- Garage (Schritt 1 Auto) ---------- */
 var gIdx=0;
-var GET={'sarthe':'10,1','chronos':'17,2','dragster':'4,6','911':'13,8','testarossa':'13,5','countach':'13,1','skyline':'16,5','challenger':'11,0','vento':'10,2','voltaris':'11,5','brixton':'15,9'};
+var GET={'sarthe':'10,1','chronos':'12,0','dragster':'4,6','911':'13,8','testarossa':'13,5','countach':'13,1','skyline':'16,5','challenger':'11,0','vento':'10,2','voltaris':'11,5','brixton':'15,9'};
 function ownerOf(id){for(var i=0;i<CAREER.length;i++)if(CAREER[i].reward===id||CAREER[i].bonus===id)return {who:CHARS[CAREER[i].ch].who,r:i+1};return null;}
 function gLocked(i){return mode==='series'&&!owned(SPECS[i].id);}
 function garageRender(){
