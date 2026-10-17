@@ -767,7 +767,7 @@ function say(id,delay){
     function fallback(){try{if(!window.speechSynthesis||!window.SpeechSynthesisUtterance)return;var u=new SpeechSynthesisUtterance(h.t);u.lang='de-DE';u.rate=0.9;var v=pickVoice();if(v)u.voice=v;HQ.sp=true;window.speechSynthesis.speak(u);}catch(e){}}
     if(!h.u){fallback();return;}
     var a=new Audio(h.u);HQ.el=a;a.onerror=function(){if(tok===HQ.tok)fallback();};a.onended=function(){if(HQ.el===a){relA(a);HQ.el=null;mediaOff();}};
-    var pr=a.play();if(pr&&pr.catch)pr.catch(function(){});
+    aVoice();var pr=a.play();if(pr&&pr.catch)pr.catch(function(){});
   },delay||0);
 }
 function sayOnce(key,id,delay){if(!R||R.said===key)return;R.said=key;say(id,delay);}
@@ -1086,7 +1086,7 @@ function listenTTS(from,part,to,onIdx){
   var t=R.t,tok=++tts.tok,gotB=false,rate=S.set.speed==='slow'?0.7:0.92,pt=0;
   var bounds=[part==='b'?[t.rs,t.words.length]:[0,t.rs]].filter(function(p){return p[1]>p[0];});
   from=from||0;
-  function end(){if(tok!==tts.tok)return;tts.on=false;tts.paused=false;clearTimeout(tts.timer);clearTimeout(tts.gap);mark(-1);setBtn();if(onIdx)onIdx(-1);}
+  function end(err){if(tok!==tts.tok)return;tts.on=false;tts.paused=false;clearTimeout(tts.timer);clearTimeout(tts.gap);mark(-1);setBtn();if(err!==true&&onIdx)onIdx(-1);}
   function est(my,i,e){
     tts.est=function(){est(my,i,e);};
     if(tok!==tts.tok||gotB||my!==pt||i>=e||tts.paused)return;
@@ -1103,8 +1103,8 @@ function listenTTS(from,part,to,onIdx){
       var ci=ev.charIndex||0,j=0;for(var i=0;i<offs.length;i++){if(offs[i]<=ci)j=i;else break;}mark(s+j);};
     u.onend=function(){if(tok!==tts.tok||my!==pt)return;clearTimeout(tts.timer);
       if(k+1<bounds.length){tts.gapK=k+1;tts.gap=setTimeout(function(){tts.gapK=null;run(k+1,0);},GAP*1000);}else end();};
-    u.onerror=end;
-    try{window.speechSynthesis.speak(u);}catch(err){end();return;}
+    u.onerror=function(){end(true);}; /* Gerätestimme ging nicht: nicht so tun, als wäre fertig vorgelesen */
+    try{window.speechSynthesis.speak(u);}catch(err){end(true);return;}
     tts.timer=setTimeout(function(){if(gotB||tok!==tts.tok||my!==pt)return;est(my,s,e);},900);
   }
   tts.resumeFn=function(){if(tts.gapK!=null){var k=tts.gapK;tts.gapK=null;run(k,0);}else{try{window.speechSynthesis.resume();}catch(e){}if(tts.est&&!gotB)tts.est();}};
@@ -1178,10 +1178,14 @@ function sfxFanfare(){if(!sfxOn())return 0;var ac=sfxAC();if(!ac)return 0;var t0
   }catch(e){}
   return 2500;}
 /* Medien freigeben, damit iOS sie nicht auf dem Sperrbildschirm anzeigt */
-function relA(a){if(!a)return;try{a.onended=null;a.pause();a.removeAttribute('src');a.load();}catch(e){}}
+function relA(a){if(!a)return;try{a.onended=null;a.pause();a.removeAttribute('src');a.load();}catch(e){}setTimeout(aIdle,0);}
 /* iPhone: kurze Töne statt Musik, dann gibt es keinen Player im Sperrbildschirm. Bei der Aufnahme braucht es play-and-record */
 function aSess(t){try{if(navigator.audioSession&&navigator.audioSession.type!==t)navigator.audioSession.type=t;}catch(e){}}
 aSess('transient');
+/* Stimmen (Vorlesen, Hinweise, eigene Aufnahme) brauchen "playback": Bei "transient" macht das iPhone sie stumm, sobald der Stumm-Schalter an ist.
+   Danach geht es zurück auf "transient", damit die Klick-Töne keinen Player im Sperrbildschirm wecken. Während der Aufnahme bleibt play-and-record. */
+function aVoice(){try{if(navigator.audioSession&&navigator.audioSession.type==='play-and-record')return;}catch(e){}aSess('playback');}
+function aIdle(){if(tts.el||HQ.el||(PL.a&&!PL.a.paused))return;try{if(!navigator.audioSession||navigator.audioSession.type!=='playback')return;}catch(e){return;}aSess('transient');}
 function mediaOff(){try{if('mediaSession' in navigator){navigator.mediaSession.metadata=null;navigator.mediaSession.playbackState='none';}}catch(e){}}
 /* Spielt einen Teil (a = Geschichte, b = Rätsel) ab Wort "from" bis vor Wort "to". onIdx bekommt das gerade gesprochene Wort. */
 function playPart(id,pk,from,to,onIdx,onFail){
@@ -1196,7 +1200,7 @@ function playPart(id,pk,from,to,onIdx,onFail){
   tts.el=el;tts.on=true;tts.paused=false;tts.part=pk;tts.ac=null;setBtn();
   el.onended=function(){if(tok!==tts.tok)return;stopListen();onIdx(-1);};
   el.onerror=function(){if(tok!==tts.tok||el.currentTime>0)return;stopListen();onFail();}; /* Datei fehlt oder kein Netz: Gerätestimme */
-  var p=el.play();
+  aVoice();var p=el.play();
   if(p&&p.catch)p.catch(function(){if(tok!==tts.tok)return;stopListen();onFail();});
   /* Markierung nachführen: pro Bild und zusätzlich bei jedem timeupdate (falls Safari die Bild-Schleife drosselt) */
   function upd(){
@@ -1215,7 +1219,7 @@ function listen(from,part,to){
   if(typeof from!=='number'){
     part=part||'a';
     if(tts.on&&tts.part===part){
-      if(tts.paused){tts.paused=false;setBtn();if(tts.el){try{tts.el.play();}catch(e){}}else if(tts.resumeFn)tts.resumeFn();}
+      if(tts.paused){tts.paused=false;setBtn();if(tts.el){aVoice();try{tts.el.play();}catch(e){}}else if(tts.resumeFn)tts.resumeFn();}
       else{tts.paused=true;setBtn();if(tts.el){try{tts.el.pause();}catch(e){}}else if(tts.pauseFn)tts.pauseFn();}
       return;
     }
@@ -1534,7 +1538,7 @@ function plToggle(id){
   var el=document.getElementById(id);if(!el)return;var a=plAudio(el);
   if(PL.a===a&&!a.paused){plStop();return;}
   plStop();stopListen();PL.a=a;PL.el=el;var bt=el.querySelector('.plb');bt.innerHTML=IC_PAUSE;bt.setAttribute('aria-label','Pause');
-  var pr=a.play();if(pr&&pr.catch)pr.catch(function(){plStop();});
+  aVoice();var pr=a.play();if(pr&&pr.catch)pr.catch(function(){plStop();});
 }
 function plSeek(id,x){var el=document.getElementById(id);if(!el)return;var a=plAudio(el),d=plDur(a),r=el.querySelector('.plt').getBoundingClientRect();if(!d)return;a.currentTime=Math.max(0,Math.min(1,(x-r.left)/r.width))*d;plUpd(el,a);}
 function freeUrls(){plStop();REC.urls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}});REC.urls=[];}
