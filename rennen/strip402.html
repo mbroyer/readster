@@ -1539,7 +1539,7 @@ class EngineProc extends AudioWorkletProcessor{
   constructor(opt){
     super();var po=(opt&&opt.processorOptions)||{};
     this.seed=po.seed||22222;this.P=null;this.rpm=po.rpm||800;this.thr=0;this.ang=0;this.norm=1;this.fbs=0;this.indF=0;this.wph=0;this.wph2=0;
-    this.port.onmessage=(e)=>{if(e.data.preset)this.setup(e.data.preset);};
+    this.port.onmessage=(e)=>{if(e.data.preset)this.setup(e.data.preset);if(e.data.stop){this.dead=true;this.port.postMessage('end');}};
     if(po.preset)this.setup(po.preset);
   }
   rnd(){var x=this.seed;x^=x<<13;x^=x>>>17;x^=x<<5;this.seed=x>>>0;return this.seed/4294967296;}
@@ -1576,6 +1576,8 @@ class EngineProc extends AudioWorkletProcessor{
     this.mech.set('bp',P.mechF||3200,1.2);
   }
   process(inputs,outputs,params){
+    /* Version 84: beendeter Motorklang rechnet nicht weiter (vorher liefen nach jedem Rennen zwei Klang-Generatoren unhörbar weiter, nach vielen Rennen ruckelte es) */
+    if(this.dead)return false;
     var out=outputs[0],Lc=out[0],Rc=out[1]||out[0],n=Lc.length,P=this.P;
     if(!P){for(var z=0;z<n;z++){Lc[z]=0;Rc[z]=0;}return true;}
     var sr=sampleRate,tr=params.rpm[0],tt=params.thr[0],cut=params.cut[0],nc=this.ev.length,nb=this.banks.length;
@@ -2259,7 +2261,7 @@ var Snd=(function(){
     if(!ac||!vs.length){vs=[];return;}
     var old=vs,t=ac.currentTime;vs=[];
     old.forEach(function(v){try{v.out.gain.setTargetAtTime(0,t,quick?0.01:0.25);}catch(e){}});
-    setTimeout(function(){old.forEach(function(v){v.src.forEach(function(s){try{s.stop();}catch(e){}});if(v.v2){try{v.n.disconnect();v.out.disconnect();}catch(e){}}});},quick?80:1500);
+    setTimeout(function(){old.forEach(function(v){v.src.forEach(function(s){try{s.stop();}catch(e){}});if(v.v2){try{v.n.port.postMessage({stop:true});v.n.disconnect();v.out.disconnect();}catch(e){}}});},quick?80:1500);
   };
   /* Version 77: Ton beim ersten echten Tippen freischalten (iPhone/Safari zählt nur touchend/click, nicht pointerdown). true = war noch gesperrt */
   /* Version 79: App im Hintergrund oder iPhone gesperrt = Ton sofort aus, beim Zurückkommen wieder an */
@@ -2316,6 +2318,8 @@ var Snd=(function(){
       n2.connect(bp);o.connect(og);og.connect(bp);bp.connect(sg);sg.gain.value=0;sg.connect(g);
       g.gain.value=0;g.connect(master);n.start();n2.start();o.start();vib.start();
       bk={g:g,rg:rg,sg:sg,o:o,bp:bp,lp:lp,nx:0};}
+    /* Version 84: ohne Bremsen nicht jedes Bild neu einplanen (die Planungsliste des Tons wuchs sonst mit jeder Sekunde Spielzeit) */
+    if(!on){if(bk.off)return;bk.off=true;}else bk.off=false;
     var t=ac.currentTime,k=Math.max(0,Math.min(1,(v-2)/35));
     bk.g.gain.setTargetAtTime(on&&S.on?1:0,t,on?0.03:0.1);
     if(!on){bk.nx=0;return;}
