@@ -244,6 +244,8 @@ button:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .h-tree .col{display:flex;flex-direction:column;align-items:center;gap:5px}
 .h-tree .b{width:15px;height:15px}.h-tree .b.sm{width:10px;height:10px}
 .h-foot{position:relative;margin-top:auto;padding:0 12px 12px;display:grid;gap:7px}
+.h-reset{justify-self:center;margin-top:2px;padding:6px 12px;border:0;background:none;color:rgba(255,255,255,.55);font:600 12px/1.2 inherit;letter-spacing:.04em;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.h-reset.warn{color:#ff6b6b;text-decoration:none;border:1px solid rgba(255,107,107,.6);border-radius:10px}
 .h-mode{position:relative;display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:2px 12px;width:100%;text-align:left;padding:10px 14px;border-radius:16px;border:1px solid var(--line);background:var(--panel);color:var(--ink);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);cursor:pointer}
 .h-mode .ico{grid-row:1/4;grid-column:1;width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:rgba(255,255,255,.08)}
 .h-mode .ico svg{width:24px;height:24px}
@@ -694,6 +696,7 @@ html,body{touch-action:manipulation}
           <span class="d" id="hTrD">Übungsfahrt mit Anleitung</span>
           <span class="chev" aria-hidden="true">›</span>
         </button>
+        <button class="h-reset" id="hReset" type="button">Spielstand zurücksetzen</button>
       </div>
     </section>
 
@@ -4385,6 +4388,14 @@ function serIntro(first){
 }
 $('hSeries').onclick=function(){startMode('series',this);};
 $('hFree').onclick=function(){startMode('free',this);};
+/* Version 89: Spielstand zurücksetzen (Karriere, Garage, Teile, Pokale, Training, Bestzeiten). Zweimal tippen, damit es nicht aus Versehen passiert. Einstellungen bleiben. */
+$('hReset').onclick=function(){
+  var b=this;
+  if(!b.classList.contains('warn')){b.classList.add('warn');b.textContent='Wirklich alles löschen? Nochmal tippen';clearTimeout(b._t);b._t=setTimeout(function(){b.classList.remove('warn');b.textContent='Spielstand zurücksetzen';},4000);return;}
+  clearTimeout(b._t);
+  try{['s402save','s402serIntro','s402coach','s402train','s402ghost'].forEach(function(k){localStorage.removeItem(k);});}catch(e){}
+  location.reload();
+};
 $('hTrainBtn').onclick=function(){if(hBusy)return;hBusy=true;this.classList.add('hit');launchAnim(function(){startPractice();});};
 /* ---------- Training (Version 51): Übungsfahrt im echten Spiel, gleiche Bedienung, echter Motorsound ---------- */
 var PRAC=false;
