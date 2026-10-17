@@ -482,6 +482,12 @@ details.adult p{color:var(--muted);font-weight:600;font-size:.92rem;margin-top:6
 .wjstep{text-align:center;color:var(--muted);font-weight:500}
 .wj span.ok{border-color:var(--good);color:var(--good)}
 textarea.code{width:100%;min-height:90px;font:600 .8rem/1.3 ui-monospace,Menlo,monospace;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:8px;resize:vertical}
+textarea.fbtext{width:100%;min-height:96px;font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px;resize:vertical}
+.fbbtn svg{width:22px;height:22px}
+.fbsheet{display:flex;flex-direction:column;gap:12px}.fbsheet .link{align-self:center}.fbsheet .link svg{width:18px;height:18px;vertical-align:-3px}
+.fbmic{min-height:96px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:1.4rem}.fbmic svg{width:52px;height:52px;margin:0}
+.fbmic.on{background:#e5484d;border-color:#e5484d;color:#fff}.fbdot{width:16px;height:16px;border-radius:50%;background:#fff;animation:fbblink 1s infinite}@keyframes fbblink{50%{opacity:.25}}
+.fbdone{display:flex;justify-content:center}.fbdone svg{width:96px;height:96px;color:var(--accent)}.fbsheet h2{margin:0}.fbsheet h2+.hint{margin:-4px 0 0}
 input.codein{width:100%;font:600 1.4rem/1.2 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-align:center;text-transform:uppercase;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:12px;min-height:56px}
 .pick .link{align-self:center}
 input.name{width:100%;font:700 1.1rem var(--f-body);color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px 12px;min-height:48px}
@@ -913,7 +919,7 @@ window.addEventListener('popstate',function(){
   recStop(false);stopListen();R=null;renderHome();show('home');
 });
 function openBox(id,html){var b=$(id);b.innerHTML=html;b.hidden=false;}
-function closeBox(id){$(id).hidden=true;$(id).innerHTML='';}
+function closeBox(id){if(id==='#sheet'&&typeof fbQuiet==='function')fbQuiet();$(id).hidden=true;$(id).innerHTML='';}
 /* ---------- Startseite ---------- */
 var IC_SOLO='<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="16" cy="10" r="6"/><path d="M5 28c0-6.6 4.9-11 11-11s11 4.4 11 11z"/></svg>';
 var IC_F2='<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="currentColor" opacity=".25"/><circle cx="11" cy="13" r="2" fill="currentColor"/><circle cx="21" cy="13" r="2" fill="currentColor"/><path d="M9.5 18.5c3.5 5 9.5 5 13 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
@@ -922,7 +928,7 @@ var IC_F0='<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r
 var IC_DUO='<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="11" cy="11" r="5"/><path d="M1.5 27c0-5.8 4.2-9.5 9.5-9.5s9.5 3.7 9.5 9.5z"/><circle cx="22.5" cy="9" r="4" opacity=".65"/><path d="M17.5 17.4c1.4-1 3.1-1.6 5-1.6 4.7 0 8 3.4 8 8.7h-8.7c-.7-2.9-2.2-5.3-4.3-7.1z" opacity=".65"/></svg>';
 var MODE=null;
 /* Sprach-Hinweise: die App sagt, was zu tun ist, statt es hinzuschreiben (MP3 von ElevenLabs, sonst Gerätestimme) */
-var HINTS={"hoeren":{"t":"Tippe auf Zuhören. Dann hörst du die Geschichte.","u":"audio/hinweis-hoeren.mp3?v=c23c47cc"},"lesen":{"t":"Jetzt du! Tippe auf Jetzt lesen und lies laut.","u":"audio/hinweis-lesen.mp3?v=9978fa6a"},"aufnahme":{"t":"Gleich geht's los. Lies laut bis zum Ende. Dann tippe auf Fertig.","u":"audio/hinweis-aufnahme.mp3?v=3c07059d"},"gefuehl":{"t":"Wie war das Lesen für dich? Tippe auf ein Gesicht.","u":"audio/hinweis-gefuehl.mp3?v=7ecfce94"},"zahlen":{"t":"Super! Hier siehst du, wie schnell du gelesen hast.","u":"audio/hinweis-zahlen.mp3?v=7d7e4bcb"},"hoerdich":{"t":"Hör dir selbst zu. Tippe auf die Wörter, die schwer waren.","u":"audio/hinweis-hoerdich.mp3?v=5b961679"},"fragen":{"t":"Tippe auf die richtige Antwort.","u":"audio/hinweis-fragen.mp3?v=963e7e1a"},"satz":{"t":"Hör gut zu. Dann liest du den Satz nach.","u":"audio/hinweis-satz.mp3?v=40775a80"},"auto1":{"t":"Noch ein Text, dann bekommst du dein erstes Auto!","u":"audio/hinweis-auto1.mp3?v=7e3efe82"},"auto2":{"t":"Noch zwei Texte, dann bekommst du dein erstes Auto!","u":"audio/hinweis-auto2.mp3?v=9779e0ef"},"auto3":{"t":"Noch drei Texte, dann bekommst du dein erstes Auto!","u":"audio/hinweis-auto3.mp3?v=00d45e1b"},"tank1":{"t":"Noch ein Text, dann ist der Tank voll und du fährst ein Rennen!","u":"audio/hinweis-tank1.mp3?v=708394b2"},"tank2":{"t":"Noch zwei Texte, dann fährst du ein Rennen!","u":"audio/hinweis-tank2.mp3?v=4babd5cf"},"tank3":{"t":"Noch drei Texte, dann fährst du ein Rennen!","u":"audio/hinweis-tank3.mp3?v=17457c3c"},"tankvoll":{"t":"Dein Tank ist voll! Tippe auf Rennen fahren.","u":"audio/hinweis-tankvoll.mp3?v=0a60b050"},"rennen":{"t":"Drück aufs Gas und halte den Finger drauf. Bei Grün tippst du auf Los!","u":"audio/hinweis-rennen.mp3?v=ebeb53b4"},"nachrennen":{"t":"Super gefahren! Jetzt ist der Tank leer. Lies den nächsten Text, dann füllt er sich wieder.","u":"audio/hinweis-nachrennen.mp3?v=052ac335"},"tour1":{"t":"Hallo! Ich zeige dir kurz, wie Readster geht.","u":"audio/hinweis-tour1.mp3?v=c5907247"},"tour2":{"t":"Zuerst hörst du dir die Geschichte an.","u":"audio/hinweis-tour2.mp3?v=a7280b05"},"tour3":{"t":"Dann liest du sie laut vor. Ich nehme dich dabei auf.","u":"audio/hinweis-tour3.mp3?v=392879b4"},"tour4":{"t":"Danach hörst du dich selbst an und tippst auf die Wörter, die schwer waren.","u":"audio/hinweis-tour4.mp3?v=68114e93"},"tour5":{"t":"Jeder Text, den du liest, füllt deinen Tank. Nach drei Texten ist er voll.","u":"audio/hinweis-tour5.mp3?v=4dd49766"},"rgas":{"t":"Leg deinen Finger auf das Gaspedal und schieb ihn nach oben.","u":"audio/hinweis-rgas.mp3?v=c7fdb166"},"rzone":{"t":"Gut! Halte die Nadel im grünen Feld.","u":"audio/hinweis-rzone.mp3?v=25c4c8fd"},"rampel":{"t":"Bleib auf dem Gas. Wenn die Ampel grün wird, tippst du auf Los.","u":"audio/hinweis-rampel.mp3?v=84130f8d"},"rlos":{"t":"Jetzt! Tippe auf Los!","u":"audio/hinweis-rlos.mp3?v=f8f57c78"},"rwarte":{"t":"Noch nicht! Warte, bis die Ampel grün ist.","u":"audio/hinweis-rwarte.mp3?v=b9d036fa"},"rauto":{"t":"Lass den Finger auf dem Gas. Das Auto schaltet von allein.","u":"audio/hinweis-rauto.mp3?v=b08f1777"},"rschalt":{"t":"Der Knopf leuchtet gelb. Tippe jetzt auf Schalten!","u":"audio/hinweis-rschalt.mp3?v=ad7caeb9"},"rbrems":{"t":"Im Ziel! Halte den Bremsknopf gedrückt.","u":"audio/hinweis-rbrems.mp3?v=9257fbbf"},"rgasweg":{"t":"Finger auf dem Gas lassen!","u":"audio/hinweis-rgasweg.mp3?v=c84c10b1"},"rsieg":{"t":"Du hast gewonnen!","u":"audio/hinweis-rsieg.mp3?v=efc79ae9"},"rverloren":{"t":"Knapp verloren. Nächstes Mal klappt es!","u":"audio/hinweis-rverloren.mp3?v=69dfe4cb"},"rzufrueh":{"t":"Zu früh gestartet. Warte auf Grün!","u":"audio/hinweis-rzufrueh.mp3?v=07766bb1"},"rtmehr":{"t":"Tipp: Gib beim Start etwas mehr Gas.","u":"audio/hinweis-rtmehr.mp3?v=a78ac30d"},"rtweniger":{"t":"Tipp: Gib beim Start etwas weniger Gas.","u":"audio/hinweis-rtweniger.mp3?v=5a0ac6d4"},"rtschalt":{"t":"Tipp: Schalte, wenn der Knopf gelb leuchtet.","u":"audio/hinweis-rtschalt.mp3?v=c35a8aae"},"rtbrems":{"t":"Tipp: Bremse nach dem Ziel früher.","u":"audio/hinweis-rtbrems.mp3?v=865bb820"},"rprobe":{"t":"Super geübt! Jetzt kommt das echte Rennen.","u":"audio/hinweis-rprobe.mp3?v=41b31eff"},"rdrag":{"t":"Ein Dragrace geht nur geradeaus. Keine Kurven! Du gibst die ganze Zeit Vollgas, vom Start bis ins Ziel.","u":"audio/hinweis-rdrag.mp3?v=75fa00ca"},"rlosvoll":{"t":"Grün! Tippe auf Los und lass das Gas ganz oben!","u":"audio/hinweis-rlosvoll.mp3?v=4ffe3fec"},"rvollgas":{"t":"Vollgas bis ins Ziel!","u":"audio/hinweis-rvollgas.mp3?v=7dca14fe"},"rganz":{"t":"Schieb das Gas ganz nach oben. Vollgas!","u":"audio/hinweis-rganz.mp3?v=a484dfe3"},"tour6":{"t":"Du kannst allein lesen oder zu zweit. Zu zweit lest ihr abwechselnd, Satz für Satz, zum Beispiel mit Opa. Oben kannst du jederzeit umschalten.","u":"audio/hinweis-tour6.mp3?v=60a2ce29"},"tour7":{"t":"Ist der Tank voll, fährst du ein Beschleunigungsrennen. Zwei Autos stehen an der Startlinie. Bei Grün geht es los. Wer als Erster die Viertelmeile schafft, gewinnt!","u":"audio/hinweis-tour7.mp3?v=cb7ef29a"},"tourp1":{"t":"Zu zweit geht es Satz für Satz. Zuerst liest dein Partner einen Satz ruhig vor, und du hörst gut zu.","u":"audio/hinweis-tourp1.mp3?v=3d497f66"},"tourp2":{"t":"Dann liest du denselben Satz laut nach. Danach kommt der nächste Satz.","u":"audio/hinweis-tourp2.mp3?v=9db7ec7a"},"tourp3":{"t":"Tippt zusammen auf die Wörter, die schwer waren. Die übst du später im Wort-Jäger.","u":"audio/hinweis-tourp3.mp3?v=28229a65"},"wjsilben":{"t":"Tippe jede Silbe an und sprich sie dabei laut.","u":"audio/hinweis-wjsilben.mp3?v=bf7dc1ab"},"wjlesen":{"t":"Jetzt liest du das ganze Wort laut. Nach jedem Lesen tippst du auf die nächste Zahl. Eins, zwei, drei.","u":"audio/hinweis-wjlesen.mp3?v=d20c0db7"},"wjgut":{"t":"Wie gut kannst du das Wort schon? Tippe auf Kann ich oder auf Morgen nochmal.","u":"audio/hinweis-wjgut.mp3?v=5555c24e"}},HQ={el:null,tok:0,t:0};
+var HINTS={"hoeren":{"t":"Tippe auf Zuhören. Dann hörst du die Geschichte.","u":"audio/hinweis-hoeren.mp3?v=c23c47cc"},"lesen":{"t":"Jetzt du! Tippe auf Jetzt lesen und lies laut.","u":"audio/hinweis-lesen.mp3?v=9978fa6a"},"aufnahme":{"t":"Gleich geht's los. Lies laut bis zum Ende. Dann tippe auf Fertig.","u":"audio/hinweis-aufnahme.mp3?v=3c07059d"},"gefuehl":{"t":"Wie war das Lesen für dich? Tippe auf ein Gesicht.","u":"audio/hinweis-gefuehl.mp3?v=7ecfce94"},"zahlen":{"t":"Super! Hier siehst du, wie schnell du gelesen hast.","u":"audio/hinweis-zahlen.mp3?v=7d7e4bcb"},"hoerdich":{"t":"Hör dir selbst zu. Tippe auf die Wörter, die schwer waren.","u":"audio/hinweis-hoerdich.mp3?v=5b961679"},"fragen":{"t":"Tippe auf die richtige Antwort.","u":"audio/hinweis-fragen.mp3?v=963e7e1a"},"satz":{"t":"Hör gut zu. Dann liest du den Satz nach.","u":"audio/hinweis-satz.mp3?v=40775a80"},"auto1":{"t":"Noch ein Text, dann bekommst du dein erstes Auto!","u":"audio/hinweis-auto1.mp3?v=7e3efe82"},"auto2":{"t":"Noch zwei Texte, dann bekommst du dein erstes Auto!","u":"audio/hinweis-auto2.mp3?v=9779e0ef"},"auto3":{"t":"Noch drei Texte, dann bekommst du dein erstes Auto!","u":"audio/hinweis-auto3.mp3?v=00d45e1b"},"tank1":{"t":"Noch ein Text, dann ist der Tank voll und du fährst ein Rennen!","u":"audio/hinweis-tank1.mp3?v=708394b2"},"tank2":{"t":"Noch zwei Texte, dann fährst du ein Rennen!","u":"audio/hinweis-tank2.mp3?v=4babd5cf"},"tank3":{"t":"Noch drei Texte, dann fährst du ein Rennen!","u":"audio/hinweis-tank3.mp3?v=17457c3c"},"tankvoll":{"t":"Dein Tank ist voll! Tippe auf Rennen fahren.","u":"audio/hinweis-tankvoll.mp3?v=0a60b050"},"rennen":{"t":"Drück aufs Gas und halte den Finger drauf. Bei Grün tippst du auf Los!","u":"audio/hinweis-rennen.mp3?v=ebeb53b4"},"nachrennen":{"t":"Super gefahren! Jetzt ist der Tank leer. Lies den nächsten Text, dann füllt er sich wieder.","u":"audio/hinweis-nachrennen.mp3?v=052ac335"},"tour1":{"t":"Hallo! Ich zeige dir kurz, wie Readster geht.","u":"audio/hinweis-tour1.mp3?v=c5907247"},"tour2":{"t":"Zuerst hörst du dir die Geschichte an.","u":"audio/hinweis-tour2.mp3?v=a7280b05"},"tour3":{"t":"Dann liest du sie laut vor. Ich nehme dich dabei auf.","u":"audio/hinweis-tour3.mp3?v=392879b4"},"tour4":{"t":"Danach hörst du dich selbst an und tippst auf die Wörter, die schwer waren.","u":"audio/hinweis-tour4.mp3?v=68114e93"},"tour5":{"t":"Jeder Text, den du liest, füllt deinen Tank. Nach drei Texten ist er voll.","u":"audio/hinweis-tour5.mp3?v=4dd49766"},"rgas":{"t":"Leg deinen Finger auf das Gaspedal und schieb ihn nach oben.","u":"audio/hinweis-rgas.mp3?v=c7fdb166"},"rzone":{"t":"Gut! Halte die Nadel im grünen Feld.","u":"audio/hinweis-rzone.mp3?v=25c4c8fd"},"rampel":{"t":"Bleib auf dem Gas. Wenn die Ampel grün wird, tippst du auf Los.","u":"audio/hinweis-rampel.mp3?v=84130f8d"},"rlos":{"t":"Jetzt! Tippe auf Los!","u":"audio/hinweis-rlos.mp3?v=f8f57c78"},"rwarte":{"t":"Noch nicht! Warte, bis die Ampel grün ist.","u":"audio/hinweis-rwarte.mp3?v=b9d036fa"},"rauto":{"t":"Lass den Finger auf dem Gas. Das Auto schaltet von allein.","u":"audio/hinweis-rauto.mp3?v=b08f1777"},"rschalt":{"t":"Der Knopf leuchtet gelb. Tippe jetzt auf Schalten!","u":"audio/hinweis-rschalt.mp3?v=ad7caeb9"},"rbrems":{"t":"Im Ziel! Halte den Bremsknopf gedrückt.","u":"audio/hinweis-rbrems.mp3?v=9257fbbf"},"rgasweg":{"t":"Finger auf dem Gas lassen!","u":"audio/hinweis-rgasweg.mp3?v=c84c10b1"},"rsieg":{"t":"Du hast gewonnen!","u":"audio/hinweis-rsieg.mp3?v=efc79ae9"},"rverloren":{"t":"Knapp verloren. Nächstes Mal klappt es!","u":"audio/hinweis-rverloren.mp3?v=69dfe4cb"},"rzufrueh":{"t":"Zu früh gestartet. Warte auf Grün!","u":"audio/hinweis-rzufrueh.mp3?v=07766bb1"},"rtmehr":{"t":"Tipp: Gib beim Start etwas mehr Gas.","u":"audio/hinweis-rtmehr.mp3?v=a78ac30d"},"rtweniger":{"t":"Tipp: Gib beim Start etwas weniger Gas.","u":"audio/hinweis-rtweniger.mp3?v=5a0ac6d4"},"rtschalt":{"t":"Tipp: Schalte, wenn der Knopf gelb leuchtet.","u":"audio/hinweis-rtschalt.mp3?v=c35a8aae"},"rtbrems":{"t":"Tipp: Bremse nach dem Ziel früher.","u":"audio/hinweis-rtbrems.mp3?v=865bb820"},"rprobe":{"t":"Super geübt! Jetzt kommt das echte Rennen.","u":"audio/hinweis-rprobe.mp3?v=41b31eff"},"rdrag":{"t":"Ein Dragrace geht nur geradeaus. Keine Kurven! Du gibst die ganze Zeit Vollgas, vom Start bis ins Ziel.","u":"audio/hinweis-rdrag.mp3?v=75fa00ca"},"rlosvoll":{"t":"Grün! Tippe auf Los und lass das Gas ganz oben!","u":"audio/hinweis-rlosvoll.mp3?v=4ffe3fec"},"rvollgas":{"t":"Vollgas bis ins Ziel!","u":"audio/hinweis-rvollgas.mp3?v=7dca14fe"},"rganz":{"t":"Schieb das Gas ganz nach oben. Vollgas!","u":"audio/hinweis-rganz.mp3?v=a484dfe3"},"tour6":{"t":"Du kannst allein lesen oder zu zweit. Zu zweit lest ihr abwechselnd, Satz für Satz, zum Beispiel mit Opa. Oben kannst du jederzeit umschalten.","u":"audio/hinweis-tour6.mp3?v=60a2ce29"},"tour7":{"t":"Ist der Tank voll, fährst du ein Beschleunigungsrennen. Zwei Autos stehen an der Startlinie. Bei Grün geht es los. Wer als Erster die Viertelmeile schafft, gewinnt!","u":"audio/hinweis-tour7.mp3?v=cb7ef29a"},"tourp1":{"t":"Zu zweit geht es Satz für Satz. Zuerst liest dein Partner einen Satz ruhig vor, und du hörst gut zu.","u":"audio/hinweis-tourp1.mp3?v=3d497f66"},"tourp2":{"t":"Dann liest du denselben Satz laut nach. Danach kommt der nächste Satz.","u":"audio/hinweis-tourp2.mp3?v=9db7ec7a"},"tourp3":{"t":"Tippt zusammen auf die Wörter, die schwer waren. Die übst du später im Wort-Jäger.","u":"audio/hinweis-tourp3.mp3?v=28229a65"},"wjsilben":{"t":"Tippe jede Silbe an und sprich sie dabei laut.","u":"audio/hinweis-wjsilben.mp3?v=bf7dc1ab"},"wjlesen":{"t":"Jetzt liest du das ganze Wort laut. Nach jedem Lesen tippst du auf die nächste Zahl. Eins, zwei, drei.","u":"audio/hinweis-wjlesen.mp3?v=d20c0db7"},"wjgut":{"t":"Wie gut kannst du das Wort schon? Tippe auf Kann ich oder auf Morgen nochmal.","u":"audio/hinweis-wjgut.mp3?v=5555c24e"},"feedback":{"t":"Wie findest du Readster? Was gefällt dir, und was nicht? Tippe auf das Mikrofon und erzähl es Mark."},"fbdanke":{"t":"Danke! Deine Nachricht ist bei Mark angekommen."}},HQ={el:null,tok:0,t:0};
 function sayStop(){HQ.tok++;clearTimeout(HQ.t);if(HQ.el){relA(HQ.el);HQ.el=null;}try{if(window.speechSynthesis&&HQ.sp){window.speechSynthesis.cancel();HQ.sp=false;}}catch(e){}}
 function say(id,delay){
   var h=HINTS[id];if(!h||!S.set.voice)return;
@@ -960,6 +966,7 @@ function tourOpen(i,list){TI=i||0;if(list)TOUR=list;else if(!TI)TOUR=tourList();
   say(x.s,250);}
 function tourEnd(){sayStop();S.tour=1;if(MODE)S.tourSeen[MODE]=1;save();closeBox('#modal');}
 var IC_NEXT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+var IC_FB='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5h16v10H10l-4.5 4v-4H4z"/><path d="M8.5 9.5h7M8.5 12.5h4.5"/></svg>';
 var IC_STATS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 20v-6M12 20V9M19 20V4"/></svg>';
 var IC_PUMP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M3 21h13M7 7h5v4H7z"/><path d="M15 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3"/></svg>';
 var IC_FLAG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 3v18h2v-7h10l-2-4 2-4H7V3z"/></svg>';
@@ -1005,7 +1012,7 @@ function renderHome(){
   if(S.tour&&MODE&&!Object.keys(S.tourSeen||{}).length){S.tourSeen={};S.tourSeen[MODE]=1;} /* ältere Stände: gesehen im aktuellen Modus */
   if(!S.tour&&$('#modal').hidden)setTimeout(function(){if(!S.tour&&$('#modal').hidden&&CUR==='home')tourOpen(0);},0);
   var p=lvlProg(S.xp),sg=suggest(),wk=weekInfo(),n=doneCount();
-  var h='<header class="top"><h1 class="brand"><img class="wordmark sm" alt="Readster" src="'+LOGO+'"></h1><div class="chips"><button class="iconbtn prgbtn" data-a="stats" aria-label="Dein Fortschritt">'+IC_STATS+(n?'<span class="badge">'+n+'</span>':'')+'</button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
+  var h='<header class="top"><h1 class="brand"><img class="wordmark sm" alt="Readster" src="'+LOGO+'"></h1><div class="chips"><button class="iconbtn prgbtn" data-a="stats" aria-label="Dein Fortschritt">'+IC_STATS+(n?'<span class="badge">'+n+'</span>':'')+'</button><button class="iconbtn fbbtn" data-a="fb" aria-label="Feedback an Mark senden">'+IC_FB+'</button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
   /* Modus: ein Schalter mit Wörtern, zeigt zugleich, welcher Modus gerade gilt */
   h+='<div class="mseg" role="group" aria-label="Wie liest du?"><button data-a="mode" data-v="solo" aria-pressed="'+(MODE==='solo')+'">'+IC_SOLO+'<span>Allein lesen</span></button><button data-a="mode" data-v="partner" aria-pressed="'+(MODE==='partner')+'">'+IC_DUO+'<span>Zu zweit lesen</span></button></div>';
   if(S.whNote)h+='<section class="card left whnote"><p class="fb">'+esc(S.whNote)+'</p><button class="btn ghost sm" data-a="whNoteOk">Okay</button></section>';
@@ -2084,7 +2091,7 @@ function renderSheet(){
     tg('wh','Stockstellen erkennen',(WH_SERVER?'Die Aufnahme geht kurz an Cloudflare und wird dort nicht gespeichert.':'Lädt einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB, danach läuft alles auf dem Gerät.'),'<span class="hint fb" id="whst">'+esc(s.wh?whStatus():'')+'</span>')+
     tg('nums','Tempo-Zahlen zeigen','Aus: nur „schneller als beim ersten Mal“.')+
     tg('mit','Mitlesen beim Lesen',LIVE_OK?'Beim lauten Lesen wandert die Markierung mit dem Kind mit. Der Ton geht dafür an Apple oder Google.':'Dieser Browser kann das leider nicht.')+'</section>';
-  h+='<section class="sgrp"><h3>Hilfe</h3><details class="howto-d"><summary>So funktioniert Readster</summary><ul class="howto"><li>Zuhören, dann selbst laut lesen (mit Aufnahme).</li><li>Danach: Gesicht wählen, Tempo ansehen, sich selbst anhören und schwere Wörter antippen.</li><li>Zwei Fragen zum Text.</li><li>Jeder Text füllt den Tank. Drei Texte: ein Rennen. Neue Autos kommen mit der Zeit dazu.</li><li>Schwere Wörter landen im Wort-Jäger und werden an mehreren Tagen geübt.</li></ul></details><button class="link" data-a="tourAgain">Einführung nochmal zeigen</button></section>';
+  h+='<section class="sgrp"><h3>Hilfe</h3><details class="howto-d"><summary>So funktioniert Readster</summary><ul class="howto"><li>Zuhören, dann selbst laut lesen (mit Aufnahme).</li><li>Danach: Gesicht wählen, Tempo ansehen, sich selbst anhören und schwere Wörter antippen.</li><li>Zwei Fragen zum Text.</li><li>Jeder Text füllt den Tank. Drei Texte: ein Rennen. Neue Autos kommen mit der Zeit dazu.</li><li>Schwere Wörter landen im Wort-Jäger und werden an mehreren Tagen geübt.</li></ul></details><button class="link" data-a="tourAgain">Einführung nochmal zeigen</button><button class="link" data-a="fb">Feedback an Mark senden</button></section>';
   /* Zum Ausprobieren der Rennen: Level springen und Tank füllen (ändert den echten Fortschritt dieses Codes) */
   var Lc=lvl(S.xp);
   if(TEST)h+='<section class="sgrp"><h3>Rennen testen</h3><small class="sgh">Level '+Lc+', Tank '+(fuelFull()?'voll':Math.round((S.fuel||0)/XP_RACE*100)+' %')+'. Ändert den Fortschritt dieses Codes.</small><div class="dbg">'+
@@ -2184,6 +2191,70 @@ function logout(msg){
 function renderReset(){
   openBox('#sheet','<div class="card"><h2>Fortschritt löschen?</h2><p class="hint">Alle gelesenen Texte, Autos und markierten Wörter auf diesem Gerät werden gelöscht.</p><div class="cfbtns"><button class="btn ghost" data-a="sheetOk">Abbrechen</button><button class="btn" data-a="doReset">Löschen</button></div></div>');
 }
+/* Feedback an Mark: Gesicht, Sprachnachricht und/oder Text, landet beim Cloudflare-Dienst (Ansicht: /feedback beim Worker).
+   Kinder lesen keine Erklärungen: die Stimme sagt, was zu tun ist, das Mikrofon ist der große Knopf. */
+var FB={rec:null,stream:null,chunks:[],blob:null,mime:'',t0:0,sek:0,tick:0,mood:null,text:'',busy:false,done:false,msg:'',ort:''};
+var FB_MAX=120;
+function fbReset(){fbQuiet();FB.blob=null;FB.mime='';FB.sek=0;FB.mood=null;FB.text='';FB.busy=false;FB.done=false;FB.msg='';}
+function fbOpen(){fbReset();FB.ort=CUR+(R&&R.t?' · '+R.t.title:'');renderFeedback();say('feedback',300);}
+function renderFeedback(){
+  var ta=$('#fbText');if(ta)FB.text=ta.value;
+  var h='<div class="card left fbsheet">';
+  if(FB.done){
+    h+='<div class="fbdone">'+IC_F2+'</div><h2>Danke!</h2><p class="hint">Deine Nachricht ist bei Mark angekommen.</p><button class="btn wide" data-a="sheetOk">Fertig</button></div>';
+    openBox('#sheet',h);return;
+  }
+  h+='<h2>Feedback an Mark</h2><p class="hint">Wie findest du Readster? Was gefällt dir, was stört, was fehlt? Deine Nachricht geht direkt an Mark, der Readster gebaut hat.</p>';
+  h+='<div class="faces fbfaces">'+[[2,'Gefällt mir',IC_F2],[1,'Geht so',IC_F1],[0,'Gefällt mir nicht',IC_F0]].map(function(o){return '<button class="btn '+(FB.mood===o[0]?'on':'ghost')+'" data-a="fbMood" data-v="'+o[0]+'" aria-label="'+o[1]+'">'+o[2]+'</button>';}).join('')+'</div>';
+  if(FB.rec)h+='<button class="btn wide fbmic on" data-a="fbRec" aria-label="Aufnahme beenden"><span class="fbdot"></span><span id="fbTime">'+fmtSec(FB.sek)+'</span></button>';
+  else if(FB.blob)h+=audioTag(FB.blob)+'<button class="link" data-a="fbRec">'+IC_MIC+' Nochmal aufnehmen</button>';
+  else h+='<button class="btn wide fbmic" data-a="fbRec" aria-label="Sprachnachricht aufnehmen">'+IC_MIC+'</button>';
+  h+='<textarea class="fbtext" id="fbText" maxlength="4000" placeholder="Oder hier aufschreiben, was Mark wissen soll …">'+esc(FB.text)+'</textarea>';
+  if(FB.msg)h+='<p class="hint fb">'+esc(FB.msg)+'</p>';
+  h+='<button class="btn wide acc" data-a="fbSend"'+(FB.busy||FB.rec?' disabled':'')+'>'+(FB.busy?'Wird gesendet …':'Abschicken')+'</button>';
+  h+='<button class="link" data-a="sheetOk">Abbrechen</button></div>';
+  openBox('#sheet',h);
+}
+function fbQuiet(){
+  clearInterval(FB.tick);var r=FB.rec;FB.rec=null;
+  if(r&&r.state!=='inactive'){r.onstop=null;try{r.stop();}catch(e){}}
+  if(FB.stream){FB.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});FB.stream=null;}
+}
+function fbRec(){
+  if(FB.rec){fbStop();return;}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){FB.msg='Dieser Browser kann leider keine Sprachnachricht aufnehmen. Du kannst aber schreiben.';renderFeedback();return;}
+  sayStop();plStop();freeUrls();aSess('play-and-record');
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){
+    if($('#sheet').hidden||!$('.fbsheet')){st.getTracks().forEach(function(t){try{t.stop();}catch(e){}});return;}
+    FB.stream=st;FB.chunks=[];FB.blob=null;FB.msg='';
+    var mt='';['audio/mp4','audio/webm;codecs=opus','audio/webm'].some(function(m){try{if(MediaRecorder.isTypeSupported(m)){mt=m;return true;}}catch(e){}return false;});
+    var r=mt?new MediaRecorder(st,mt.indexOf('webm')>=0?{mimeType:mt,audioBitsPerSecond:32000}:{mimeType:mt}):new MediaRecorder(st);
+    r.ondataavailable=function(e){if(e.data&&e.data.size)FB.chunks.push(e.data);};
+    r.onstop=function(){FB.mime=r.mimeType||mt||'audio/mp4';FB.blob=FB.chunks.length?new Blob(FB.chunks,{type:FB.mime}):null;FB.chunks=[];
+      if(FB.stream){FB.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});FB.stream=null;}aSess('playback');renderFeedback();};
+    try{r.start(1000);}catch(e){r.start();}
+    FB.rec=r;FB.t0=Date.now();FB.sek=0;
+    FB.tick=setInterval(function(){FB.sek=Math.round((Date.now()-FB.t0)/1000);var t=$('#fbTime');if(t)t.textContent=fmtSec(FB.sek);if(FB.sek>=FB_MAX)fbStop();},500);
+    renderFeedback();
+  }).catch(function(){FB.msg='Das Mikrofon ist nicht freigegeben. Du kannst aber schreiben.';renderFeedback();});
+}
+function fbStop(){clearInterval(FB.tick);var r=FB.rec;FB.rec=null;if(r&&r.state!=='inactive'){try{r.stop();}catch(e){}}}
+function fbSend(){
+  var ta=$('#fbText');if(ta)FB.text=ta.value;
+  if(FB.busy||FB.rec)return;
+  if(!FB.text.trim()&&!FB.blob&&FB.mood===null){FB.msg='Tippe auf ein Gesicht, sprich etwas auf oder schreib etwas.';renderFeedback();say('feedback');return;}
+  if(!SYNC_URL||!CODE){FB.msg='Feedback geht nur, wenn du mit einem Code angemeldet bist.';renderFeedback();return;}
+  FB.busy=true;FB.msg='';renderFeedback();
+  var info=[FB.ort,MODE==='partner'?'zu zweit':'allein','Level '+lvl(S.xp),doneCount()+' Texte',navigator.userAgent].join(' · ');
+  var pr=FB.blob?new Promise(function(res,rej){var fr=new FileReader();fr.onload=function(){res(String(fr.result).split(',')[1]||'');};fr.onerror=rej;fr.readAsDataURL(FB.blob);}):Promise.resolve('');
+  pr.then(function(ton){
+    return fetch(SYNC_URL+'/feedback',{method:'POST',headers:{'Content-Type':'application/json','X-Readster-Code':CODE},
+      body:JSON.stringify({text:FB.text.trim(),stimmung:FB.mood,ton:ton,mime:FB.mime,sek:FB.sek,info:info})});
+  }).then(function(r){
+    if(!r.ok)throw new Error(r.status);
+    FB.busy=false;FB.done=true;freeUrls();FB.blob=null;renderFeedback();say('fbdanke',200);if(typeof sfxGood==='function')sfxGood();
+  }).catch(function(){FB.busy=false;FB.msg='Das hat nicht geklappt. Prüfe das Internet und versuche es nochmal.';renderFeedback();});
+}
 /* Klicks */
 document.addEventListener('click',function(e){
   var w=e.target.closest('.w');
@@ -2247,6 +2318,10 @@ document.addEventListener('click',function(e){
     case 'settings':renderSheet();break;
     case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl')val=v==='lang'?'lang':v==='true';else if(k==='rec'||k==='nums'||k==='wh'||k==='voice'||k==='sfx'||k==='mit')val=(v==='true');S.set[k]=val;save();if(k==='wh'&&val)whPreload();renderSheet();readStyle();break;
     case 'sheetOk':closeBox('#sheet');break;
+    case 'fb':fbOpen();break;
+    case 'fbMood':var ta2=$('#fbText');if(ta2)FB.text=ta2.value;FB.mood=+v;FB.msg='';renderFeedback();break;
+    case 'fbRec':fbRec();break;
+    case 'fbSend':fbSend();break;
     case 'reset':renderReset();break;
     case 'dbgLv':if(!TEST)break;S.xp=XPK*(+v-1)*(+v-1);var ds=RSTAGES[rankOf(+v)];if(ds.car)S.rcar=ds.car;save();renderSheet();renderHome();break;
     case 'dbgFuel':if(!TEST)break;if(!hasCar()){S.xp=XPK*(RSTAGES[CAR0].lv-1)*(RSTAGES[CAR0].lv-1);S.rcar=RSTAGES[CAR0].car;}S.fuel=XP_RACE;save();renderSheet();renderHome();break;
@@ -2294,7 +2369,7 @@ function goQuiet(){
   /* Läuft gerade eine Aufnahme oder der Countdown: Runde abbrechen und das Mikrofon sofort freigeben */
   if(R&&(R.phase==='timing'||R.phase==='count')){recStop(false);recCleanup();cdHide();R.phase='read';R.msg='Das Lesen wurde unterbrochen. Starte einfach nochmal.';try{renderCtl();}catch(e){}R.msg='';}
   else if(REC.stream||REC.rec){recStop(false);recCleanup();}
-  sayStop();if(typeof stopListen==='function')stopListen();if(typeof plStop==='function')plStop();var ps=document.querySelectorAll('.plr');for(var i=0;i<ps.length;i++){if(ps[i]._a){relA(ps[i]._a);ps[i]._a=null;}}mediaOff();/* Tonquelle ganz schließen, nur anhalten reicht dem iPhone nicht; sie wird beim nächsten Ton neu angelegt */try{if(AC){AC.close();AC=null;SFX.g=null;SFX.nb=null;}}catch(e){AC=null;SFX.g=null;SFX.nb=null;}}
+  fbQuiet();sayStop();if(typeof stopListen==='function')stopListen();if(typeof plStop==='function')plStop();var ps=document.querySelectorAll('.plr');for(var i=0;i<ps.length;i++){if(ps[i]._a){relA(ps[i]._a);ps[i]._a=null;}}mediaOff();/* Tonquelle ganz schließen, nur anhalten reicht dem iPhone nicht; sie wird beim nächsten Ton neu angelegt */try{if(AC){AC.close();AC=null;SFX.g=null;SFX.nb=null;}}catch(e){AC=null;SFX.g=null;SFX.nb=null;}}
 document.addEventListener('visibilitychange',function(){if(document.hidden)goQuiet();});
 window.addEventListener('pagehide',goQuiet);
 })();

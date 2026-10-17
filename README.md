@@ -9,7 +9,7 @@ Readster ist nur mit einem Code nutzbar (Liste `CODES` beim Cloudflare-Worker, s
 - `index.html`: die fertige App. Wird aus `quelle/` gebaut, nicht von Hand ändern.
 - `quelle/`: Vorlage, Lesetexte (`lesetexte_stufe1.json`) und Skripte.
 - `audio/`: Vorlese-Aufnahmen (MP3 plus Wortzeiten), erzeugt von ElevenLabs.
-- `cloudflare/`: Whisper-Dienst für die genaue Auswertung.
+- `cloudflare/`: Whisper-Dienst für die genaue Auswertung, Fortschritt pro Code und Feedback (Ansicht unter `/feedback` beim Worker).
 
 ## Vorlesen erzeugen
 
