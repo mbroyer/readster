@@ -3013,7 +3013,7 @@ var Snd=(function(){
   S.begin=function(p,o){
     S.end(true);
     if(!init())return;
-    try{if(ac.state!=='running')ac.resume();}catch(e){}
+    try{if(ac.state!=='running')ac.resume().catch(function(){});}catch(e){}
     var my=++gen;
     function mk(f,c,pan,vol){return c.ev?voiceEV(c,pan,vol):f(c,pan,vol);}
     if(S.legacy||wk===-1){vs=[mk(voice,p,-0.45,1)].concat(o?[mk(voice,o,0.45,0.65)]:[]);return;}
@@ -3032,14 +3032,33 @@ var Snd=(function(){
   };
   /* Version 77: Ton beim ersten echten Tippen freischalten (iPhone/Safari zählt nur touchend/click, nicht pointerdown). true = war noch gesperrt */
   /* Version 79: App im Hintergrund oder iPhone gesperrt = Ton sofort aus, beim Zurückkommen wieder an */
-  S.sleep=function(h){if(!ac)return;try{if(h)ac.suspend();else if(S.on)ac.resume();}catch(e){}};
+  S.sleep=function(h){if(!ac)return;try{var r=h?ac.suspend():(S.on?ac.resume():null);if(r&&r.catch)r.catch(function(){});}catch(e){}};
   function vis(){S.sleep(document.hidden);if(document.hidden){try{speechSynthesis.cancel();}catch(e){}try{kvStop();}catch(e){}}}
   /* Kurze Töne statt Musik: so zeigt das iPhone keinen Player im Sperrbildschirm */
   try{if(navigator.audioSession)navigator.audioSession.type='transient';}catch(e){}
   document.addEventListener('visibilitychange',vis);
   window.addEventListener('pagehide',function(){S.sleep(true);try{kvStop();}catch(e){}});
   window.addEventListener('pageshow',function(){if(!document.hidden)S.sleep(false);});
-  S.unlock=function(){if(!init())return false;var was=ac.state==='running';if(!was){try{ac.resume();}catch(e){}}return !was;};
+  /* Version 90: nach App- oder Fensterwechsel blieb der Ton stumm. Das iPhone lässt den Ton oft nur beim Tippen wieder an,
+     darum bei jedem Tippen nachsehen; hängt er fest, wird er einmal ganz neu aufgebaut (laufende Motoren inklusive) */
+  var wakeBad=false;
+  function rebuild(){
+    var cars=vs.map(function(v){return v.c;});
+    gen++;vs=[];bk=null;
+    try{ac.close();}catch(e){}
+    ac=null;master=null;nbuf=null;wk=0;wkP=null;wakeBad=false;
+    if(!init())return;
+    try{ac.resume().catch(function(){});}catch(e){}
+    if(cars.length)S.begin(cars[0],cars[1]||null);
+  }
+  function wake(){
+    if(!ac||!S.on||document.hidden||ac.state==='running')return;
+    if(wakeBad||ac.state==='interrupted'){rebuild();return;}
+    try{var r=ac.resume();if(r&&r.catch)r.catch(function(){});}catch(e){}
+    setTimeout(function(){if(ac&&S.on&&!document.hidden&&ac.state!=='running')wakeBad=true;},700);
+  }
+  ['touchend','click','keydown'].forEach(function(ev){document.addEventListener(ev,wake,true);});
+  S.unlock=function(){if(!init())return false;var was=ac.state==='running';if(!was){try{ac.resume().catch(function(){});}catch(e){}}return !was;};
   S.setOn=function(o){S.on=o;if(master)master.gain.value=o?0.6:0;};
   S.update=function(){
     if(!ac||!vs.length)return;
