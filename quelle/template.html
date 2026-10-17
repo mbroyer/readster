@@ -299,9 +299,7 @@ ul.howto{margin:0;padding-left:1.2em;color:var(--muted);font-weight:500;font-siz
 /* Nur lange Wörter (ab drei Silben) bunt */
 .rtext.syl-lang .w:not(.wlang) .sy{color:inherit}
 .rtext .w.now{background:var(--warn-bg);box-shadow:0 0 0 3px var(--accent)}
-.rtext{position:relative;isolation:isolate}.rtext.finger{touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-.rtext .w.fw{background:color-mix(in srgb,var(--xp) 30%,transparent);box-shadow:inset 0 -4px 0 var(--xp)}
-.lruler{position:absolute;left:-8px;right:-8px;border-radius:10px;background:color-mix(in srgb,var(--accent) 12%,transparent);pointer-events:none;z-index:-1;transition:top .12s}
+.rtext{position:relative;isolation:isolate}
 .rtext.marking .w{cursor:pointer}
 .rtext.seek .w{cursor:pointer}
 .rtext .w.st{background:var(--bad-bg);text-decoration:underline wavy var(--bad);text-underline-offset:6px}
@@ -1009,8 +1007,8 @@ function renderCtl(){
     h+='<button class="link" data-a="cancel">Beenden</button>';
   }else if(R.phase==='timing'){
     dk='<button class="btn wide stop" data-a="stop"><i></i>Fertig</button>';
-    top=R.recOn?'<div class="recbar" role="status"><span class="pulse"></span><div><b>Aufnahme läuft</b><span>Lies laut bis zum Ende. Dein Finger kann mitlesen.</span></div></div>':
-      '<div class="recbar off" role="status"><div><b>Lies jetzt laut</b><span>Bis zum Ende, dann „Fertig“. Dein Finger kann mitlesen.</span></div></div>';
+    top=R.recOn?'<div class="recbar" role="status"><span class="pulse"></span><div><b>Aufnahme läuft</b><span>Lies laut bis zum Ende.</span></div></div>':
+      '<div class="recbar off" role="status"><div><b>Lies jetzt laut</b><span>Bis zum Ende, dann „Fertig“.</span></div></div>';
     if(!R.recOn&&R.recTried&&S.set.rec)h+='<p class="hint">'+esc(recFailText())+'</p>';
     h+='<button class="link" data-a="cancel">Abbrechen</button>';
   }else if(R.phase==='count'){
@@ -1052,7 +1050,7 @@ function renderCtl(){
     h+='</div>';
   }
   c.innerHTML=h;setDock(dk);var rt=$('#rtop');if(rt)rt.innerHTML=top;
-  var rx=$('#rtext');if(rx)rx.classList.toggle('finger',R.phase==='timing');if(R.phase!=='timing'){fingClear();if(R.phase!=='count')liveStop();}
+  if(R.phase!=='timing'&&R.phase!=='count')liveStop();
   if(R.phase==='mark'){if(R.ms==='listen')fillRec($('#recm'),t.id,true);updateMarkInfo();}else{var os=document.querySelectorAll('#rtext .w.sug,#rtext .w.srm');for(var oi=0;oi<os.length;oi++)os[oi].classList.remove('sug','srm');}
 }
 /* Vorlesen */
@@ -1464,25 +1462,6 @@ function recGet(k){k=rk(k);return recDB().then(function(db){if(!db)return REC.me
 function recMine(k){k=String(k);return CODE?k.indexOf(CODE+'|')===0:k.indexOf('|')<0;}
 function recDelAll(){Object.keys(REC.mem).forEach(function(k){if(recMine(k))delete REC.mem[k];});S.recN={};save();return recDB().then(function(db){if(!db)return;return new Promise(function(r){try{var x=db.transaction('r','readwrite'),st=x.objectStore('r'),q=st.openCursor();q.onsuccess=function(){var cu=q.result;if(!cu)return;if(recMine(cu.key))cu.delete();cu.continue();};x.oncomplete=r;x.onerror=r;x.onabort=r;}catch(e){r();}});});}
 function recCleanup(){if(REC.stream){REC.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});REC.stream=null;}aSess('transient');}
-/* ---------- Mitlesen mit dem Finger: Wort unter dem Finger markieren, Zeile hervorheben ---------- */
-var FG={w:null,bar:null,t:0};
-function fingClear(){if(FG.w)FG.w.classList.remove('fw');FG.w=null;if(FG.bar){FG.bar.remove();FG.bar=null;}}
-function fingAt(x,y,move){
-  var tx=$('#rtext');if(!tx||!tx.classList.contains('finger'))return;
-  var w=null;/* Der Finger liegt beim Lesen leicht unter dem Wort: zuerst ein Stück oberhalb des Berührungspunkts suchen */[-28,-42,-14,0].some(function(d){var e=document.elementFromPoint(x,y+d);w=e&&e.closest&&e.closest('#rtext .w');return !!w;});
-  if(!w||w===FG.w)return;
-  if(FG.w)FG.w.classList.remove('fw');FG.w=w;w.classList.add('fw');
-  if(!FG.bar||!FG.bar.isConnected){FG.bar=document.createElement('i');FG.bar.className='lruler';tx.appendChild(FG.bar);}
-  FG.bar.style.top=(w.offsetTop-4)+'px';FG.bar.style.height=(w.offsetHeight+8)+'px';
-  /* Wischen nach oben/unten scrollt wie überall (touch-action:pan-y), Entlangfahren an der Zeile markiert.
-     Nur beim Entlangfahren am Rand von selbst ein Stück weiterscrollen, nie schon beim Aufsetzen:
-     sonst kämpft das mit dem Wischen, das gerade erst beginnt */
-  if(!move||Date.now()-FG.t<500)return;
-  var r=w.getBoundingClientRect(),dk=$('#dock'),lim=innerHeight-((dk&&!dk.hidden)?dk.offsetHeight:0)-90;
-  if(r.bottom>lim){FG.t=Date.now();window.scrollBy({top:r.bottom-lim+60,behavior:'smooth'});}else if(r.top<90){FG.t=Date.now();window.scrollBy({top:r.top-150,behavior:'smooth'});}
-}
-document.addEventListener('pointerdown',function(e){if(e.target.closest&&e.target.closest('#rtext.finger'))fingAt(e.clientX,e.clientY,false);});
-document.addEventListener('pointermove',function(e){if(e.pointerType==='mouse'&&!e.buttons)return;if(e.target.closest&&e.target.closest('#rtext.finger'))fingAt(e.clientX,e.clientY,true);});
 /* ---------- Mitlesen per Sprache (Test): Spracherkennung des Browsers, Abgleich mit dem Text ---------- */
 var LIVE_OK=!!(window.SpeechRecognition||window.webkitSpeechRecognition),LV=null;
 function lvNorm(x){return String(x).toLowerCase().replace(/[^a-zäöüß0-9]/g,'');}
