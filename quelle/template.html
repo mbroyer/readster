@@ -483,10 +483,11 @@ details.adult p{color:var(--muted);font-weight:600;font-size:.92rem;margin-top:6
 .wj span.ok{border-color:var(--good);color:var(--good)}
 textarea.code{width:100%;min-height:90px;font:600 .8rem/1.3 ui-monospace,Menlo,monospace;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:8px;resize:vertical}
 textarea.fbtext{width:100%;min-height:96px;font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px;resize:vertical}
+.fbbtn svg{width:22px;height:22px}
 .fbsheet{display:flex;flex-direction:column;gap:12px}.fbsheet .link{align-self:center}.fbsheet .link svg{width:18px;height:18px;vertical-align:-3px}
 .fbmic{min-height:96px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:1.4rem}.fbmic svg{width:52px;height:52px;margin:0}
 .fbmic.on{background:#e5484d;border-color:#e5484d;color:#fff}.fbdot{width:16px;height:16px;border-radius:50%;background:#fff;animation:fbblink 1s infinite}@keyframes fbblink{50%{opacity:.25}}
-.fbdone{display:flex;justify-content:center}.fbdone svg{width:96px;height:96px;color:var(--accent)}.fbsheet h2{margin:0}
+.fbdone{display:flex;justify-content:center}.fbdone svg{width:96px;height:96px;color:var(--accent)}.fbsheet h2{margin:0}.fbsheet h2+.hint{margin:-4px 0 0}
 input.codein{width:100%;font:600 1.4rem/1.2 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-align:center;text-transform:uppercase;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:12px;min-height:56px}
 .pick .link{align-self:center}
 input.name{width:100%;font:700 1.1rem var(--f-body);color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px 12px;min-height:48px}
@@ -843,7 +844,7 @@ function renderHome(){
   if(S.tour&&MODE&&!Object.keys(S.tourSeen||{}).length){S.tourSeen={};S.tourSeen[MODE]=1;} /* ältere Stände: gesehen im aktuellen Modus */
   if(!S.tour&&$('#modal').hidden)setTimeout(function(){if(!S.tour&&$('#modal').hidden&&CUR==='home')tourOpen(0);},0);
   var p=lvlProg(S.xp),sg=suggest(),wk=weekInfo(),n=doneCount();
-  var h='<header class="top"><h1 class="brand"><img class="wordmark sm" alt="Readster" src="'+LOGO+'"></h1><div class="chips"><button class="iconbtn prgbtn" data-a="stats" aria-label="Dein Fortschritt">'+IC_STATS+(n?'<span class="badge">'+n+'</span>':'')+'</button><button class="iconbtn" data-a="fb" aria-label="Feedback senden">'+IC_FB+'</button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
+  var h='<header class="top"><h1 class="brand"><img class="wordmark sm" alt="Readster" src="'+LOGO+'"></h1><div class="chips"><button class="iconbtn prgbtn" data-a="stats" aria-label="Dein Fortschritt">'+IC_STATS+(n?'<span class="badge">'+n+'</span>':'')+'</button><button class="iconbtn fbbtn" data-a="fb" aria-label="Feedback an Mark senden">'+IC_FB+'</button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
   /* Modus: ein Schalter mit Wörtern, zeigt zugleich, welcher Modus gerade gilt */
   h+='<div class="mseg" role="group" aria-label="Wie liest du?"><button data-a="mode" data-v="solo" aria-pressed="'+(MODE==='solo')+'">'+IC_SOLO+'<span>Allein lesen</span></button><button data-a="mode" data-v="partner" aria-pressed="'+(MODE==='partner')+'">'+IC_DUO+'<span>Zu zweit lesen</span></button></div>';
   if(S.whNote)h+='<section class="card left whnote"><p class="fb">'+esc(S.whNote)+'</p><button class="btn ghost sm" data-a="whNoteOk">Okay</button></section>';
@@ -2025,15 +2026,15 @@ function renderFeedback(){
   var ta=$('#fbText');if(ta)FB.text=ta.value;
   var h='<div class="card left fbsheet">';
   if(FB.done){
-    h+='<div class="fbdone">'+IC_F2+'</div><h2>Danke!</h2><p class="hint">Deine Nachricht ist angekommen.</p><button class="btn wide" data-a="sheetOk">Fertig</button></div>';
+    h+='<div class="fbdone">'+IC_F2+'</div><h2>Danke!</h2><p class="hint">Deine Nachricht ist bei Mark angekommen.</p><button class="btn wide" data-a="sheetOk">Fertig</button></div>';
     openBox('#sheet',h);return;
   }
-  h+='<h2>Feedback</h2>';
+  h+='<h2>Feedback an Mark</h2><p class="hint">Wie findest du Readster? Was gefällt dir, was stört, was fehlt? Deine Nachricht geht direkt an Mark, der Readster gebaut hat.</p>';
   h+='<div class="faces fbfaces">'+[[2,'Gefällt mir',IC_F2],[1,'Geht so',IC_F1],[0,'Gefällt mir nicht',IC_F0]].map(function(o){return '<button class="btn '+(FB.mood===o[0]?'on':'ghost')+'" data-a="fbMood" data-v="'+o[0]+'" aria-label="'+o[1]+'">'+o[2]+'</button>';}).join('')+'</div>';
   if(FB.rec)h+='<button class="btn wide fbmic on" data-a="fbRec" aria-label="Aufnahme beenden"><span class="fbdot"></span><span id="fbTime">'+fmtSec(FB.sek)+'</span></button>';
   else if(FB.blob)h+=audioTag(FB.blob)+'<button class="link" data-a="fbRec">'+IC_MIC+' Nochmal aufnehmen</button>';
   else h+='<button class="btn wide fbmic" data-a="fbRec" aria-label="Sprachnachricht aufnehmen">'+IC_MIC+'</button>';
-  h+='<textarea class="fbtext" id="fbText" maxlength="4000" placeholder="Oder hier schreiben …">'+esc(FB.text)+'</textarea>';
+  h+='<textarea class="fbtext" id="fbText" maxlength="4000" placeholder="Oder hier aufschreiben, was Mark wissen soll …">'+esc(FB.text)+'</textarea>';
   if(FB.msg)h+='<p class="hint fb">'+esc(FB.msg)+'</p>';
   h+='<button class="btn wide acc" data-a="fbSend"'+(FB.busy||FB.rec?' disabled':'')+'>'+(FB.busy?'Wird gesendet …':'Abschicken')+'</button>';
   h+='<button class="link" data-a="sheetOk">Abbrechen</button></div>';
