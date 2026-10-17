@@ -539,7 +539,9 @@ body:not(.emb) .ktip{font:600 19px/1.2 var(--f-display);letter-spacing:.02em}
 .abort[hidden]{display:none}
 .ser .lad{display:flex;gap:4px;margin:6px 0 2px}
 .ser .lad i{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.14)}
-.ser .lad i.dn{background:var(--green)}.ser .lad i.cur{background:var(--accent)}
+.ser .lad i.dn{background:var(--green)}.ser .lad i.cur{background:var(--accent)}.ser .lad i.gap{margin-left:6px}
+.ser .swarn{margin-top:5px;padding:6px 8px;border-radius:8px;background:rgba(255,120,80,.14);color:#ffb59c;font:500 14px/1.35 var(--f-display)}
+.ser .smed{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:6px 0 2px}.ser .smed button{padding:5px 2px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:#dfe4ee;font:600 12px/1.15 var(--f-display);cursor:pointer}.ser .smed button.on{border-color:var(--accent);color:var(--accent)}.ser .smed small{display:block;font-weight:500;opacity:.75}
 .ser .shelp{margin-top:6px;padding:0;border:0;background:none;color:var(--accent);font:600 14px var(--f-display);letter-spacing:.06em;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .ser ol{margin:6px 0 2px;padding:0 0 0 18px;display:grid;gap:3px;font:500 14px/1.35 var(--f-display);color:#dfe4ee}
 .ser ol[hidden]{display:none}
@@ -680,7 +682,7 @@ html,body{touch-action:manipulation}
           <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8 20h8M10 17h4"/></svg></span>
           <span class="pill" id="hPillS" hidden>Neu? Hier starten</span><span class="n">Karriere</span>
           <span class="d" id="hSerD"></span>
-          <span class="h-prog prog" id="hProg" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+          <span class="h-prog prog" id="hProg" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
           <span class="chev" aria-hidden="true">›</span>
         </button>
         <button class="h-mode" id="hFree" type="button">
@@ -2765,6 +2767,7 @@ var treeEl=$('tree'),msgEl=$('msg'),hudEl=$('hud'),sheetEl=$('sheet'),slipEl=$('
 var spdEl=$('spd'),etEl=$('et');
 var curMsg='';
 
+function f1(n){return n.toFixed(1).replace('.',',');}
 function f3(n){return n==null?'–,–––':n.toFixed(3).replace('.',',');}
 function kmh(v){return (v*3.6).toFixed(1).replace('.',',');}
 function dots(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
@@ -2957,14 +2960,18 @@ function renderSheet(){
   $('freeRow').style.display=ser?'none':'grid';
   var sc=$('serCard');sc.style.display=ser?'block':'none';
   if(ser){
-    var LV=CAREER[carLvl()],rw=LV.reward&&!owned(LV.reward)?SPECS[carIdx(LV.reward)]:null;
-    sc.innerHTML='<div class="s1"><span>'+(carDone()?'Karriere geschafft · Meister':'Stufe '+(carLvl()+1)+' von '+CAREER.length+' · '+LV.tier)+'</span></div>'+
+    var LV=curRace(),CL=CLASSES[LV.k],dn=carDone(),rw=!dn&&!owned(LV.car)?SPECS[carIdx(LV.car)]:null,est=estET(id),
+      warn=!dn&&!LV.dial&&est>CL.max+0.3?'<div class="swarn">Dein '+shortName(SPECS[pIdx])+' schafft etwa '+String(est.toFixed(1)).replace('.',',')+' s, hier fahren die Gegner '+CL.t+'. Rüste in der Werkstatt auf oder nimm ein schnelleres Auto.</div>':'',
+      mh=dn?'<div class="smed">'+CLASSES.slice(0,5).map(function(c,k){var m=medalOf(k,SAVE.mb[k]);return '<button type="button" data-mk="'+k+'" class="'+(k===LV.k?'on':'')+'">'+c.n+'<small>'+(m>=0?MEDN[m]:'–')+'</small></button>';}).join('')+'</div>':'';
+    sc.innerHTML='<div class="s1"><span>'+(dn?'Meister · Medaillenjagd · '+CL.n:(LV.dial?'Finale · Top Fuel':'Klasse '+(LV.k+1)+' · '+CL.n+' ('+CL.t+') · '+(LV.boss?'Boss':'Rennen '+raceNo(carLvl())+' von 3')))+'</span></div>'+mh+
       '<div class="s2">'+ch.who+'<small>'+shortName(SPECS[carIdx(ch.car)])+(ch.sw?' · '+SWAPS[ch.car][ch.sw-1].n:'')+(ch.up?' · Stage '+ch.up:'')+'</small></div>'+
       '<div class="sq">'+ch.quote+'</div>'+
-      '<div class="lad" aria-hidden="true">'+CAREER.map(function(c,i){return '<i class="'+(i<SAVE.round?'dn':(i===SAVE.round?'cur':''))+'"></i>';}).join('')+'</div>'+
-      '<div class="s4">Sieg: +'+LV.parts+' Teile'+(rw?', und der '+shortName(rw)+' wird frei':(LV.cup&&!carDone()?' und der Pokal':''))+'. Verlierst du, passiert nichts.</div>'+
+      '<div class="lad" aria-hidden="true">'+CAREER.map(function(c,i){return '<i class="'+(i<SAVE.round?'dn':(i===SAVE.round?'cur':''))+(i&&c.k!==CAREER[i-1].k?' gap':'')+'"></i>';}).join('')+'</div>'+
+      (dn?'<div class="s4">Ziel für '+CL.n+': Bronze '+f1(CL.med[0])+' s, Silber '+f1(CL.med[1])+' s, Gold '+f1(CL.med[2])+' s. Es zählen nur Autos der Klasse '+CL.n+' oder langsamer, getunt sein dürfen sie.'+(SAVE.mb[LV.k]!=null?' Deine Bestzeit: '+f1(SAVE.mb[LV.k])+' s.':'')+'</div>'
+        :'<div class="s4">Sieg: +'+LV.parts+' Teile'+(rw?', und der '+shortName(rw)+' kommt in deine Garage':'')+(LV.boss?(LV.dial?'. Gewinnst du, bist du Meister!':'. Boss geschlagen = Pokal und Aufstieg in die Klasse '+CLASSES[LV.k+1].n+'.'):'.')+(LV.dial?' Der Nitro Rail startet erst, wenn dein Vorsprung abgelaufen ist (etwa '+f1(Math.max(0,est-4.7))+' s).':'')+' Verlierst du, passiert nichts.</div>')+warn+
       '<button type="button" class="shelp" id="serHelp">So geht die Karriere</button>';
     $('serHelp').onclick=function(){serIntro(false);};
+    sc.querySelectorAll('[data-mk]').forEach(function(b){b.onclick=function(){SAVE.mk=+b.getAttribute('data-mk');saveSave();reset();};});
   }
   $('recap').innerHTML='<b>'+shortName(SPECS[pIdx])+'</b> · '+(sw?sw.n+' '+sw.sub:'Serienmotor')+(tuneSel.p?' · Stage '+Math.min(tuneSel.p,upStage(id)):'')+(ser?'':' · gegen '+shortName(SPECS[oIdx])+(oIdx===pIdx&&typeof TWIN!=='undefined'?' ('+(TWIN[SPECS[oIdx].id]||[0,'blau'])[1]+')':''));
   $('oppBtn').textContent='Gegner: '+shortName(SPECS[oIdx])+(oIdx===pIdx&&typeof TWIN!=='undefined'?' ('+(TWIN[SPECS[oIdx].id]||[0,'blau'])[1]+')':'')+' ›';
@@ -3043,8 +3050,9 @@ function start(){
   var roll=T+3.8,arrive=roll+2.8,a=arrive+1.4+Math.random()*0.8;
   seq={roll:roll,arrive:arrive,pre:arrive+0.3,stg:arrive+0.9,a1:a,a2:a+0.5,a3:a+1.0,g:a+1.5};
   var Q=opp.quirk;
-  opp.launchAt=opp.willFoul?seq.g-(0.06+Math.random()*0.14):seq.g+Q.rt[0]+Math.random()*(Q.rt[1]-Q.rt[0]);
-  opp.rt=opp.launchAt-seq.g;
+  opp.dial=Q.dial?Math.max(0,estET(player.id)-4.7):0;
+  opp.launchAt=opp.dial+(opp.willFoul?seq.g-(0.06+Math.random()*0.14):seq.g+Q.rt[0]+Math.random()*(Q.rt[1]-Q.rt[0]));
+  opp.rt=opp.launchAt-seq.g-opp.dial;
   ghostUse=GH[ghKey()]||null;ghostRec=[];
   opp.bluffT=[];var bw=seq.a1-0.45-(seq.arrive+0.4);if(bw>0.35){opp.bluffT.push(seq.arrive+0.4+Math.random()*Math.max(0,bw-0.3));if(bw>1.0)opp.bluffT.push(opp.bluffT[0]+0.45+Math.random()*Math.max(0,bw-0.9));}
   sheetEl.hidden=true;$('menu').hidden=true;hudEl.hidden=false;gasLvl=0;
@@ -3145,7 +3153,8 @@ function doShift(c,lift){
   var sw=lift&&!c.lim&&d>=-130&&d<=70;
   if(sw){c.bStk=Math.min(4,(c.bStk||0)+1);c.bStr=0.14+0.05*(c.bStk-1);c.boostT=2.2;c.nBoost=(c.nBoost||0)+1;}
   /* Version 88: der Zeitsprung kommt von selbst beim ersten perfekten Schaltvorgang (Mark) */
-  if(c.id==='chronos'&&!c.tjUsed&&lift&&g===0){c.flux=1;c.tjGo=true;}
+  /* Version 92: Doc Emmi in der Karriere trifft den Zeitsprung nur in jedem vierten Rennen (tjP, einmal pro Rennen ausgewürfelt) */
+  if(c.id==='chronos'&&!c.tjUsed&&lift&&g===0&&(c.tjOk==null?(c.tjOk=c.isPlayer||!c.quirk||Math.random()<(c.quirk.tjP||1)):c.tjOk)){c.flux=1;c.tjGo=true;}
   /* Version 91: Turbo Boost (Shadowhawk) zündet ebenso beim ersten perfekten Schaltvorgang */
   if(c.id==='kitt'&&!c.tbUsed&&lift&&g===0)c.tbGo=true;
   else c.bStk=0;
@@ -3624,39 +3633,68 @@ var DIFFS=[{n:'Leicht',rt:[0.32,0.6],u:[-0.9,1.7],sn:1200,sb:0.5,pw:0.93},{n:'Mi
 try{diff=Math.max(0,Math.min(2,parseInt(localStorage.getItem('s402diff')||'0',10)||0));}catch(e){}
 var SAVE={garage:['skyline'],parts:0,up:{},round:0,trophies:0};
 try{var _s=JSON.parse(localStorage.getItem('s402save')||'null');if(_s&&_s.garage&&_s.garage.length)for(var _k in _s)SAVE[_k]=_s[_k];}catch(e){}
-SAVE.garage=SAVE.garage.filter(function(x){return ['911','testarossa','countach','skyline','challenger','vento','voltaris','brixton','sarthe','chronos','dragster','kitt','f89','munja'].indexOf(x)>=0;});if(!SAVE.garage.length)SAVE.garage=['skyline'];if(!(SAVE.round>=0&&SAVE.round<=10))SAVE.round=0;
+SAVE.garage=SAVE.garage.filter(function(x){return ['911','testarossa','countach','skyline','challenger','vento','voltaris','brixton','sarthe','chronos','dragster','kitt','f89','munja'].indexOf(x)>=0;});if(!SAVE.garage.length)SAVE.garage=['skyline'];if(!(SAVE.round>=0&&SAVE.round<=16))SAVE.round=0;
 function saveSave(){try{localStorage.setItem('s402save',JSON.stringify(SAVE));}catch(e){}}
 var mode='series';try{mode=localStorage.getItem('s402mode')==='free'?'free':'series';}catch(e){}
 var tuneSel={g:1,t:0,p:0,s:0};if(!SAVE.sw)SAVE.sw={};
 var CHARS=[
- {who:'Frühstarter Kai',car:'skyline',stage:'Sechzehntelfinale',quote:'„Ich gehe bei Orange los!“',tip:'Neigt zum Frühstart.',rt:[0.09,0.22],u:[0,1.3],sn:1000,sb:0.5,pw:0.96,foulP:0.3,heat:[0.2,0.6],bl:1},
- {who:'Begrenzer-Ben',car:'911',stage:'Achtelfinale',quote:'„Immer bis zum Anschlag!“',tip:'Schaltet zu spät und hängt im Begrenzer.',rt:[0.2,0.35],u:[0.9,1.5],sn:0,sb:0,late:0.35,pw:0.98,foulP:0,heat:[0.4,0.8],bl:0.25},
- {who:'Schalt-Sam',car:'testarossa',stage:'Viertelfinale',quote:'„Schalten ist alles.“',tip:'Schwacher Start, perfekte Schaltpunkte.',rt:[0.3,0.5],u:[-0.8,-0.1],sn:160,sb:0.62,pw:1,foulP:0,heat:[0.4,0.8],bl:0.3},
- {who:'Burnout-Bruno',car:'countach',stage:'Halbfinale',quote:'„Heiße Reifen, heißer Wagen.“',tip:'Reifen immer heiß, kaum Schwächen.',rt:[0.17,0.27],u:[0.15,1],sn:550,sb:0.65,pw:1,foulP:0,heat:[1,1],bl:0.8},
- {who:'Muskel-Max',car:'challenger',stage:'Finale',quote:'„Hubraum kann man durch nichts ersetzen.“',tip:'Brutale Leistung, viel Wheelspin – wer sauber startet, gewinnt.',rt:[0.15,0.3],u:[0.4,1.3],sn:700,sb:0.55,pw:0.95,foulP:0.08,heat:[0.5,0.9],bl:0.5}
+ {who:'Frühstarter Kai',car:'skyline',quote:'„Ich gehe bei Orange los!“',tip:'Neigt zum Frühstart.',rt:[0.09,0.22],u:[0,1.3],sn:1000,sb:0.5,pw:0.96,foulP:0.3,heat:[0.2,0.6],bl:1},
+ {who:'Begrenzer-Ben',car:'911',quote:'„Immer bis zum Anschlag!“',tip:'Schaltet zu spät und hängt im Begrenzer.',rt:[0.2,0.35],u:[0.9,1.5],sn:0,sb:0,late:0.35,pw:0.98,foulP:0,heat:[0.4,0.8],bl:0.25},
+ {who:'Schalt-Sam',car:'testarossa',quote:'„Schalten ist alles.“',tip:'Schwacher Start, perfekte Schaltpunkte.',rt:[0.3,0.5],u:[-0.8,-0.1],sn:160,sb:0.62,pw:1,foulP:0,heat:[0.4,0.8],bl:0.3},
+ {who:'Burnout-Bruno',car:'countach',quote:'„Heiße Reifen, heißer Wagen.“',tip:'Reifen immer heiß, kaum Schwächen.',rt:[0.17,0.27],u:[0.15,1],sn:550,sb:0.65,pw:1,foulP:0,heat:[1,1],bl:0.8},
+ {who:'Muskel-Max',car:'challenger',quote:'„Hubraum kann man durch nichts ersetzen.“',tip:'Brutale Leistung, viel Wheelspin – wer sauber startet, gewinnt.',rt:[0.15,0.3],u:[0.4,1.3],sn:700,sb:0.55,pw:0.95,foulP:0.08,heat:[0.5,0.9],bl:0.5},
+ /* Version 92: neue Figuren für die Klassen-Karriere */
+ {who:'Nachbar Nico',car:'skyline',quote:'„Frisch gewaschen, frisch getankt!“',tip:'Gemütlicher Start, schaltet ungenau.',rt:[0.3,0.55],u:[-0.9,1.6],sn:1100,sb:0.5,pw:0.93,foulP:0.05,heat:[0.1,0.4],bl:0.3},
+ {who:'Doc Emmi',car:'chronos',quote:'„Bei 88 Meilen pro Stunde wird es spannend!“',tip:'Schaltet oft zu spät. Gelingt ihr ein perfekter Gang, springt der Chronos durch die Zeit.',rt:[0.25,0.45],u:[-0.5,1.2],sn:700,sb:0.5,pw:0.96,tjP:0.25,foulP:0.04,heat:[0.2,0.6],bl:0.4},
+ {who:'Nachtfalke Nina',car:'kitt',quote:'„Turbo Boost ist kein Spielzeug.“',tip:'Zündet den Turbo Boost beim ersten perfekten Schalten.',rt:[0.2,0.36],u:[-0.3,1.1],sn:650,sb:0.58,pw:0.97,foulP:0.04,heat:[0.4,0.8],bl:0.4},
+ {who:'Leise Lena',car:'voltaris',quote:'„Du hörst mich erst, wenn ich vorbei bin.“',tip:'Elektro: kein Schalten, sehr gleichmäßig.',rt:[0.18,0.32],u:[0,1],sn:400,sb:0.6,pw:0.98,foulP:0.02,heat:[0.3,0.6],bl:0.2},
+ {who:'Le-Mans-Luc',car:'sarthe',quote:'„24 Stunden? Ich brauche zehn Sekunden.“',tip:'Rennprofi: schnelle Reaktion, saubere Gänge.',rt:[0.14,0.26],u:[0.1,0.9],sn:350,sb:0.64,pw:1,foulP:0.03,heat:[0.6,1],bl:0.5},
+ {who:'Schrauber-Steffi',car:'challenger',quote:'„Ich hab Max seinen Contender mal ordentlich aufgemacht.“',tip:'Getunter Contender mit Tauschmotor, viel Wheelspin.',rt:[0.15,0.28],u:[0.3,1.2],sn:500,sb:0.6,pw:1,foulP:0.05,heat:[0.6,1],bl:0.6},
+ {who:'Gräfin Greta',car:'vento',quote:'„Sechzehn Zylinder, null Kompromisse.“',tip:'Reagiert blitzschnell und macht kaum Fehler.',rt:[0.12,0.22],u:[0.2,0.8],sn:250,sb:0.66,pw:1,foulP:0.02,heat:[0.7,1],bl:0.4},
+ {who:'Rennfahrer Rico',car:'f89',quote:'„Ich komme direkt aus der Formel 1.“',tip:'Sehr schnell, aber ungeduldig am Start.',rt:[0.11,0.24],u:[0,1.1],sn:400,sb:0.62,pw:1,foulP:0.1,heat:[0.7,1],bl:0.7},
+ {who:'Turbo-Tina',car:'911',quote:'„Mein Elfer hat alles bekommen, was es gibt.“',tip:'Voll getunter Elfer mit Drag-Umbau.',rt:[0.13,0.25],u:[0.2,0.9],sn:300,sb:0.65,pw:1,foulP:0.03,heat:[0.7,1],bl:0.5},
+ {who:'Blitz-Bea',car:'munja',quote:'„Volle Kraft ab null. Immer.“',tip:'Elektro-Allrad: kein Schalten, kaum Fehler.',rt:[0.11,0.2],u:[0.2,0.8],sn:200,sb:0.68,pw:1,foulP:0.02,heat:[0.7,1],bl:0.3},
+ {who:'Legende Lou',car:'dragster',quote:'„Ich warte gern auf dich.“',tip:'Der Nitro Rail ist doppelt so schnell. Darum startet er erst, wenn dein Vorsprung abgelaufen ist.',rt:[0.1,0.18],u:[0.3,0.8],sn:150,sb:0.68,pw:1,foulP:0,heat:[1,1],bl:0.6}
 ];
-/* Version 69: Karriere statt Rennserie: 10 Stufen, 5 Fahrer je zweimal (Amateur, dann Profi mit aufgemotztem Auto).
-   Du behältst dein Auto. Sieg = Teile, beim ersten Mal auch ein neues Auto (reward). Niederlage = nichts passiert. */
+/* Version 92: Klassen-Karriere (Konzept karriere/KONZEPT_karriere_neu.md). Fünf Klassen nach Zeit, je drei Rennen: zwei Herausforderer, dann der Boss.
+   Wer gewinnt, bekommt das Auto des Gegners (falls noch nicht in der Garage). Boss schlagen = Pokal und Aufstieg. Danach das Top-Fuel-Finale mit Vorsprung (Bracket).
+   Nach dem Titel: Medaillenjagd, je Klasse Bronze/Silber/Gold für eine Zielzeit, nur mit Autos dieser Klasse oder langsamer. */
+var CLASSES=[
+ {n:'Straße',t:'über 15 s',max:99,med:[15.5,14.6,13.8]},
+ {n:'Sport',t:'13 bis 15 s',max:15,med:[13.2,12.5,11.8]},
+ {n:'Super',t:'11 bis 13 s',max:13,med:[11.2,10.6,10.0]},
+ {n:'Hyper',t:'10 bis 11 s',max:11,med:[10.2,9.7,9.2]},
+ {n:'Formel',t:'unter 10 s',max:10,med:[9.0,8.7,8.4]},
+ {n:'Top Fuel',t:'Finale',max:99}
+];
+/* Klasse jedes Autos (Serie), für die Medaillen */
+var CCLS={'skyline':0,'chronos':0,'brixton':0,'911':1,'testarossa':1,'countach':1,'kitt':2,'voltaris':2,'challenger':2,'sarthe':3,'vento':3,'f89':4,'munja':4,'dragster':5};
 var CAREER=[
- {ch:0,tier:'Amateur',reward:'911',parts:3},
- {ch:1,tier:'Amateur',reward:'testarossa',parts:3},
- {ch:2,tier:'Amateur',reward:'countach',parts:3},
- {ch:3,tier:'Amateur',reward:'challenger',parts:4},
- {ch:4,tier:'Amateur',reward:'chronos',parts:5,cup:true},
- {ch:0,tier:'Profi',reward:'brixton',parts:5,up:2,sw:1},
- {ch:1,tier:'Profi',reward:'sarthe',parts:5,up:1,sw:1},
- {ch:2,tier:'Profi',reward:'voltaris',parts:6,up:2,sw:1},
- {ch:3,tier:'Profi',reward:'kitt',parts:6,up:2,sw:1},
- {ch:4,tier:'Profi',reward:'vento',bonus:['dragster','f89','munja'],car:'vento',parts:8,up:1,sw:1,cup:true}
+ {k:0,ch:5,parts:4},{k:0,ch:6,parts:4},{k:0,ch:0,car:'brixton',parts:6,boss:true},
+ {k:1,ch:1,parts:5},{k:1,ch:2,parts:5},{k:1,ch:3,parts:8,boss:true},
+ {k:2,ch:7,parts:6},{k:2,ch:8,parts:6},{k:2,ch:4,parts:10,boss:true},
+ {k:3,ch:9,parts:7},{k:3,ch:10,up:2,sw:1,parts:7},{k:3,ch:11,parts:12,boss:true},
+ {k:4,ch:12,parts:8},{k:4,ch:13,up:2,sw:2,parts:8},{k:4,ch:14,parts:14,boss:true},
+ {k:5,ch:15,parts:20,boss:true,dial:true}
 ];
-/* Version 86: neue Autos als Belohnung in der Profi-Runde (Terrier, Model P, im Finale der Vento, den dort auch Muskel-Max fährt).
-   Wer die Stufe schon geschafft hat, bekommt das Auto gleich. */
-/* Version 87: Chronos im Amateur-Finale, Sarthe in Profi-Stufe 7, nach dem Karriere-Sieg zusätzlich der Nitro Rail (bonus) */
-/* Version 91: Shadowhawk in Profi-Stufe 9, nach dem Karriere-Sieg zusätzlich F89 und Munja R */
-CAREER.forEach(function(L,i){if(SAVE.round>i)[L.reward].concat(L.bonus||[]).forEach(function(r){if(r&&SAVE.garage.indexOf(r)<0)SAVE.garage.push(r);});});
+CAREER.forEach(function(L){if(!L.car)L.car=CHARS[L.ch].car;});
+if(!SAVE.mb)SAVE.mb={};if(SAVE.mk==null)SAVE.mk=0;
+/* alte Spielstände (10 Stufen) auf Klassen umrechnen, Autos und Teile bleiben */
+if(SAVE.cv!==2){SAVE.round=[0,1,3,4,6,7,9,10,12,13,16][Math.max(0,Math.min(10,SAVE.round|0))];SAVE.cv=2;}
+if(!(SAVE.round>=0&&SAVE.round<=CAREER.length))SAVE.round=0;
+CAREER.forEach(function(L,i){if(SAVE.round>i&&SAVE.garage.indexOf(L.car)<0)SAVE.garage.push(L.car);});
 function carLvl(){return Math.min(SAVE.round,CAREER.length-1);}
-function carOpp(i){var L=CAREER[i==null?carLvl():i],a={};for(var k in CHARS[L.ch])a[k]=CHARS[L.ch][k];if(L.car)a.car=L.car;a.up=L.up||0;a.sw=L.sw||0;a.tier=L.tier;if(L.tier==='Profi'){a.pw=Math.max(a.pw,1);a.foulP=a.foulP*0.5;a.rt=[Math.max(0.1,a.rt[0]-0.04),Math.max(0.2,a.rt[1]-0.06)];a.sn=a.sn*0.7;}return a;}
 function carDone(){return SAVE.round>=CAREER.length;}
+function bossOf(k){for(var i=0;i<CAREER.length;i++)if(CAREER[i].k===k&&CAREER[i].boss)return CAREER[i];return CAREER[0];}
+function curRace(){return carDone()?bossOf(SAVE.mk||0):CAREER[carLvl()];}
+function raceNo(i){var n=0;for(var j=0;j<=i;j++)if(CAREER[j].k===CAREER[i].k)n++;return n;}
+function carOpp(){var L=curRace(),a={};for(var k in CHARS[L.ch])a[k]=CHARS[L.ch][k];a.car=L.car;a.up=L.up||0;a.sw=L.sw||0;a.k=L.k;a.dial=!!L.dial;
+  if(L.k>=3){a.pw=Math.max(a.pw,1);a.foulP=a.foulP*0.5;}return a;}
+/* Bestzeit des Spielers mit diesem Auto (sonst Serienzeit), für Warnung und Bracket-Vorsprung */
+function estET(id){var b=null;for(var k in GH)if(k.indexOf(id)===0&&/^[sdw0-9]*$/.test(k.slice(id.length))&&GH[k]&&GH[k].et&&(b==null||GH[k].et<b))b=GH[k].et;return b!=null?b:parseFloat(String(GET[id]||'15').replace(',','.'));}
+function medalOf(k,et){var m=CLASSES[k].med;if(!m||et==null)return -1;return et<=m[2]?2:(et<=m[1]?1:(et<=m[0]?0:-1));}
+var MEDN=['Bronze','Silber','Gold'];
+function medCount(){var n=0;for(var k=0;k<5;k++)if(SAVE.mb[k]!=null&&medalOf(k,SAVE.mb[k])>=0)n++;return n;}
 function aiParams(){
   if(EMB_AI)return EMB_AI;
   if(mode==='series'){return carOpp();}
@@ -3721,7 +3759,7 @@ function simStep(dt){
   if(player.launched)player.thrIn=(T-player.launchT<0.4)?1:gasLvl;
   player.brakeIn=brakeTouch||kDown||kSpace||(player.autoBrake&&player.over);
   if(state==='ready')return;
-  if(!opp.launched&&T>=opp.launchAt){if(opp.willFoul)opp.foul=true;opp.rt=T-seq.g;launch(opp);}
+  if(!opp.launched&&T>=opp.launchAt){if(opp.willFoul)opp.foul=true;opp.rt=T-seq.g-(opp.dial||0);launch(opp);}
   if(!player.launched)preStep(player,dt);
   if(!opp.launched)preStep(opp,dt);
   if(opp.launched&&opp.shiftT<=0&&opp.gear<opp.ng-1&&!opp.over&&opp.er>=opp.aiShift[opp.gear]&&(!opp.quirk.late||opp.limT>opp.quirk.late))doShift(opp);
@@ -3783,17 +3821,23 @@ function finish(){
     h+='<p class="stake">'+(rec?(old?'NEUE BESTZEIT mit dem '+shortName(player)+': '+f3(myet)+' s (vorher '+f3(old.et)+')':'Erste Bestzeit mit dem '+shortName(player)+': '+f3(myet)+' s. Beim nächsten Lauf fährt sie als Geisterauto mit.'):'Bestzeit mit dem '+shortName(player)+': '+f3(old.et)+' s (diese Fahrt '+f3(myet)+')')+'</p>';
   }
   if(mode==='series'){
-    var st='',r0=carLvl(),L=CAREER[r0],fin=carDone();
-    if(won){
+    var st='',r0=carLvl(),L=curRace(),fin=carDone();
+    if(fin){
+      var met=(player.done&&!player.foul)?player.finishAbs-seq.g:null,kk=L.k,okc=(CCLS[player.id]==null?0:CCLS[player.id])<=kk;
+      SAVE.parts+=won?3:1;
+      if(met==null)st='Für eine Medaille musst du sauber ins Ziel kommen.';
+      else if(!okc)st='Der '+shortName(player)+' ist zu schnell für die Klasse '+CLASSES[kk].n+', hier zählt keine Medaille. Nimm ein Auto dieser Klasse oder langsamer.';
+      else{var om=medalOf(kk,SAVE.mb[kk]),nm=medalOf(kk,met);if(SAVE.mb[kk]==null||met<SAVE.mb[kk])SAVE.mb[kk]=met;
+        st=nm>om?'MEDAILLE in '+CLASSES[kk].n+': '+MEDN[nm]+'! ':(nm>=0?MEDN[nm]+'-Zeit in '+CLASSES[kk].n+'. ':'Noch keine Medaille: Bronze gibt es ab '+f1(CLASSES[kk].med[0])+' s. ');
+        if(nm>=0&&nm<2)st+='Für '+MEDN[nm+1]+' brauchst du '+f1(CLASSES[kk].med[nm+1])+' s.';}
+      btn='Nochmal';
+    }else if(won){
       var gain=L.parts+(player.nBoost||0);st='Sieg: +'+L.parts+' Teile'+(player.nBoost?' und +'+player.nBoost+' für Boosts':'')+'. ';
       SAVE.parts+=gain;
-      if(!fin){
-        if(L.reward&&!owned(L.reward)){SAVE.garage.push(L.reward);st+='Neues Auto in deiner Garage: '+shortName(SPECS[carIdx(L.reward)])+'! ';}
-        var nb=(L.bonus||[]).filter(function(b){return !owned(b);});if(nb.length){nb.forEach(function(b){SAVE.garage.push(b);});st+='Bonus für den Karriere-Sieg: '+nb.map(function(b){return shortName(SPECS[carIdx(b)]);}).join(', ').replace(/, ([^,]*)$/,' und $1')+'! ';}
-        if(L.cup){SAVE.trophies++;st+='POKAL GEWONNEN! ';}
-        SAVE.round=r0+1;btn=SAVE.round>=CAREER.length?'Weiter':'Nächste Stufe';
-        if(SAVE.round>=CAREER.length)st+='Karriere geschafft, du bist Meister!';
-      }else btn='Nochmal';
+      if(!owned(L.car)){SAVE.garage.push(L.car);st+='Der '+shortName(SPECS[carIdx(L.car)])+' von '+opp.who+' gehört jetzt dir! ';}
+      if(L.boss){SAVE.trophies++;st+=L.dial?'POKAL! ':'POKAL! Aufstieg in die Klasse '+CLASSES[L.k+1].n+'. ';}
+      SAVE.round=r0+1;btn=carDone()?'Weiter':(L.boss?'Nächste Klasse':'Nächstes Rennen');
+      if(carDone())st+='Karriere geschafft, du bist Meister! Jetzt kannst du in jeder Klasse Medaillen jagen.';
     }else{
       SAVE.parts+=1;st='Verloren: +1 Teil. Dein Auto bleibt deins, probier es noch mal'+(wsCan(player.id)?' oder rüste erst in der Werkstatt auf':'')+'.';btn='Nochmal';
     }
@@ -4708,7 +4752,7 @@ function fitAllWb(){fitWb($('hWbS'),Math.max(160,$('hSplash').clientHeight-250))
 /* ---------- Garage (Schritt 1 Auto) ---------- */
 var gIdx=0;
 var GET={'kitt':'12,9','f89':'8,9','munja':'8,8','sarthe':'10,1','chronos':'12,0','dragster':'4,6','911':'13,8','testarossa':'13,5','countach':'13,1','skyline':'16,5','challenger':'11,0','vento':'10,2','voltaris':'11,5','brixton':'15,9'};
-function ownerOf(id){for(var i=0;i<CAREER.length;i++)if(CAREER[i].reward===id||(CAREER[i].bonus||[]).indexOf(id)>=0)return {who:CHARS[CAREER[i].ch].who,r:i+1};return null;}
+function ownerOf(id){for(var i=0;i<CAREER.length;i++)if(CAREER[i].car===id)return {who:CHARS[CAREER[i].ch].who,r:i+1,k:CLASSES[CAREER[i].k].n};return null;}
 function gLocked(i){return mode==='series'&&!owned(SPECS[i].id);}
 function garageRender(){
   gIdx=pIdx;
@@ -4716,7 +4760,7 @@ function garageRender(){
   var h='<div class="gar"><div class="gar-ml"><span>'+(ser?'Karriere · <b>'+n+' von '+SPECS.length+' Autos</b> in deiner Garage':'Freies Rennen · <b>alle Autos offen</b>')+'</span><span id="garPos"></span></div>'+
     '<div class="gar-rail" id="garRail" tabindex="0" aria-label="Autos: wischen oder Pfeiltasten">';
   SPECS.forEach(function(s,i){var o=ownerOf(s.id);
-    h+='<div class="gar-sl'+(gLocked(i)?' lk':'')+(i%2?' mir':'')+'">'+GAR_DECO+'<div class="gar-bay" data-no="'+(i+1)+'"><canvas data-top="'+i+'" role="img" aria-label="'+shortName(s)+' von oben"></canvas><span class="gar-lock">'+(o?'Wird frei nach Stufe '+o.r:'Gesperrt')+'</span></div></div>';});
+    h+='<div class="gar-sl'+(gLocked(i)?' lk':'')+(i%2?' mir':'')+'">'+GAR_DECO+'<div class="gar-bay" data-no="'+(i+1)+'"><canvas data-top="'+i+'" role="img" aria-label="'+shortName(s)+' von oben"></canvas><span class="gar-lock">'+(o?'Sieg gegen '+o.who:'Gesperrt')+'</span></div></div>';});
   h+='</div><div class="gar-info" id="garInfo"><div class="gar-br"><span class="gar-brand" id="garBrand"></span><span class="gar-own" id="garOwn"></span></div>'+
     '<div class="gar-mod"><h2 id="garName"></h2><div class="gar-et"><b id="garEt"></b><span>Viertelmeile Serie</span></div></div>'+
     '<div class="gar-sub" id="garSub"></div><div class="gar-st" id="garSt"></div><div class="gar-leg" id="garLeg"><s></s>Strich = dein aktuelles Auto</div>'+
@@ -4749,7 +4793,7 @@ function garInfo(){
   $('garSub').textContent=s.sub;
   $('garEt').textContent=(GET[s.id]||'–')+' s';
   var ow=$('garOwn');
-  if(lk){ow.textContent=o?'Belohnung für Stufe '+o.r+' ('+o.who+')':'Gesperrt';ow.className='gar-own lk';}
+  if(lk){ow.textContent=o?'Gewinne gegen '+o.who+' ('+o.k+')':'Gesperrt';ow.className='gar-own lk';}
   else{ow.textContent=gIdx===pIdx?'Dein Auto':(mode==='series'?'In deiner Garage':'Frei wählbar');ow.className='gar-own';}
   $('garInfo').className='gar-info'+(lk?' lk':'');
   $('garSt').innerHTML=gb('Leistung',ps,1000,mps,ps+' PS')+gb('Drehmoment',s.nm,1300,me.nm,s.nm+' Nm')+gb('Leichtbau',2300-s.kg,1300,2300-me.kg,dots(s.kg)+' kg')+gb('Grip',s.trac,1.3,me.trac,Math.round(s.trac*100)+' %');
@@ -4762,7 +4806,7 @@ function garInfo(){
 }
 function garageFoot(){
   var s=SPECS[gIdx],n=$('mNext');if(mstep!=='car')return;
-  if(gLocked(gIdx)){var o=ownerOf(s.id);n.disabled=true;n.textContent=o?'Erst Stufe '+o.r+' schaffen':'Gesperrt';}
+  if(gLocked(gIdx)){var o=ownerOf(s.id);n.disabled=true;n.textContent=o?'Erst '+o.who+' schlagen':'Gesperrt';}
   else{n.disabled=false;n.textContent='Weiter: Rennen ›';}
 }
 function garagePick(){
@@ -4808,8 +4852,8 @@ function titleRender(){
   $('hDayIco').innerHTML=night?ICO_MOON:ICO_SUN;$('hDayTxt').textContent=night?'Nacht':'Tag';
   $('hSnd').setAttribute('aria-pressed',Snd.on?'true':'false');$('hSndTxt').textContent=Snd.on?'Ton an':'Ton aus';
   var r=carLvl();
-  $('hSerD').textContent=(carDone()?'Meister · alle 10 Stufen geschafft':'Stufe '+(r+1)+' von '+CAREER.length+' · '+CHARS[CAREER[r].ch].who)+(SAVE.trophies?' · Pokale: '+SAVE.trophies:'');
-  $('hProg').querySelectorAll('i').forEach(function(x,i){x.classList.toggle('on',i<=r);});
+  var RL=CAREER[r];$('hSerD').textContent=(carDone()?'Meister · Medaillen: '+medCount()+' von 5':(RL.dial?'Finale · gegen '+CHARS[RL.ch].who:'Klasse '+(RL.k+1)+' · '+CLASSES[RL.k].n+' · '+(RL.boss?'Boss ':'')+CHARS[RL.ch].who))+(SAVE.trophies?' · Pokale: '+SAVE.trophies:'');
+  $('hProg').querySelectorAll('i').forEach(function(x,i){x.classList.toggle('on',carDone()||i<=RL.k);});
   var nd=0;LESSONS.forEach(function(L){if(HM.done[L.id])nd++;});
   $('hTrD').textContent=HM.done.prac?'Übungsfahrt mit Anleitung · geschafft':'Übungsfahrt mit Anleitung';
   $('hPill').hidden=true;$('hPillS').hidden=!HM.first;
@@ -4841,23 +4885,23 @@ function startMode(m,btn){
 }
 /* Version 67: geführte Erklärung der Rennserie, vor der Autowahl (beim ersten Mal) und über den Link auf der Rennkarte */
 function serIntro(first){
-  var el=$('serIntro'),st=0,r=carLvl(),LV=CAREER[r],oi=carIdx(LV.reward&&!owned(LV.reward)?LV.reward:(LV.car||CHARS[LV.ch].car)),mi=pIdx,N=4;
+  var el=$('serIntro'),st=0,LV=curRace(),oi=carIdx(LV.car),mi=pIdx,N=4;
   var TRO='<svg class="trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8.5 20h7M9.5 17h5v3h-5z"/></svg>';
   function car(i,k,cls){return '<canvas data-i="'+i+'" data-k="'+k+'"'+(cls?' class="'+cls+'"':'')+'></canvas>';}
   function close(){el.hidden=true;el.innerHTML='';try{localStorage.setItem('s402serIntro','1');}catch(e){}}
   function render(){
     var v='',t='',p='';
     if(st===0){
-      v='<div class="sl">'+CHARS.map(function(c,i){return '<div class="'+(i===LV.ch?'cur':'')+'" style="animation-delay:'+(i*0.09)+'s"><b>'+(i+1)+'</b><span>'+c.who+'<small>Stufe '+(i+1)+' · Profi: Stufe '+(i+6)+'</small></span>'+car(carIdx(c.car),9)+'</div>';}).join('')+'</div>';
-      t='<em>10 Stufen</em>, die Gegner werden stärker';p='Fünf Fahrer, jeder zweimal: erst Amateur, dann Profi mit aufgemotztem Auto.';
+      v='<div class="sl">'+CLASSES.map(function(c,i){var B=bossOf(i);return '<div class="'+(i===LV.k?'cur':'')+'" style="animation-delay:'+(i*0.09)+'s"><b>'+(i+1)+'</b><span>'+c.n+'<small>'+c.t+' · Boss: '+CHARS[B.ch].who+'</small></span>'+car(carIdx(B.car),9)+'</div>';}).join('')+'</div>';
+      t='<em>Fünf Klassen</em>, dann das Finale';p='Jede Klasse hat drei Rennen: zwei Herausforderer, dann den Boss. Schlägst du den Boss, steigst du auf.';
     }else if(st===1){
-      v='<div class="sx"><div class="sbox op">'+(LV.reward&&!owned(LV.reward)?'Neues Auto':'Gegner')+car(oi,24,'gone')+'</div><div class="sarr">›</div><div class="sbox me">Deine Garage'+car(oi,24,'come')+'<span class="plus">+ Teile</span></div></div>';
-      t='Gewinnst du, gibt es <em>Teile</em>';p='Schaffst du eine Stufe zum ersten Mal, wird ein neues Auto frei.';
+      v='<div class="sx"><div class="sbox op">Gegner'+car(oi,24,'gone')+'</div><div class="sarr">›</div><div class="sbox me">Deine Garage'+car(oi,24,'come')+'<span class="plus">+ Teile</span></div></div>';
+      t='Gewinnst du, bekommst du <em>sein Auto</em>';p='Dazu gibt es Teile. Mit Teilen tunst du dein Lieblingsauto eine Klasse höher, oder du fährst das gewonnene Auto.';
     }else if(st===2){
       v='<div class="sx"><div class="sbox me">Deine Garage'+car(mi,24)+'<span class="plus">bleibt deins</span></div><div class="sarr">›</div><div class="sbox op" style="border-color:rgba(255,210,63,.6);color:var(--accent)">Werkstatt'+car(mi,24)+'<span class="plus" style="background:rgba(255,210,63,.16);color:var(--accent)">+ PS</span></div></div>';
       t='Verlierst du, <em>passiert nichts</em>';p='Einfach noch mal fahren, oder erst in der Werkstatt aufrüsten.';
     }else{
-      v=TRO;t='Stufe 5 und 10: <em>Pokal!</em>';p='Mit Teilen machst du dein Auto stärker, so hältst du mit den Profis mit.';
+      v=TRO;t='Boss geschlagen: <em>Pokal!</em>';p='Im Finale wartet der Nitro Rail, du bekommst Vorsprung. Danach jagst du in jeder Klasse Medaillen.';
     }
     var last=st===N-1;
     el.innerHTML='<div class="sdots" aria-hidden="true">'+[0,1,2,3].map(function(i){return '<i class="'+(i<=st?'on':'')+'"></i>';}).join('')+'</div>'+
@@ -5207,7 +5251,7 @@ function embIntro(){
   var q=embQ(),o={car:SPECS[carIdx(q.car||'skyline')].id,auto:q.auto==='1',brake:q.brake!=='0'&&(q.brake==='1'||q.auto==='1'),easy:q.easy!=='0',night:q.night==='1',
     wx:(q.wx===''||q.wx==null)?null:Math.max(0,Math.min(2,+q.wx||0)),diff:Math.max(0,Math.min(2,+q.diff||0)),rival:q.rival==='1',best:q.best?parseFloat(String(q.best).replace(',','.')):null,
     name:q.name||SPECS[carIdx(q.car||'skyline')].name,color:q.color||'#2563c9',voice:q.voice!=='0',hv:q.hv||'',tut:q.tut==null?null:q.tut==='1',probe:q.probe==='1',prac:false,ai:null,rv:null};
-  if(o.rival){var rv=CHARS[Math.floor(Math.random()*CHARS.length)],a={};for(var k in rv)a[k]=rv[k];
+  if(o.rival){var rv=CHARS[Math.floor(Math.random()*5)],a={};for(var k in rv)a[k]=rv[k];
     if(o.diff>=2){a.pw=Math.max(a.pw,1);a.rt=[Math.max(0.1,a.rt[0]-0.05),Math.max(0.2,a.rt[1]-0.08)];}o.ai=a;o.rv=rv;}
   EMB=o;o.prac=o.probe&&!kidStore(probeKey());
   var h='<canvas class="ecar" aria-hidden="true"></canvas><h2>'+embEsc(o.name)+'</h2>';
