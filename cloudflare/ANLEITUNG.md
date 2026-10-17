@@ -30,3 +30,15 @@ Codes vergeben:
 Die Liste gilt auch für die Whisper-Auswertung: Ohne gültigen Code nimmt der Worker keine Aufnahmen an. Ohne Variable `CODES` ist jeder Code erlaubt, dann kann sich jeder mit einem ausgedachten Code anmelden.
 
 Gespeichert werden nur Fortschritt und Einstellungen (Level, gelesene Texte, Wörter, Tempo), keine Aufnahmen. Die Aufnahmen bleiben auf dem Gerät. Im kostenlosen Tarif sind 1.000 Speichervorgänge pro Tag frei, das reicht für viele Testpersonen.
+
+## Feedback sammeln
+
+In Readster gibt es oben auf der Startseite einen Feedback-Knopf (Sprechblase) und unter Lesehilfen → Für Erwachsene → Hilfe den Link „Feedback an Mark senden“. Testpersonen tippen dort ein Gesicht an, sprechen eine Sprachnachricht auf (bis 2 Minuten) und/oder schreiben etwas. Das Feedback landet mit Code, Uhrzeit und Gerät im selben Speicher wie der Fortschritt (`readster-fortschritt`).
+
+Einmalig einrichten, etwa 3 Minuten:
+
+1. Den Worker `readster-whisper` öffnen → **Code bearbeiten**, den ganzen Inhalt durch die neue `worker.js` ersetzen und **Bereitstellen** tippen.
+2. Im Worker **Einstellungen** → **Variablen und Geheimnisse** → **Hinzufügen**. Typ **Geheimnis** (Secret), Name `FEEDBACK_SCHLUESSEL`, als Wert ein langes, ausgedachtes Passwort. **Bereitstellen** tippen.
+3. Feedback lesen: `https://readster-whisper.mark-broyer.workers.dev/feedback` öffnen und den Schlüssel eingeben. Am besten die Adresse mit `?k=SCHLÜSSEL` als Lesezeichen speichern. Neueste Nachrichten stehen oben, Sprachnachrichten lassen sich direkt abspielen, jedes Feedback kann einzeln gelöscht werden.
+
+Ohne gültigen Code nimmt der Worker kein Feedback an. Ohne `FEEDBACK_SCHLUESSEL` lässt sich die Ansicht nicht öffnen.

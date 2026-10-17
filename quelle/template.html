@@ -482,6 +482,11 @@ details.adult p{color:var(--muted);font-weight:600;font-size:.92rem;margin-top:6
 .wjstep{text-align:center;color:var(--muted);font-weight:500}
 .wj span.ok{border-color:var(--good);color:var(--good)}
 textarea.code{width:100%;min-height:90px;font:600 .8rem/1.3 ui-monospace,Menlo,monospace;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:8px;resize:vertical}
+textarea.fbtext{width:100%;min-height:96px;font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px;resize:vertical}
+.fbsheet{display:flex;flex-direction:column;gap:12px}.fbsheet .link{align-self:center}.fbsheet .link svg{width:18px;height:18px;vertical-align:-3px}
+.fbmic{min-height:96px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:1.4rem}.fbmic svg{width:52px;height:52px;margin:0}
+.fbmic.on{background:#e5484d;border-color:#e5484d;color:#fff}.fbdot{width:16px;height:16px;border-radius:50%;background:#fff;animation:fbblink 1s infinite}@keyframes fbblink{50%{opacity:.25}}
+.fbdone{display:flex;justify-content:center}.fbdone svg{width:96px;height:96px;color:var(--accent)}.fbsheet h2{margin:0}
 input.codein{width:100%;font:600 1.4rem/1.2 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-align:center;text-transform:uppercase;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:12px;min-height:56px}
 .pick .link{align-self:center}
 input.name{width:100%;font:700 1.1rem var(--f-body);color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px 12px;min-height:48px}
@@ -745,7 +750,7 @@ window.addEventListener('popstate',function(){
   recStop(false);stopListen();R=null;renderHome();show('home');
 });
 function openBox(id,html){var b=$(id);b.innerHTML=html;b.hidden=false;}
-function closeBox(id){$(id).hidden=true;$(id).innerHTML='';}
+function closeBox(id){if(id==='#sheet'&&typeof fbQuiet==='function')fbQuiet();$(id).hidden=true;$(id).innerHTML='';}
 /* ---------- Startseite ---------- */
 var IC_SOLO='<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="16" cy="10" r="6"/><path d="M5 28c0-6.6 4.9-11 11-11s11 4.4 11 11z"/></svg>';
 var IC_F2='<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="currentColor" opacity=".25"/><circle cx="11" cy="13" r="2" fill="currentColor"/><circle cx="21" cy="13" r="2" fill="currentColor"/><path d="M9.5 18.5c3.5 5 9.5 5 13 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
@@ -792,6 +797,7 @@ function tourOpen(i,list){TI=i||0;if(list)TOUR=list;else if(!TI)TOUR=tourList();
   say(x.s,250);}
 function tourEnd(){sayStop();S.tour=1;if(MODE)S.tourSeen[MODE]=1;save();closeBox('#modal');}
 var IC_NEXT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+var IC_FB='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5h16v10H10l-4.5 4v-4H4z"/><path d="M8.5 9.5h7M8.5 12.5h4.5"/></svg>';
 var IC_STATS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 20v-6M12 20V9M19 20V4"/></svg>';
 var IC_PUMP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M3 21h13M7 7h5v4H7z"/><path d="M15 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3"/></svg>';
 var IC_FLAG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 3v18h2v-7h10l-2-4 2-4H7V3z"/></svg>';
@@ -837,7 +843,7 @@ function renderHome(){
   if(S.tour&&MODE&&!Object.keys(S.tourSeen||{}).length){S.tourSeen={};S.tourSeen[MODE]=1;} /* ältere Stände: gesehen im aktuellen Modus */
   if(!S.tour&&$('#modal').hidden)setTimeout(function(){if(!S.tour&&$('#modal').hidden&&CUR==='home')tourOpen(0);},0);
   var p=lvlProg(S.xp),sg=suggest(),wk=weekInfo(),n=doneCount();
-  var h='<header class="top"><h1 class="brand"><img class="wordmark sm" alt="Readster" src="'+LOGO+'"></h1><div class="chips"><button class="iconbtn prgbtn" data-a="stats" aria-label="Dein Fortschritt">'+IC_STATS+(n?'<span class="badge">'+n+'</span>':'')+'</button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
+  var h='<header class="top"><h1 class="brand"><img class="wordmark sm" alt="Readster" src="'+LOGO+'"></h1><div class="chips"><button class="iconbtn prgbtn" data-a="stats" aria-label="Dein Fortschritt">'+IC_STATS+(n?'<span class="badge">'+n+'</span>':'')+'</button><button class="iconbtn" data-a="fb" aria-label="Feedback senden">'+IC_FB+'</button><button class="iconbtn" data-a="settings" aria-label="Lesehilfen einstellen">Aa</button></div></header>';
   /* Modus: ein Schalter mit Wörtern, zeigt zugleich, welcher Modus gerade gilt */
   h+='<div class="mseg" role="group" aria-label="Wie liest du?"><button data-a="mode" data-v="solo" aria-pressed="'+(MODE==='solo')+'">'+IC_SOLO+'<span>Allein lesen</span></button><button data-a="mode" data-v="partner" aria-pressed="'+(MODE==='partner')+'">'+IC_DUO+'<span>Zu zweit lesen</span></button></div>';
   if(S.whNote)h+='<section class="card left whnote"><p class="fb">'+esc(S.whNote)+'</p><button class="btn ghost sm" data-a="whNoteOk">Okay</button></section>';
@@ -1909,7 +1915,7 @@ function renderSheet(){
     tg('wh','Stockstellen erkennen',(WH_SERVER?'Die Aufnahme geht kurz an Cloudflare und wird dort nicht gespeichert.':'Lädt einmalig '+(whModel()?'etwa 40':'etwa 80')+' MB, danach läuft alles auf dem Gerät.'),'<span class="hint fb" id="whst">'+esc(s.wh?whStatus():'')+'</span>')+
     tg('nums','Tempo-Zahlen zeigen','Aus: nur „schneller als beim ersten Mal“.')+
     tg('mit','Mitlesen beim Lesen',LIVE_OK?'Beim lauten Lesen wandert die Markierung mit dem Kind mit. Der Ton geht dafür an Apple oder Google.':'Dieser Browser kann das leider nicht.')+'</section>';
-  h+='<section class="sgrp"><h3>Hilfe</h3><details class="howto-d"><summary>So funktioniert Readster</summary><ul class="howto"><li>Zuhören, dann selbst laut lesen (mit Aufnahme).</li><li>Danach: Gesicht wählen, Tempo ansehen, sich selbst anhören und schwere Wörter antippen.</li><li>Zwei Fragen zum Text.</li><li>Jeder Text füllt den Tank. Drei Texte: ein Rennen. Neue Autos kommen mit der Zeit dazu.</li><li>Schwere Wörter landen im Wort-Jäger und werden an mehreren Tagen geübt.</li></ul></details><button class="link" data-a="tourAgain">Einführung nochmal zeigen</button></section>';
+  h+='<section class="sgrp"><h3>Hilfe</h3><details class="howto-d"><summary>So funktioniert Readster</summary><ul class="howto"><li>Zuhören, dann selbst laut lesen (mit Aufnahme).</li><li>Danach: Gesicht wählen, Tempo ansehen, sich selbst anhören und schwere Wörter antippen.</li><li>Zwei Fragen zum Text.</li><li>Jeder Text füllt den Tank. Drei Texte: ein Rennen. Neue Autos kommen mit der Zeit dazu.</li><li>Schwere Wörter landen im Wort-Jäger und werden an mehreren Tagen geübt.</li></ul></details><button class="link" data-a="tourAgain">Einführung nochmal zeigen</button><button class="link" data-a="fb">Feedback an Mark senden</button></section>';
   /* Zum Ausprobieren der Rennen: Level springen und Tank füllen (ändert den echten Fortschritt dieses Codes) */
   var Lc=lvl(S.xp);
   h+='<section class="sgrp"><h3>Rennen testen</h3><small class="sgh">Level '+Lc+', Tank '+(fuelFull()?'voll':Math.round((S.fuel||0)/XP_RACE*100)+' %')+'. Ändert den Fortschritt dieses Codes.</small><div class="dbg">'+
@@ -2009,6 +2015,70 @@ function logout(msg){
 function renderReset(){
   openBox('#sheet','<div class="card"><h2>Fortschritt löschen?</h2><p class="hint">Alle gelesenen Texte, Autos und markierten Wörter auf diesem Gerät werden gelöscht.</p><div class="cfbtns"><button class="btn ghost" data-a="sheetOk">Abbrechen</button><button class="btn" data-a="doReset">Löschen</button></div></div>');
 }
+/* Feedback an Mark: Gesicht, Sprachnachricht und/oder Text, landet beim Cloudflare-Dienst (Ansicht: /feedback beim Worker).
+   Kinder lesen keine Erklärungen: die Stimme sagt, was zu tun ist, das Mikrofon ist der große Knopf. */
+var FB={rec:null,stream:null,chunks:[],blob:null,mime:'',t0:0,sek:0,tick:0,mood:null,text:'',busy:false,done:false,msg:'',ort:''};
+var FB_MAX=120;
+function fbReset(){fbQuiet();FB.blob=null;FB.mime='';FB.sek=0;FB.mood=null;FB.text='';FB.busy=false;FB.done=false;FB.msg='';}
+function fbOpen(){fbReset();FB.ort=CUR+(R&&R.t?' · '+R.t.title:'');renderFeedback();say('feedback',300);}
+function renderFeedback(){
+  var ta=$('#fbText');if(ta)FB.text=ta.value;
+  var h='<div class="card left fbsheet">';
+  if(FB.done){
+    h+='<div class="fbdone">'+IC_F2+'</div><h2>Danke!</h2><p class="hint">Deine Nachricht ist angekommen.</p><button class="btn wide" data-a="sheetOk">Fertig</button></div>';
+    openBox('#sheet',h);return;
+  }
+  h+='<h2>Feedback</h2>';
+  h+='<div class="faces fbfaces">'+[[2,'Gefällt mir',IC_F2],[1,'Geht so',IC_F1],[0,'Gefällt mir nicht',IC_F0]].map(function(o){return '<button class="btn '+(FB.mood===o[0]?'on':'ghost')+'" data-a="fbMood" data-v="'+o[0]+'" aria-label="'+o[1]+'">'+o[2]+'</button>';}).join('')+'</div>';
+  if(FB.rec)h+='<button class="btn wide fbmic on" data-a="fbRec" aria-label="Aufnahme beenden"><span class="fbdot"></span><span id="fbTime">'+fmtSec(FB.sek)+'</span></button>';
+  else if(FB.blob)h+=audioTag(FB.blob)+'<button class="link" data-a="fbRec">'+IC_MIC+' Nochmal aufnehmen</button>';
+  else h+='<button class="btn wide fbmic" data-a="fbRec" aria-label="Sprachnachricht aufnehmen">'+IC_MIC+'</button>';
+  h+='<textarea class="fbtext" id="fbText" maxlength="4000" placeholder="Oder hier schreiben …">'+esc(FB.text)+'</textarea>';
+  if(FB.msg)h+='<p class="hint fb">'+esc(FB.msg)+'</p>';
+  h+='<button class="btn wide acc" data-a="fbSend"'+(FB.busy||FB.rec?' disabled':'')+'>'+(FB.busy?'Wird gesendet …':'Abschicken')+'</button>';
+  h+='<button class="link" data-a="sheetOk">Abbrechen</button></div>';
+  openBox('#sheet',h);
+}
+function fbQuiet(){
+  clearInterval(FB.tick);var r=FB.rec;FB.rec=null;
+  if(r&&r.state!=='inactive'){r.onstop=null;try{r.stop();}catch(e){}}
+  if(FB.stream){FB.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});FB.stream=null;}
+}
+function fbRec(){
+  if(FB.rec){fbStop();return;}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){FB.msg='Dieser Browser kann leider keine Sprachnachricht aufnehmen. Du kannst aber schreiben.';renderFeedback();return;}
+  sayStop();plStop();freeUrls();aSess('play-and-record');
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){
+    if($('#sheet').hidden||!$('.fbsheet')){st.getTracks().forEach(function(t){try{t.stop();}catch(e){}});return;}
+    FB.stream=st;FB.chunks=[];FB.blob=null;FB.msg='';
+    var mt='';['audio/mp4','audio/webm;codecs=opus','audio/webm'].some(function(m){try{if(MediaRecorder.isTypeSupported(m)){mt=m;return true;}}catch(e){}return false;});
+    var r=mt?new MediaRecorder(st,mt.indexOf('webm')>=0?{mimeType:mt,audioBitsPerSecond:32000}:{mimeType:mt}):new MediaRecorder(st);
+    r.ondataavailable=function(e){if(e.data&&e.data.size)FB.chunks.push(e.data);};
+    r.onstop=function(){FB.mime=r.mimeType||mt||'audio/mp4';FB.blob=FB.chunks.length?new Blob(FB.chunks,{type:FB.mime}):null;FB.chunks=[];
+      if(FB.stream){FB.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});FB.stream=null;}aSess('playback');renderFeedback();};
+    try{r.start(1000);}catch(e){r.start();}
+    FB.rec=r;FB.t0=Date.now();FB.sek=0;
+    FB.tick=setInterval(function(){FB.sek=Math.round((Date.now()-FB.t0)/1000);var t=$('#fbTime');if(t)t.textContent=fmtSec(FB.sek);if(FB.sek>=FB_MAX)fbStop();},500);
+    renderFeedback();
+  }).catch(function(){FB.msg='Das Mikrofon ist nicht freigegeben. Du kannst aber schreiben.';renderFeedback();});
+}
+function fbStop(){clearInterval(FB.tick);var r=FB.rec;FB.rec=null;if(r&&r.state!=='inactive'){try{r.stop();}catch(e){}}}
+function fbSend(){
+  var ta=$('#fbText');if(ta)FB.text=ta.value;
+  if(FB.busy||FB.rec)return;
+  if(!FB.text.trim()&&!FB.blob&&FB.mood===null){FB.msg='Tippe auf ein Gesicht, sprich etwas auf oder schreib etwas.';renderFeedback();say('feedback');return;}
+  if(!SYNC_URL||!CODE){FB.msg='Feedback geht nur, wenn du mit einem Code angemeldet bist.';renderFeedback();return;}
+  FB.busy=true;FB.msg='';renderFeedback();
+  var info=[FB.ort,MODE==='partner'?'zu zweit':'allein','Level '+lvl(S.xp),doneCount()+' Texte',navigator.userAgent].join(' · ');
+  var pr=FB.blob?new Promise(function(res,rej){var fr=new FileReader();fr.onload=function(){res(String(fr.result).split(',')[1]||'');};fr.onerror=rej;fr.readAsDataURL(FB.blob);}):Promise.resolve('');
+  pr.then(function(ton){
+    return fetch(SYNC_URL+'/feedback',{method:'POST',headers:{'Content-Type':'application/json','X-Readster-Code':CODE},
+      body:JSON.stringify({text:FB.text.trim(),stimmung:FB.mood,ton:ton,mime:FB.mime,sek:FB.sek,info:info})});
+  }).then(function(r){
+    if(!r.ok)throw new Error(r.status);
+    FB.busy=false;FB.done=true;freeUrls();FB.blob=null;renderFeedback();say('fbdanke',200);if(typeof sfxGood==='function')sfxGood();
+  }).catch(function(){FB.busy=false;FB.msg='Das hat nicht geklappt. Prüfe das Internet und versuche es nochmal.';renderFeedback();});
+}
 /* Klicks */
 document.addEventListener('click',function(e){
   var w=e.target.closest('.w');
@@ -2072,6 +2142,10 @@ document.addEventListener('click',function(e){
     case 'settings':renderSheet();break;
     case 'set':var k=b.dataset.k,val=v;if(k==='size'||k==='line'||k==='space')val=+v;else if(k==='syl')val=v==='lang'?'lang':v==='true';else if(k==='rec'||k==='nums'||k==='wh'||k==='voice'||k==='sfx'||k==='mit')val=(v==='true');S.set[k]=val;save();if(k==='wh'&&val)whPreload();renderSheet();readStyle();break;
     case 'sheetOk':closeBox('#sheet');break;
+    case 'fb':fbOpen();break;
+    case 'fbMood':var ta2=$('#fbText');if(ta2)FB.text=ta2.value;FB.mood=+v;FB.msg='';renderFeedback();break;
+    case 'fbRec':fbRec();break;
+    case 'fbSend':fbSend();break;
     case 'reset':renderReset();break;
     case 'dbgLv':S.xp=XPK*(+v-1)*(+v-1);var ds=RSTAGES[rankOf(+v)];if(ds.car)S.rcar=ds.car;save();renderSheet();renderHome();break;
     case 'dbgFuel':if(!hasCar()){S.xp=XPK*(RSTAGES[CAR0].lv-1)*(RSTAGES[CAR0].lv-1);S.rcar=RSTAGES[CAR0].car;}S.fuel=XP_RACE;save();renderSheet();renderHome();break;
@@ -2119,7 +2193,7 @@ function goQuiet(){
   /* Läuft gerade eine Aufnahme oder der Countdown: Runde abbrechen und das Mikrofon sofort freigeben */
   if(R&&(R.phase==='timing'||R.phase==='count')){recStop(false);recCleanup();cdHide();R.phase='read';R.msg='Das Lesen wurde unterbrochen. Starte einfach nochmal.';try{renderCtl();}catch(e){}R.msg='';}
   else if(REC.stream||REC.rec){recStop(false);recCleanup();}
-  sayStop();if(typeof stopListen==='function')stopListen();if(typeof plStop==='function')plStop();var ps=document.querySelectorAll('.plr');for(var i=0;i<ps.length;i++){if(ps[i]._a){relA(ps[i]._a);ps[i]._a=null;}}mediaOff();/* Tonquelle ganz schließen, nur anhalten reicht dem iPhone nicht; sie wird beim nächsten Ton neu angelegt */try{if(AC){AC.close();AC=null;SFX.g=null;SFX.nb=null;}}catch(e){AC=null;SFX.g=null;SFX.nb=null;}}
+  fbQuiet();sayStop();if(typeof stopListen==='function')stopListen();if(typeof plStop==='function')plStop();var ps=document.querySelectorAll('.plr');for(var i=0;i<ps.length;i++){if(ps[i]._a){relA(ps[i]._a);ps[i]._a=null;}}mediaOff();/* Tonquelle ganz schließen, nur anhalten reicht dem iPhone nicht; sie wird beim nächsten Ton neu angelegt */try{if(AC){AC.close();AC=null;SFX.g=null;SFX.nb=null;}}catch(e){AC=null;SFX.g=null;SFX.nb=null;}}
 document.addEventListener('visibilitychange',function(){if(document.hidden)goQuiet();});
 window.addEventListener('pagehide',goQuiet);
 })();
