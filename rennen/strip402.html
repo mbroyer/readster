@@ -2531,6 +2531,162 @@ CARS.push({
   }
 });
 })();
+/* ---- Albion Tempest (McMurtry Spéirling, Fan-Car) – nach Marks Draufsicht-Foto (gedreht, Front oben, 2×) (Mark, 18.10.) ---- */
+(function(){
+var CX=878,CY=1678,S=975,cache=null;
+function full(h){return h.concat(h.slice(1,h.length-1).reverse().map(function(p){return [2*CX-p[0],p[1]];}));}
+var SIL=full([[878,20],[938,30],[998,37],[1058,45],[1118,57],[1178,72],[1230,84],[1280,88],[1330,82],[1375,86],[1412,110],[1450,140],[1500,174],[1540,214],[1596,276],[1632,334],[1656,414],[1665,500],[1668,600],[1666,800],[1655,860],[1620,900],[1600,950],[1590,1050],[1578,1150],[1572,1300],[1572,1600],[1576,1800],[1592,1950],[1620,2050],[1648,2150],[1664,2300],[1668,2500],[1664,2700],[1650,2800],[1622,2880],[1590,2930],[1640,2935],[1665,2955],[1666,3250],[1645,3298],[1400,3318],[1100,3330],[878,3334]]);
+function m(p){return [+((p[0]-CX)/S).toFixed(3),+((p[1]-CY)/S).toFixed(3)];}
+var DUCT=[[1106,422],[1256,440],[1300,520],[1481,800],[1481,990],[1256,880],[1106,762]];
+var FV=[[1430,410],[1520,404],[1554,438],[1562,560],[1556,680],[1525,702],[1490,690],[1440,630],[1418,560],[1418,450]];
+var RV=[[1424,2522],[1500,2510],[1552,2530],[1560,2650],[1556,2790],[1522,2832],[1462,2832],[1426,2792],[1416,2650]];
+var CAP=full([[878,1100],[960,1108],[1040,1140],[1100,1200],[1140,1300],[1165,1450],[1180,1650],[1186,1850],[1180,2050],[1162,2250],[1124,2370],[1050,2425],[878,2442]]);
+var GLS=full([[878,1124],[956,1131],[1028,1162],[1078,1218],[1112,1305],[1134,1440],[1150,1640],[1156,1850],[1150,2050],[1134,2240],[1100,2350],[1036,2400],[878,2414]]);
+var POD=full([[878,1468],[972,1478],[1050,1515],[1102,1580],[1124,1680],[1132,1850],[1128,2100],[1110,2280],[1070,2370],[990,2405],[878,2412]]);
+var GRV=[[1118,770],[1256,882],[1300,960],[1336,1080],[1360,1300],[1370,1550],[1368,1800],[1352,2080],[1306,2290],[1226,2430],[1130,2496],[1062,2478],[1124,2408],[1170,2290],[1196,2090],[1204,1860],[1198,1650],[1184,1450],[1162,1300],[1150,1180],[1136,1000],[1120,850]];
+var WING=full([[878,3010],[1200,2996],[1500,2976],[1640,2960],[1666,2955],[1666,3250],[1645,3298],[1400,3318],[1100,3330],[878,3334]]);
+CARS.push({
+  id:'tempest',name:'Albion Tempest',sub:'2022 · Fan-Car · zwei Elektromotoren',color:'Mintgrün',
+  kw:746,nm:1000,kg:1000,drive:'Heck',ev:true,L:3.4,Wd:1.62,wb:2.18,fo:0.55,cdA:0.9,trac:1.9,eff:0.93,
+  tF:0.24,tR:0.3,trF:0.6,trR:0.6,axF:-1.16,axR:1.02,
+  lamp:'led',body:'#2f8a76',smooth:false,px:{s:S,cx:CX,cy:CY},
+  outline:SIL.map(m),
+  cues:['Winziger Elektro-Fan-Car: ein Lüfter saugt ihn an die Straße','Zwei Elektromotoren, unter 1000 kg','Runde Kotflügel-Pods mit großen Radhaus-Entlüftungen','Ovale Kanzel in tiefer Mulde, grüne Dachhaube, Luftkanäle links und rechts','Riesiger Heckflügel auf zwei Schwanenhals-Stützen'],
+  head:[{x:-0.62,y:-1.56,w:0.1,h:0.04,skipDay:1},{x:0.52,y:-1.56,w:0.1,h:0.04,skipDay:1}],
+  tail:[{x:-0.6,y:1.3,w:1.2,h:0.03,skipDay:1}],
+  paint:function(g,u,c){
+    var B=c.body,sh=CarLab.shade,i;
+    var CX2=2*CX;
+    function lgr(x0,y0,x1,y1,st){var r=g.createLinearGradient(x0,y0,x1,y1);st.forEach(function(s){r.addColorStop(s[0],s[1]);});return r;}
+    function mx(p){return p.map(function(q){return [CX2-q[0],q[1]];}).reverse();}
+    function pth(p,sm){var n=p.length,k;g.beginPath();if(!sm){g.moveTo(p[0][0],p[0][1]);for(k=1;k<n;k++)g.lineTo(p[k][0],p[k][1]);}else{g.moveTo((p[n-1][0]+p[0][0])/2,(p[n-1][1]+p[0][1])/2);for(k=0;k<n;k++){var a=p[k],b=p[(k+1)%n];g.quadraticCurveTo(a[0],a[1],(a[0]+b[0])/2,(a[1]+b[1])/2);}}g.closePath();}
+    function P(p,f,sm){pth(p,sm);g.fillStyle=f;g.fill();}
+    function PM(p,f,sm){P(p,f,sm);P(mx(p),f,sm);}
+    function clip(p,fn,sm){g.save();pth(p,sm);g.clip();fn();g.restore();}
+    function Ln(p,col,w,a){g.save();if(a!=null)g.globalAlpha=a;g.beginPath();g.moveTo(p[0][0],p[0][1]);for(var k=1;k<p.length;k++)g.lineTo(p[k][0],p[k][1]);g.strokeStyle=col;g.lineWidth=w;g.lineJoin='round';g.lineCap='round';g.stroke();g.restore();}
+    function LM(p,col,w,a){Ln(p,col,w,a);Ln(mx(p),col,w,a);}
+    function C(d,col,w,a){g.save();if(a!=null)g.globalAlpha=a;g.strokeStyle=col;g.lineWidth=w;g.lineCap='round';g.stroke(new Path2D(d));g.restore();}
+    function CM(d,col,w,a){C(d,col,w,a);C(d.replace(/(-?[\d.]+) (-?[\d.]+)/g,function(_,x,y){return (CX2-parseFloat(x))+' '+y;}),col,w,a);}
+    function E(x,y,rx,ry,f,rot){g.beginPath();g.ellipse(x,y,rx,ry,rot||0,0,6.2832);g.fillStyle=f;g.fill();}
+    function EM(x,y,rx,ry,f,rot){E(x,y,rx,ry,f,rot);E(CX2-x,y,rx,ry,f,-(rot||0));}
+    function RR(x,y,w,h,r,f){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();g.fillStyle=f;g.fill();}
+    function soft(x,y,rx,ry,rgb,a){g.save();g.translate(x,y);g.scale(rx,ry);var rg=g.createRadialGradient(0,0,0,0,0,1);rg.addColorStop(0,'rgba('+rgb+','+a+')');rg.addColorStop(0.55,'rgba('+rgb+','+a*0.45+')');rg.addColorStop(1,'rgba('+rgb+',0)');g.fillStyle=rg;g.fillRect(-1,-1,2,2);g.restore();}
+    function HL(p,w,aL,aR,gl){var s=Math.abs(g.getTransform().a),q=mx(p),k;for(k=0;k<2;k++){var a=k?aR:aL,pp=k?p:q;if(a<=0.01)continue;g.save();g.shadowColor='rgba(255,250,240,'+Math.min(1,a)+')';g.shadowBlur=(gl||5)*s;Ln(pp,'rgba(255,253,248,'+a+')',w);g.restore();}}
+    function PMg(p,x0,x1,st,sm){P(p,lgr(x0,0,x1,0,st),sm);P(mx(p),lgr(CX2-x0,0,CX2-x1,0,st),sm);}
+    var sil=cache||(cache=new Path2D('M'+SIL.map(function(p){return p[0]+' '+p[1];}).join(' L')+'Z'));
+    g.save();g.clip(sil);
+    /* 1 Grundlack glänzend: Pods hell, Mitte und Taille dunkler */
+    g.fillStyle=lgr(88,0,1668,0,[[0,sh(B,-0.75)],[0.035,sh(B,-0.35)],[0.08,sh(B,0.15)],[0.13,sh(B,0.5)],[0.2,sh(B,0.1)],[0.27,sh(B,-0.38)],[0.38,sh(B,-0.15)],[0.5,sh(B,0.02)],[0.62,sh(B,-0.15)],[0.73,sh(B,-0.38)],[0.8,sh(B,0.1)],[0.87,sh(B,0.5)],[0.92,sh(B,0.15)],[0.965,sh(B,-0.35)],[1,sh(B,-0.75)]]);
+    g.fillRect(60,0,1640,3340);
+    g.fillStyle=lgr(0,22,0,3334,[[0,'rgba(255,255,255,.12)'],[0.3,'rgba(0,0,0,0)'],[0.85,'rgba(0,0,0,.08)'],[1,'rgba(0,0,0,.3)']]);g.fillRect(60,0,1640,3340);
+    /* Wölbungen: Kotflügel-Pods vorn und Hüften hinten hell, Taille dunkel */
+    soft(1700,1500,170,560,'0,25,20',0.55);soft(56,1500,170,560,'0,25,20',0.55);
+    soft(1420,520,230,560,'240,255,240',0.42);soft(336,520,230,560,'240,255,240',0.5);
+    soft(1280,420,60,320,'255,255,250',0.4);soft(476,420,60,320,'255,255,250',0.5);
+    soft(1440,2360,230,460,'240,255,240',0.45);soft(316,2360,230,460,'240,255,240',0.38);
+    soft(1500,2200,90,160,'255,255,250',0.45);soft(256,2200,90,160,'255,255,250',0.3);
+    soft(878,250,260,160,'240,255,245',0.22);soft(1240,180,50,140,'0,25,20',0.35);soft(516,180,50,140,'0,25,20',0.35);soft(1360,160,60,60,'255,255,250',0.4);soft(396,160,60,60,'255,255,250',0.5);
+    /* Längsrinne zwischen Seitenkasten und Kanzel */
+    soft(1185,560,70,460,'0,25,20',0.45);soft(571,560,70,460,'0,25,20',0.45);
+    HL([[1470,1000],[1462,1300],[1466,1650],[1490,1950],[1530,2040]],3,0.4,0.6,10);
+    HL([[1262,90],[1262,300],[1270,560],[1300,640]],2.5,0.75,0.55,10);
+    HL([[1560,980],[1545,1150],[1540,1500],[1548,1850],[1580,2030]],2,0.45,0.35,8);
+    HL([[1350,2045],[1540,2052],[1610,2090],[1650,2180]],2,0.6,0.5,8);
+    /* 2 Haubenkanäle mit dunkler Kante */
+    PM(DUCT,lgr(1106,0,1481,0,[[0,sh(B,-0.15)],[0.35,sh(B,-0.4)],[0.7,sh(B,-0.6)],[1,sh(B,-0.85)]]));
+    clip(DUCT,function(){soft(1180,600,60,200,'230,255,240',0.35);},false);clip(mx(DUCT),function(){soft(2*CX-1180,600,60,200,'230,255,240',0.25);},false);
+    LM([[1256,440],[1300,520],[1481,800],[1481,990],[1256,880]],'#0a1210',9);
+    LM([[1106,422],[1256,440]],'#0a1210',7);LM([[1106,425],[1106,762],[1256,880]],'rgba(10,25,20,.55)',3);
+    LM([[1112,470],[1112,750]],'rgba(255,255,250,.35)',2);
+    function dd(k){var p=k?mx(DUCT):DUCT;clip(p,function(){var q=[[1256,440],[1300,520],[1481,800],[1481,990],[1256,880]];if(k)q=q.map(function(a){return [2*CX-a[0],a[1]];});Ln(q,'rgba(0,10,8,.35)',90);Ln(q,'rgba(0,10,8,.45)',40);Ln(q,'#030605',14);});}
+    dd(0);dd(1);
+    LM([[1110,428],[1250,446],[1292,522],[1470,800]],'rgba(225,255,240,.6)',2);
+    /* Radhaus-Entlüftungen vorn und hinten */
+    function vent(p0){PM(p0,'#050807',true);[p0,mx(p0)].forEach(function(p,k){var y0=p0[1][1],y1=p0[6][1],tx=k?2*CX-1522:1452;
+      clip(p,function(){g.fillStyle=lgr(0,y0,0,y1,[[0,'#1d2624'],[0.5,'#070a09'],[1,'#121816']]);g.fillRect(k?186:1400,y0-10,170,340);
+        RR(tx,y0+40,70,y1-y0-80,20,'#141817');for(var j=0;j<9;j++)Ln([[tx+6,y0+60+j*25],[tx+64,y0+60+j*25]],'rgba(70,80,78,.5)',4);
+        g.fillStyle=lgr(0,y0,0,y0+60,[[0,'rgba(0,0,0,.8)'],[1,'rgba(0,0,0,0)']]);g.fillRect(k?186:1400,y0-10,170,70);},true);});}
+    vent(FV);vent(RV);
+    LM([[1500,404],[1545,420],[1556,520]],'rgba(255,255,250,.5)',2);LM([[1418,455],[1416,600],[1432,682]],'rgba(255,255,250,.3)',3);LM([[1418,2560],[1416,2650],[1426,2790]],'rgba(255,255,250,.3)',3);LM([[1500,2514],[1552,2532],[1560,2650]],'rgba(255,255,250,.5)',2);
+    /* Scheinwerferschlitze, Haubenfuge, Sensor */
+    PM([[1380,118],[1470,132],[1540,170],[1556,200],[1500,206],[1400,170]],lgr(0,118,0,206,[[0,'#2b4652'],[0.5,'#0b1418'],[1,'#05090b']]),true);
+    LM([[1400,138],[1470,148],[1530,178]],'#f2f9ff',3);LM([[1384,124],[1470,136],[1540,172]],'rgba(255,255,255,.4)',2);
+    C('M650 770 Q878 690 1106 770','rgba(8,20,16,.75)',3);
+    RR(870,682,16,42,6,'#0d1412');
+    E(878,1032,22,30,'#16201e');E(878,1026,10,12,'rgba(200,230,225,.5)');
+    LM([[1656,856],[1590,878]],'rgba(8,20,16,.5)',2.5);
+    /* 3 Luftkanäle neben der Kanzel: tiefe Rinnen, Außenkante im Licht */
+    function grv(k){var p=k?mx(GRV):GRV,x0=k?2*CX-1160:1160,x1=k?2*CX-1372:1372;
+      P(p,lgr(x0,0,x1,0,[[0,sh(B,-0.8)],[0.3,sh(B,-0.62)],[0.62,sh(B,-0.35)],[0.86,sh(B,0.05)],[0.95,sh(B,0.55)],[1,sh(B,0.2)]]),true);
+      clip(p,function(){g.fillStyle=lgr(0,930,0,2500,[[0,'rgba(0,0,0,0)'],[0.75,'rgba(0,0,0,.15)'],[1,'rgba(0,0,0,.45)']]);g.fillRect(k?380:1050,920,330,1600);
+        soft(k?2*CX-1335:1335,1700,22,420,'230,255,240',k?0.35:0.5);},true);}
+    grv(0);grv(1);
+    LM([[1256,884],[1302,962],[1338,1080],[1362,1300],[1372,1550],[1370,1800],[1354,2080],[1308,2292],[1228,2432],[1132,2498]],'rgba(225,255,240,.55)',3);
+    LM([[1120,850],[1138,1000],[1154,1180],[1166,1300],[1188,1450],[1200,1650],[1206,1860],[1198,2090],[1172,2292],[1126,2410]],'rgba(0,0,0,.55)',3);
+    /* 4 Kanzel: Mulde, Glas, grüne Dachhaube */
+    soft(878,1780,360,760,'0,15,10',0.35);
+    P(CAP,'#06100d',true);
+    P(GLS,lgr(0,1124,0,2414,[[0,'#3b5d68'],[0.12,'#1d3a45'],[0.3,'#0e2129'],[0.7,'#0a171c'],[1,'#050c0f']]),true);
+    clip(GLS,function(){
+      P([[830,1126],[940,1126],[905,1480],[790,1480]],'rgba(255,255,255,.07)');
+      C('M720 1300 Q878 1180 1036 1300','rgba(255,255,255,.12)',10);
+      soft(1070,1250,40,110,'230,255,250',0.45);soft(690,1260,26,80,'230,255,250',0.25);
+      g.fillStyle='rgba(120,220,200,.22)';g.fillRect(1124,1550,40,800);g.fillStyle='rgba(120,220,200,.12)';g.fillRect(592,1550,40,800);
+      soft(878,1420,120,60,'0,0,0',0.4);
+    },true);
+    LM([[960,1110],[1040,1142],[1100,1202],[1140,1302],[1165,1452],[1180,1652],[1186,1850],[1180,2050],[1162,2250],[1124,2370],[1050,2425]],'rgba(190,255,230,.45)',4);
+    P(POD,'rgba(0,0,0,.5)',true);
+    g.save();g.translate(0,-8);
+    P(POD,lgr(624,0,1132,0,[[0,sh(B,-0.45)],[0.15,sh(B,-0.1)],[0.45,sh(B,0.22)],[0.68,sh(B,0.55)],[0.8,sh(B,0.4)],[0.93,sh(B,0)],[1,sh(B,-0.45)]]),true);
+    clip(POD,function(){g.fillStyle=lgr(0,1468,0,1700,[[0,'rgba(255,255,250,.55)'],[0.4,'rgba(255,255,250,.15)'],[1,'rgba(255,255,250,0)']]);g.fillRect(600,1460,560,240);
+      soft(1010,1560,70,60,'255,255,250',0.75);soft(1040,1900,70,360,'240,255,245',0.35);soft(720,1950,60,330,'0,20,15',0.25);
+      g.fillStyle=lgr(0,2200,0,2412,[[0,'rgba(0,15,10,0)'],[1,'rgba(0,15,10,.45)']]);g.fillRect(600,2200,560,220);},true);
+    g.restore();
+    LM([[878,1604],[1000,1603],[1128,1600]],'rgba(6,16,12,.75)',3);
+    /* Flügeltüren: Mittelfuge mit Scharnieren, Unterkante rund zur Seite */
+    Ln([[872,1606],[872,2240]],'rgba(6,16,12,.8)',3);Ln([[884,1606],[884,2240]],'rgba(6,16,12,.8)',3);Ln([[878,1610],[878,2236]],'rgba(255,255,255,.18)',2);
+    CM('M884 2240 L1040 2240 Q1110 2236 1124 2160','rgba(6,16,12,.8)',3.5);
+    LM([[1124,1606],[1124,2160]],'rgba(6,16,12,.55)',2.5);
+    [[878,1650],[878,1980]].forEach(function(q){RR(q[0]-14,q[1]-26,28,52,6,'#3b4648');RR(q[0]-6,q[1]-18,12,36,4,'#1a2022');});
+    [[760,1840],[760,2070],[998,1840],[998,2070]].forEach(function(q){RR(q[0]-10,q[1]-30,20,60,10,'#0d1412');RR(q[0]-4,q[1]-22,6,30,3,'rgba(255,255,255,.25)');});
+    [[740,1770],[760,1770],[780,1770],[740,2160],[760,2160],[780,2160],[978,1770],[998,1770],[1018,1770],[978,2160],[998,2160],[1018,2160]].forEach(function(q){E(q[0],q[1],4.5,4.5,'#0d1412');});
+    /* Glanzstern */
+    soft(1010,1555,22,22,'255,255,255',0.95);Ln([[960,1555],[1060,1555]],'rgba(255,255,255,.8)',2);Ln([[1010,1515],[1010,1595]],'rgba(255,255,255,.8)',2);
+    Ln([[985,1530],[1035,1580]],'rgba(255,255,255,.5)',1.5);Ln([[985,1580],[1035,1530]],'rgba(255,255,255,.5)',1.5);
+    /* Schrauben an den Fugen */
+    [[1480,2140],[1380,2262],[1252,2380],[1620,2096],[1100,2602],[1066,2790],[1600,880],[1180,1000]].forEach(function(q){EM(q[0],q[1],5,5,'rgba(6,16,12,.7)');});
+    /* Hüftfugen, Heckdeck */
+    LM([[1556,2052],[1480,2140],[1380,2260],[1250,2380],[1150,2405]],'rgba(8,20,16,.6)',2.5);
+    C('M600 2402 Q878 2430 1156 2402','rgba(8,20,16,.6)',2.5);
+    LM([[1156,2402],[1100,2600],[1060,2800],[1040,2930]],'rgba(8,20,16,.45)',2);
+    /* Lüfterkanal in der Mitte des Hecks */
+    P(full([[878,2480],[960,2490],[985,2560],[985,2880],[960,2950],[878,2958]]),lgr(0,2480,0,2958,[[0,sh(B,-0.4)],[0.5,sh(B,0.1)],[1,sh(B,-0.5)]]),true);
+    P(full([[878,2850],[950,2856],[958,2945],[878,2952]]),'#070a09',true);
+    for(i=0;i<5;i++)Ln([[810,2870+i*16],[946,2870+i*16]],'rgba(120,140,135,.35)',3);
+    clip(full([[878,2480],[960,2490],[985,2560],[985,2880],[960,2950],[878,2958]]),function(){soft(878,2700,60,200,'240,255,245',0.4);EM(975,2700,24,230,'rgba(0,15,10,.35)');},true);
+    LM([[960,2490],[985,2560],[985,2850]],'rgba(225,255,240,.5)',2.5);
+    /* Lüfterauslass und Heckdeck-Schatten an den Stützen */
+    soft(1080,2750,50,300,'0,15,10',0.35);soft(676,2750,50,300,'0,15,10',0.35);
+    LM([[1060,2470],[1110,2560],[1150,2700],[1190,2860],[1240,2940]],'rgba(6,16,12,.45)',2);
+    /* Heckschlitze unter dem Flügel */
+    PM([[1050,2955],[1300,2950],[1320,3010],[1060,3015]],'#060808',true);
+    /* Heckflügel: Carbon, Hauptblatt und Klappe */
+    P(WING,lgr(0,2955,0,3334,[[0,'#46525a'],[0.2,'#232b31'],[0.45,'#161b1f'],[0.5,'#3b464d'],[0.65,'#1c2227'],[1,'#0f1316']]),true);
+    clip(WING,function(){for(i=0;i<40;i++)Ln([[120+i*40,2950],[100+i*40,3340]],'rgba(255,255,255,.035)',10);});
+    LM([[878,3012],[1200,2998],[1500,2978],[1640,2962]],'rgba(255,255,255,.45)',2.5);
+    LM([[878,3102],[1300,3090],[1620,3070]],'rgba(0,0,0,.6)',4);
+    LM([[1650,2960],[1652,3290]],'rgba(255,255,255,.2)',3);
+    /* Schwanenhals-Stützen */
+    PM([[998,2470],[1036,2470],[1040,3255],[1002,3255]],lgr(998,0,1040,0,[[0,'#0d1113'],[0.5,'#39434a'],[1,'#0d1113']]));
+    LM([[1018,2480],[1020,3250]],'rgba(255,255,255,.25)',1.5);
+    g.restore();
+    /* Spiegel */
+    LM([[1412,1272],[1442,1346]],'#6d787e',22);
+    PM([[1440,1320],[1520,1334],[1600,1368],[1616,1408],[1590,1426],[1500,1412],[1446,1392],[1430,1350]],lgr(0,1320,0,1426,[[0,'#e5ecef'],[0.45,'#8d989e'],[1,'#3b4448']]),true);
+    LM([[1450,1328],[1530,1342],[1598,1372]],'rgba(255,255,255,.8)',2);
+  }
+});
+})();
 /*NEWCARS-END*/
 
 function rrect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();g.fill();}
@@ -2777,7 +2933,7 @@ function CF(g){var p=carbon(g);try{p.setTransform(new DOMMatrix().scale(0.012));
 var KG={'911':{g:[[-0.82,-0.22],[0.78,1.44]],n:0.28,b:1.68},'testarossa':{g:[[-1.08,-0.12]],n:0.08,b:0.95},'countach':{g:[[-1.16,-0.36]],n:0.1,b:0.95},
  'skyline':{g:[[-0.86,-0.38],[1.13,1.76]],n:0.35,b:-1.5},'challenger':{g:[[-0.96,-0.31],[1.21,1.72]],n:0.45,b:-1.75},'vento':{g:[[-1.7,-0.54]],n:-0.28,b:0.8},
  'voltaris':{g:[[-1.4,2.07]],n:-1.85},'brixton':{g:[[-0.77,-0.49],[0.96,1.29]],n:0.25,b:-1.12},'sarthe':{g:[[-1.45,-0.66],[0.14,0.88]],n:-0.25,b:1.4},
- 'chronos':{g:[[-0.58,-0.04]],n:0.35,b:1.3},'kitt':{g:[[-0.57,0.34],[1.25,2.18]],n:0.8,b:-1.6},'munja':{g:[[-1.57,0.58]],n:1.05}};
+ 'chronos':{g:[[-0.58,-0.04]],n:0.35,b:1.3},'kitt':{g:[[-0.57,0.34],[1.25,2.18]],n:0.8,b:-1.6},'munja':{g:[[-1.57,0.58]],n:1.05},'tempest':{g:[[-0.62,0.8]],n:0.1,cut:1}};
 function edgeX(c,y){var o=c.outline,m=0,i,a,b,t;for(i=0;i<o.length;i++){a=o[i];b=o[(i+1)%o.length];if((a[1]-y)*(b[1]-y)<=0&&a[1]!==b[1]){t=(y-a[1])/(b[1]-a[1]);m=Math.max(m,Math.abs(a[0]+t*(b[0]-a[0])));}}return m||c.Wd/2;}
 function edgeS(c,y,r){var m=9;r=r||0.24;for(var d=-r;d<=r+0.001;d+=r/3)m=Math.min(m,edgeX(c,y+d));return m;}
 function segs(c,hl){var G=(KG[c.id]||{}).g||[],o=[],y=-hl;G.forEach(function(r){if(r[0]>y)o.push([y,r[0]]);y=Math.max(y,r[1]);});if(y<hl)o.push([y,hl]);return o;}
@@ -2787,7 +2943,7 @@ var LIV={'911':{t:'A',c1:'#f4f1e6',a:'#ff8a1a',n:23,np:'r'},'testarossa':{t:'C',
  'challenger':{t:'D',c1:'#f6f6f2',c2:'#141418',a:'#ffcf1a',n:71},'vento':{t:'B',c1:'#f6f6f2',c2:'#e3261b',c3:'#f6f6f2',a:'#e3261b',n:16},
  'voltaris':{t:'E',c1:'#1d6fe0',c2:'#35c8ff',a:'#35c8ff',n:3,np:'r'},'brixton':{t:'D',c1:'#f6f6f2',c2:'#141418',a:'#ffcf1a',n:37},
  'sarthe':{t:'B',c1:'#1f5fd6',c2:'#f6f6f2',c3:'#e3261b',a:'#e3261b',n:20},'chronos':{t:'A',c1:'#d81e1e',a:'#d81e1e',n:88,np:'r'},
- 'kitt':{t:'F',c1:'#d81e1e',c2:'#f2c230',a:'#f2c230',n:2,np:'r'},'munja':{t:'C',c1:'#f4f4f0',c2:'#35c8ff',a:'#35c8ff',n:7},
+ 'kitt':{t:'F',c1:'#d81e1e',c2:'#f2c230',a:'#f2c230',n:2,np:'r'},'munja':{t:'C',c1:'#f4f4f0',c2:'#35c8ff',a:'#35c8ff',n:7},'tempest':{t:'E',c1:'#f4f4f0',c2:'#7dffcf',a:'#7dffcf',n:5,np:'r'},
  _:{t:'D',c1:'#f6f6f2',c2:'#141418',a:'#ffcf1a',n:1}};
 /* Streifen in Längsrichtung, an den Scheiben unterbrochen */
 function band(g,SG,hl,x,w,col){g.fillStyle=col;SG.forEach(function(q){var y0=q[0]+(q[0]>-hl?0.04:0),h=q[1]-y0-(q[1]<hl?0.04:0);if(h>0.06)g.fillRect(x,y0,w,h);});}
@@ -2875,7 +3031,7 @@ function over(g,c,lv,ev,t){
   /* Aufkleber auf eigener Ebene, an allen Scheiben (Pixelmaske) ausgespart, je Auto zwischengespeichert */
   var key=lv>=3?2:1,L=c._liv;
   if(!L||L.k!==key){var M=paintMask(c),cv=document.createElement('canvas');cv.width=M.w;cv.height=M.h;var lg=cv.getContext('2d');
-    lg.translate(M.w/2,M.h/2);lg.scale(MS,MS);lg.save();CarLab.clipBody(lg,c);livery(lg,c,A,LV,[[-hl,hl]],ev,lv);lg.restore();
+    lg.translate(M.w/2,M.h/2);lg.scale(MS,MS);lg.save();CarLab.clipBody(lg,c);livery(lg,c,A,LV,(KG[c.id]||{}).cut?SG:[[-hl,hl]],ev,lv);lg.restore();
     lg.setTransform(1,0,0,1,0,0);lg.globalCompositeOperation='destination-in';lg.drawImage(M.cv,0,0);lg.globalCompositeOperation='source-over';lg.translate(M.w/2,M.h/2);lg.scale(MS,MS);numbers(lg,c,A,LV,SG);L=c._liv={k:key,cv:cv,w:M.w,h:M.h};}
   g.drawImage(L.cv,-L.w/2/MS,-L.h/2/MS,L.w/MS,L.h/MS);
   /* Haubenstifte und Abschleppöse */
@@ -3050,7 +3206,11 @@ var SWAPS={
     {n:'1,5 V6 Turbo',sub:'Drag-Umbau',kw:780,nm:620,fdK:0.92,trac:1.6,hl:0.1,dkg:20,idle:3200,rT:10000,rP:13000,red:13500,f0:0.6,cost:24,snd:{cut:1.3,sub:0.7,seed:107}}],
   'munja':[
     {n:'Vier Motoren Plus',sub:'Munja RS',kw:1550,nm:2600,trac:1.5,hl:0.3,dkg:-30,idle:1,rT:0,rP:0,red:20000,f0:1,cost:14,snd:{}},
-    {n:'Vier Motoren Drag',sub:'Drag-Umbau',kw:1750,nm:3000,trac:1.7,hl:0.1,dkg:-120,idle:1,rT:0,rP:0,red:20000,f0:1,cost:24,snd:{}}]
+    {n:'Vier Motoren Drag',sub:'Drag-Umbau',kw:1750,nm:3000,trac:1.7,hl:0.1,dkg:-120,idle:1,rT:0,rP:0,red:20000,f0:1,cost:24,snd:{}}],
+  /* Version 94: Albion Tempest, stärkerer Lüfter und Drag-Umbau */
+  'tempest':[
+    {n:'Zwei Motoren Plus',sub:'Tempest S',kw:760,nm:1050,trac:2.0,hl:0.2,dkg:0,idle:1,rT:0,rP:0,red:20000,f0:1,cost:14,snd:{}},
+    {n:'Lüfter Drag',sub:'Drag-Umbau',kw:840,nm:1150,trac:2.1,hl:0.1,dkg:-40,idle:1,rT:0,rP:0,red:20000,f0:1,cost:24,snd:{}}]
 };
 function swOwned(id,k){return lvOf(id)>=k+2;}
 function curSwap(id){var l=SWAPS[id];return (tuneSel.s>0&&l&&swOwned(id,tuneSel.s))?l[tuneSel.s-1]:null;}
@@ -3199,7 +3359,7 @@ $('bkCar').onclick=function(){if(state==='ready')showStep('car');};
 $('bkSetup').onclick=function(){if(state==='ready')showStep('setup');};
 
 /* Version 74→75: gleiches Auto als Gegner erlaubt, der Gegner bekommt dann eine andere Farbe */
-var TWIN={'911':['#2a5fc4','blau'],'testarossa':['#2a5fc4','blau'],'countach':['#e4e7ea','weiß'],'skyline':['#c8161d','rot'],'challenger':['#2a5fc4','blau'],'vento':['#c8161d','rot'],'voltaris':['#1d1f24','schwarz'],'brixton':['#2f6b3a','grün'],'sarthe':['#2a5fc4','blau'],'chronos':['#1d1f24','schwarz'],'dragster':['#2a5fc4','blau'],'kitt':['#c8161d','rot'],'f89':['#2a5fc4','blau'],'munja':['#e4e7ea','weiß']};
+var TWIN={'911':['#2a5fc4','blau'],'testarossa':['#2a5fc4','blau'],'countach':['#e4e7ea','weiß'],'skyline':['#c8161d','rot'],'challenger':['#2a5fc4','blau'],'vento':['#c8161d','rot'],'voltaris':['#1d1f24','schwarz'],'brixton':['#2f6b3a','grün'],'sarthe':['#2a5fc4','blau'],'chronos':['#1d1f24','schwarz'],'dragster':['#2a5fc4','blau'],'kitt':['#c8161d','rot'],'f89':['#2a5fc4','blau'],'munja':['#e4e7ea','weiß'],'tempest':['#e8742a','orange']};
 function twinColor(c){var t=TWIN[c.id]||['#2a5fc4','blau'],sh=CarLab.shade;c.lab=Object.assign({},c.lab,{body:t[0],roof:sh(t[0],0.12),dark:sh(t[0],-0.45)});c.body=t[0];c.twin=t[1];}
 function reset(){
   if(mode==='series'){oIdx=carIdx(carOpp().car);if(!owned(SPECS[pIdx].id))pIdx=carIdx(SAVE.garage[0]);}
@@ -3260,7 +3420,9 @@ var ENG={
   /* Version 91: Shadowhawk (V8, 5 Gänge, Turbo Boost), Comet F89 (Formel-1-V10, 6 Gänge, sehr hohe Drehzahl), Munja R (Elektro, ein Gang) */
   'kitt':      {idle:700, rT:3200,rP:5200,red:5800,fd:3.42,gr:[2.95,1.94,1.34,1.00,0.73]},
   'f89':       {idle:3000,rT:10500,rP:13000,red:13500,fd:4.4,gr:[3.0,2.25,1.8,1.5,1.3,1.15]},
-  'munja':     {idle:1,   rT:0,   rP:0,   red:20000,fd:8.6,gr:[1.0],ev:true}
+  'munja':     {idle:1,   rT:0,   rP:0,   red:20000,fd:8.6,gr:[1.0],ev:true},
+  /* Version 94: Albion Tempest (Elektro-Fan-Car, ein Gang) */
+  'tempest':   {idle:1,   rT:0,   rP:0,   red:20000,fd:6.5,gr:[1.0],ev:true}
 };
 function torque(c,r){
   var p=c.pts,i;
@@ -3301,7 +3463,7 @@ function engInit(c){
   }
   c.rpm=e.idle;c.er=e.idle;c.gear=0;c.shiftT=0;c.shifts=[];c.lim=false;c.launchRpm=e.idle;c.bog=1;c.spinK=0;c.heat=0;c.heatL=0;c.heatT=0;c.acc=0;c.thrNow=0;c.thrIn=1;c.limT=0;c.limTot=0;c.blown=false;c.boostT=0;c.nBoost=0;c.bStk=0;c.bStr=0.26;c.burn=false;c.vx=0;c.vy=0;c.vvy=0;c.wt=0.5;c.ty=0;c.thrL=1;c.draft=0;c.hop=false;c.lock=false;c.bt=0;c.flux=0;c.tj=null;c.tjUsed=false;c.chute=0;c.tb=null;c.tbUsed=false;c.tbGo=false;
   /* Gewichtsverlagerung: Hinterachsanteil und Schwerpunkthöhe */
-  var rs={'911':0.60,'testarossa':0.58,'countach':0.58,'skyline':0.52,'challenger':0.53,'vento':0.56,'voltaris':0.52,'brixton':0.40,'sarthe':0.60,'chronos':0.63,'dragster':0.75,'kitt':0.47,'f89':0.62,'munja':0.52},hh={'911':0.50,'testarossa':0.48,'countach':0.46,'skyline':0.52,'challenger':0.52,'vento':0.45,'voltaris':0.48,'brixton':0.50,'kitt':0.52,'f89':0.30,'munja':0.42,'sarthe':0.38,'chronos':0.50,'dragster':0.40};
+  var rs={'911':0.60,'testarossa':0.58,'countach':0.58,'skyline':0.52,'challenger':0.53,'vento':0.56,'voltaris':0.52,'brixton':0.40,'sarthe':0.60,'chronos':0.63,'dragster':0.75,'kitt':0.47,'f89':0.62,'munja':0.52,'tempest':0.58},hh={'911':0.50,'testarossa':0.48,'countach':0.46,'skyline':0.52,'challenger':0.52,'vento':0.45,'voltaris':0.48,'brixton':0.50,'kitt':0.52,'f89':0.30,'munja':0.42,'tempest':0.30,'sarthe':0.38,'chronos':0.50,'dragster':0.40};
   c.wtK=(hh[c.id]||0.5)/c.wb/(rs[c.id]||0.56);
   /* Version 86: Antrieb: Heck profitiert von Gewichtsverlagerung beim Anfahren, Allrad kaum, Frontantrieb verliert vorne Grip */
   c.wtK*=c.drive==='Allrad'?0.15:(c.drive==='Front'?-0.6:1);
@@ -3809,7 +3971,7 @@ var DIFFS=[{n:'Leicht',rt:[0.32,0.6],u:[-0.9,1.7],sn:1200,sb:0.5,pw:0.93},{n:'Mi
 try{diff=Math.max(0,Math.min(2,parseInt(localStorage.getItem('s402diff')||'0',10)||0));}catch(e){}
 var SAVE={garage:['skyline'],parts:0,up:{},round:0,trophies:0};
 try{var _s=JSON.parse(localStorage.getItem('s402save')||'null');if(_s&&_s.garage&&_s.garage.length)for(var _k in _s)SAVE[_k]=_s[_k];}catch(e){}
-SAVE.garage=SAVE.garage.filter(function(x){return ['911','testarossa','countach','skyline','challenger','vento','voltaris','brixton','sarthe','chronos','dragster','kitt','f89','munja'].indexOf(x)>=0;});if(!SAVE.garage.length)SAVE.garage=['skyline'];if(!(SAVE.round>=0&&SAVE.round<=16))SAVE.round=0;
+SAVE.garage=SAVE.garage.filter(function(x){return ['911','testarossa','countach','skyline','challenger','vento','voltaris','brixton','sarthe','chronos','dragster','kitt','f89','munja','tempest'].indexOf(x)>=0;});if(!SAVE.garage.length)SAVE.garage=['skyline'];if(!(SAVE.round>=0&&SAVE.round<=16))SAVE.round=0;
 function saveSave(){try{localStorage.setItem('s402save',JSON.stringify(SAVE));}catch(e){}}
 var mode='series';try{mode=localStorage.getItem('s402mode')==='free'?'free':'series';}catch(e){}
 var tuneSel={g:1,t:0,p:0,s:0};if(!SAVE.sw)SAVE.sw={};
@@ -3844,7 +4006,7 @@ var CLASSES=[
  {n:'Top Fuel',t:'Finale',max:99}
 ];
 /* Klasse jedes Autos (Serie), für die Medaillen */
-var CCLS={'skyline':0,'chronos':0,'brixton':0,'911':1,'testarossa':1,'countach':1,'kitt':2,'voltaris':2,'challenger':2,'sarthe':3,'vento':3,'f89':4,'munja':4,'dragster':5};
+var CCLS={'skyline':0,'chronos':0,'brixton':0,'911':1,'testarossa':1,'countach':1,'kitt':2,'voltaris':2,'challenger':2,'sarthe':3,'vento':3,'f89':4,'munja':4,'tempest':4,'dragster':5};
 var CAREER=[
  {k:0,ch:5,parts:4},{k:0,ch:6,parts:4},{k:0,ch:0,car:'brixton',parts:6,boss:true},
  {k:1,ch:1,parts:5},{k:1,ch:2,parts:5},{k:1,ch:3,parts:8,boss:true},
@@ -3865,6 +4027,7 @@ if(!(SAVE.round>=0&&SAVE.round<=CAREER.length))SAVE.round=0;
 CAREER.forEach(function(L,i){if(SAVE.round>i&&SAVE.garage.indexOf(L.car)<0)SAVE.garage.push(L.car);});
 function carLvl(){return Math.min(SAVE.round,CAREER.length-1);}
 function carDone(){return SAVE.round>=CAREER.length;}
+if(carDone()&&!owned('tempest'))SAVE.garage.push('tempest');
 function bossOf(k){for(var i=0;i<CAREER.length;i++)if(CAREER[i].k===k&&CAREER[i].boss)return CAREER[i];return CAREER[0];}
 function curRace(){return carDone()?bossOf(SAVE.mk||0):CAREER[carLvl()];}
 function raceNo(i){var n=0;for(var j=0;j<=i;j++)if(CAREER[j].k===CAREER[i].k)n++;return n;}
@@ -3892,7 +4055,7 @@ function kitEV(id){return !!(ENG[id]&&ENG[id].ev);}
 /* Übersetzung, Reifen und Leistungsstufe je Stufe: die schnellste Kombination, vorab mit dem Testfahrer ermittelt (g Übersetzung, t Reifen, p Stage) */
 var LVT={'911':'010 011 012 212 012','testarossa':'010 011 012 012 012','countach':'010 011 012 012 012','skyline':'010 011 012 202 012','challenger':'010 011 012 012 012',
  'vento':'000 011 012 012 012','voltaris':'010 011 112 212 211','brixton':'010 011 012 212 212','dragster':'000 011 011','sarthe':'110 211 212 211 212',
- 'chronos':'000 001 002 012 002','kitt':'010 011 012 112 012','f89':'210 211 212 211 212','munja':'200 201 202 202 202'};
+ 'chronos':'000 001 002 012 002','kitt':'010 011 012 112 012','f89':'210 211 212 211 212','munja':'200 201 202 202 202','tempest':'200 201 202 202 202'};
 function lvTune(id,l){var c=(LVT[id]||'010 011 012 012 012').split(' ')[Math.min(l,4)]||'012';return {g:+c[0],t:+c[1],p:Math.min(+c[2],2),s:l>=3?Math.min(l-2,(SWAPS[id]||[]).length):0};}
 function applyLv(){if(mode!=='series'||EMB)return;var id=SPECS[pIdx].id;tuneSel=lvTune(id,lvOf(id));}
 /* Punkte gutschreiben, gibt die neue Stufe zurück (oder -1) */
@@ -4034,7 +4197,10 @@ function finish(){
       if(!owned(L.car)){SAVE.garage.push(L.car);st+='Der '+shortName(SPECS[carIdx(L.car)])+' von '+opp.who+' gehört jetzt dir! ';}
       if(L.boss){SAVE.trophies++;st+=L.dial?'POKAL! ':'POKAL! Aufstieg in die Klasse '+CLASSES[L.k+1].n+'. ';}
       SAVE.round=r0+1;btn=carDone()?'Weiter':(L.boss?'Nächste Klasse':'Nächstes Rennen');
-      if(carDone())st+='Karriere geschafft, du bist Meister! Jetzt kannst du in jeder Klasse Medaillen jagen.';
+      if(carDone()){st+='Karriere geschafft, du bist Meister! ';
+        /* Version 94: zum Titel gibt es den Albion Tempest */
+        if(!owned('tempest')){SAVE.garage.push('tempest');st+='Als Geschenk wartet der '+shortName(SPECS[carIdx('tempest')])+' in deiner Garage. ';}
+        st+='Jetzt kannst du in jeder Klasse Medaillen jagen.';}
     }else{
       var upL=gainXp(player.id,1);st='Verloren, aber dein '+shortName(SPECS[carIdx(player.id)])+' hat dazugelernt. Probier es noch mal.';btn='Nochmal';
     }
@@ -4955,7 +5121,7 @@ function fitAllWb(){fitWb($('hWbS'),Math.max(160,$('hSplash').clientHeight-250))
 
 /* ---------- Garage (Schritt 1 Auto) ---------- */
 var gIdx=0;
-var GET={'kitt':'12,9','f89':'8,9','munja':'8,8','sarthe':'10,1','chronos':'12,0','dragster':'4,6','911':'13,8','testarossa':'13,5','countach':'13,1','skyline':'16,5','challenger':'11,0','vento':'10,2','voltaris':'11,5','brixton':'15,9'};
+var GET={'tempest':'8,3','kitt':'12,9','f89':'8,9','munja':'8,8','sarthe':'10,1','chronos':'12,0','dragster':'4,6','911':'13,8','testarossa':'13,5','countach':'13,1','skyline':'16,5','challenger':'11,0','vento':'10,2','voltaris':'11,5','brixton':'15,9'};
 function ownerOf(id){for(var i=0;i<CAREER.length;i++)if(CAREER[i].car===id)return {who:CHARS[CAREER[i].ch].who,r:i+1,k:CLASSES[CAREER[i].k].n};return null;}
 function gLocked(i){return mode==='series'&&!owned(SPECS[i].id);}
 function garageRender(){
