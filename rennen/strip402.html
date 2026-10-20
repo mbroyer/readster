@@ -611,6 +611,33 @@ html,body{touch-action:manipulation}
 .ser .stl i b,.gar-lv i b{display:block;height:100%;border-radius:4px;background:var(--accent)}
 .ser .stl small,.gar-lv small{font:400 11px var(--f-mono);color:var(--muted)}
 .gar-lv[hidden],.upg[hidden]{display:none}
+/* Version 95: aufgeräumte Rennkarte, Garage als Drehkreuz, Klassenleiter, Einstellungen */
+.ser .sdl{margin-top:6px;padding:7px 10px;border-radius:10px;background:rgba(53,224,122,.1);border:1px solid rgba(53,224,122,.35);color:#d9f7e6;font:600 16px/1.3 var(--f-display)}
+.ser .sdl b{color:#fff}
+.more{margin:0 0 4px;padding:6px 8px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);font:500 14px/1.35 var(--f-display);color:#c9d0de}
+.more p{margin:0 0 4px}.more[hidden],#ladBtn[hidden]{display:none}
+.more .two{margin-top:2px}
+.gar-hub{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px;margin-top:8px}
+.gar-hub .gar-ws{margin-top:0;justify-content:center;min-height:40px;font-size:16px}
+.gar-hub .gar-ws[hidden]{display:none}
+.gar-lv{margin-top:6px}
+.si.lad{padding-top:56px}
+.si.lad .lad-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.si.lad .lad-h h2{margin:0}
+.si.lad .lad-h span{font:500 15px var(--f-display);color:#c9d0de}.si.lad .lad-h b{color:var(--accent)}
+.si.lad .sv{align-items:flex-start;overflow:auto;padding:10px 0}
+.si.lad .sl div{opacity:1;animation:none}
+.si.lad .sl div.dn b{background:var(--green);color:#0b1a10}
+.si.lad .lad-p{font-size:16px}
+.si.lad .sbtn{margin-top:12px}
+.h-set{position:absolute;inset:0;z-index:20;display:flex;align-items:flex-end;background:rgba(3,5,10,.6)}
+.h-set[hidden]{display:none}
+.h-setb{width:100%;display:grid;gap:8px;padding:16px 14px 18px;border-radius:18px 18px 0 0;background:#10141f;border-top:1px solid var(--line)}
+.h-setb h3{margin:0 0 4px;font:700 22px var(--f-display);letter-spacing:.1em;text-transform:uppercase}
+.h-sopt{display:flex;justify-content:space-between;align-items:center;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#fff;font:600 17px var(--f-display);letter-spacing:.04em;cursor:pointer}
+.h-sopt b{color:var(--accent)}
+.h-setb .h-reset{justify-self:center}
+.h-sok{min-height:50px;border:0;border-radius:12px;background:var(--accent);color:#14110a;font:700 20px var(--f-display);letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
 .upg{position:absolute;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;padding:40px 20px 22px;background:radial-gradient(110% 60% at 50% 30%,#2a2210 0,#0b0c12 64%),#05070d;color:#fff;text-align:center}
 .upg .ut{font:700 15px var(--f-display);letter-spacing:.3em;color:var(--accent);text-transform:uppercase}
 .upg h2{margin:6px 0 0;font:400 40px/1.04 "Anton","Impact","Arial Narrow",sans-serif;text-transform:uppercase}
@@ -657,7 +684,8 @@ html,body{touch-action:manipulation}
     <div class="recap" id="recap"></div>
     <div class="thint" id="tHint"></div>
     <div class="two" id="freeRow"><button class="alt" id="oppBtn" type="button">Gegner wechseln</button><button class="alt" id="diffBtn" type="button">Gegner: Leicht</button></div>
-    <div class="two"><button class="alt" id="bkCar" type="button">‹ Garage</button><button class="alt" id="aidBtn" type="button">Fahrhilfen: Aus</button></div><button id="bkSetup" type="button" hidden></button>
+    <div class="more" id="more" hidden><div id="moreTx"></div><div class="two"><button class="alt" id="aidBtn" type="button">Fahrhilfen: Aus</button><button class="alt" id="ladBtn" type="button">Klassen</button></div></div>
+    <div class="two"><button class="alt" id="bkCar" type="button">‹ Garage</button><button class="alt" id="moreBtn" type="button" aria-expanded="false">Mehr</button></div><button id="bkSetup" type="button" hidden></button>
     <button class="go" id="go" type="button">Starten</button>
     <p class="note">Prototyp, Werte gerundet. Erst Burnout, dann zur Linie rollen. Gas: Finger auf dem Pedal, höher = mehr. Bei Grün LOS. Zum Schalten Gas loslassen, Schalten tippen, Gas wieder drücken. Goldener Bereich im Drehzahlmesser = Boost.</p>
   </div>
@@ -686,6 +714,7 @@ html,body{touch-action:manipulation}
         <div class="h-wb" id="hWbT"><span class="l">Everything</span><span class="l">happens</span><span class="l">in a</span><span class="l y">quarter</span><span class="l">mile</span></div>
         <div class="h-mini">
           <button class="h-icn" id="hDay" type="button" aria-label="Tageszeit umschalten"><span id="hDayIco"></span><b id="hDayTxt">Nacht</b></button>
+          <button class="h-icn" id="hSet" type="button" aria-label="Einstellungen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><b>Mehr</b></button>
           <button class="h-icn snd" id="hSnd" type="button" aria-pressed="true" aria-label="Ton an oder aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="w" d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/><path class="x" d="M16 9.5l5 5M21 9.5l-5 5"/></svg><b id="hSndTxt">Ton an</b></button>
           <div class="h-tree" id="hTree" aria-hidden="true">
             <div class="col"><span class="b sm pre" data-t="0"></span><span class="b sm pre" data-t="0"></span><span class="b amb" data-t="1"></span><span class="b amb" data-t="2"></span><span class="b amb" data-t="3"></span><span class="b grn" data-t="4"></span></div>
@@ -714,8 +743,15 @@ html,body{touch-action:manipulation}
           <span class="d" id="hTrD">Übungsfahrt mit Anleitung</span>
           <span class="chev" aria-hidden="true">›</span>
         </button>
-        <button class="h-reset" id="hReset" type="button">Spielstand zurücksetzen</button>
       </div>
+      <div class="h-set" id="hSetP" hidden><div class="h-setb" role="dialog" aria-modal="true" aria-label="Einstellungen">
+        <h3>Einstellungen</h3>
+        <button class="h-sopt" id="hsSnd" type="button"></button>
+        <button class="h-sopt" id="hsDay" type="button"></button>
+        <button class="h-sopt" id="hsAid" type="button"></button>
+        <button class="h-reset" id="hReset" type="button">Spielstand zurücksetzen</button>
+        <button class="h-sok" id="hsOk" type="button">Fertig</button>
+      </div></div>
     </section>
 
     <section class="h-scr" id="hTrain" aria-label="Training" hidden>
@@ -3121,12 +3157,12 @@ var cols=[].slice.call(treeEl.querySelectorAll('.col')).map(function(col){return
 function setTree(){
   var side=[player,opp];
   cols.forEach(function(bulbs,i){
-    var c=side[i],on=[0,0,0,0,0,0,0];
+    var c=side[i],on=[0,0,0,0,0,0,0],q=seq&&i&&seq.o?seq.o:seq;
     if(state!=='ready'&&seq){
       on[0]=T>=seq.pre?1:0;on[1]=T>=seq.stg?1:0;
       if(c.foul){on[6]=1;}
-      else if(T>=seq.g){on[5]=1;}
-      else{on[2]=T>=seq.a1?1:0;on[3]=T>=seq.a2?1:0;on[4]=T>=seq.a3?1:0;}
+      else if(T>=q.g){on[5]=1;}
+      else{on[2]=T>=q.a1?1:0;on[3]=T>=q.a2?1:0;on[4]=T>=q.a3?1:0;}
     }
     bulbs.forEach(function(b,k){b.classList.toggle('on',!!on[k]);});
   });
@@ -3151,6 +3187,7 @@ function updateMsg(){
   if(player.foul&&!(T<fbT+1.7))setMsg('Rotlicht · disqualifiziert','bad');
   else if(player.launched){if(T<fbT+1.7)setMsg(fbTxt,fbCls);else if(!player.over&&player.shiftT<=0&&gasLvl<0.6&&!player.done)setMsg('Finger aufs Gas!','bad');else if(player.crashed)setMsg('CRASH!','bad');else if(player.over&&player.v>3)setMsg(player.autoBrake?'Bremst automatisch':player.braking?'BREMSEN':'BREMSEN! Taste halten','bad');else setMsg('');}
   else if(T>=seq.g)setMsg('Jetzt LOS!','ok');
+  else if(seq.o&&T>=seq.o.g&&seq.o.g<seq.g)setMsg('Gegner hat Vorsprung · warte auf Grün');
   else if(T>=seq.stg)setMsg('Gas halten · grüne Zone');
   else if(T>=seq.arrive)setMsg('Staging …');
   else if(T>=seq.roll)setMsg('Rollt zur Startlinie …');
@@ -3215,8 +3252,11 @@ var SWAPS={
 function swOwned(id,k){return lvOf(id)>=k+2;}
 function curSwap(id){var l=SWAPS[id];return (tuneSel.s>0&&l&&swOwned(id,tuneSel.s))?l[tuneSel.s-1]:null;}
 var PM=[1,1.09,1.18],mstep='car',pend=null,mMsg='';
+/* Version 95: Leistungsfaktor je Auto für Stage 1, Stage 2 und Motortausch, damit jede Tuning-Stufe etwa gleich viel Zeit bringt (mit dem Testfahrer ausgemessen) */
+var LF={"911":[1.15,1.4,1.4],"testarossa":[1.2,1.4,1.5],"countach":[1.2,1.4,1.65],"skyline":[1.3,1.8,1.85],"challenger":[1.05,1.1,1],"vento":[1,1,1.05],"voltaris":[1.15,1.25,1.1],"brixton":[1.25,1.85,1.9],"sarthe":[1.05,1.05,1.1],"chronos":[1.1,1.2,1.1],"kitt":[1.2,1.45,1.25],"f89":[1.05,1.2,1.2],"munja":[1.1,1.15,1.1],"tempest":[1,1,1.05]};
+function lvF(id,p,s){var f=LF[id];if(!f)return 1;if(s===1)return f[2];if(s)return 1;return p?f[p-1]:1;}
 function effStats(i){
-  var s=SPECS[i],sw=curSwap(s.id),pm=PM[Math.min(tuneSel.p,upStage(s.id))];
+  var s=SPECS[i],sw=curSwap(s.id),pp=Math.min(tuneSel.p,upStage(s.id)),pm=PM[pp]*lvF(s.id,pp,sw?tuneSel.s:0);
   var kw=(sw?sw.kw:s.kw)*pm,nm=(sw?sw.nm:s.nm)*pm,kg=s.kg+(sw?sw.dkg:0);
   return {kw:kw,ps:Math.round(kw*1.35962),nm:Math.round(nm),kg:kg};
 }
@@ -3230,8 +3270,8 @@ function drawPv(cv,s,big){
 }
 function bar(l,v,mx,t){return '<div class="sb"><span>'+l+'</span><i><b style="width:'+Math.round(100*Math.max(0.04,Math.min(1,v/mx)))+'%"></b></i><em>'+t+'</em></div>';}
 function stepsHtml(){
-  var h='<div class="mtt">'+(mstep==='setup'?'Werkstatt':'Garage')+'</div>';
-  return h+'<div class="mres">Pokale <b>'+SAVE.trophies+'</b></div>';
+  var h='<div class="mtt">'+(mstep==='setup'?'Werkstatt':'Garage')+'</div>',n=SPECS.filter(function(s){return owned(s.id);}).length;
+  return h+'<div class="mres">'+(mode==='series'?'<b>'+n+'</b> von '+SPECS.length+' Autos':'Freies Rennen')+'</div>';
 }
 function carStep(){
   var ser=mode==='series',h='<div class="mseg"><button type="button" data-act="mode" data-v="series" aria-pressed="'+(ser?'true':'false')+'">Karriere</button><button type="button" data-act="mode" data-v="free" aria-pressed="'+(ser?'false':'true')+'">Freies Rennen</button></div>';
@@ -3298,34 +3338,34 @@ function renderSheet(){
   $('freeRow').style.display=ser?'none':'grid';if($('bkSetup'))$('bkSetup').style.display=ser?'none':'';
   var sc=$('serCard');sc.style.display=ser?'block':'none';
   if(ser){
-    var LV=curRace(),CL=CLASSES[LV.k],dn=carDone(),rw=!dn&&!owned(LV.car)?SPECS[carIdx(LV.car)]:null,est=estET(id),
-      warn=!dn&&!LV.dial&&est>CL.max+0.3?'<div class="swarn">Dein '+shortName(SPECS[pIdx])+' schafft etwa '+String(est.toFixed(1)).replace('.',',')+' s, hier fahren die Gegner '+CL.t+'. Fahre weiter, dein Auto wird mit jedem Rennen besser, oder nimm ein schnelleres Auto.</div>':'',
+    var LV=curRace(),CL=CLASSES[LV.k],dn=carDone(),rw=!dn&&!owned(LV.car)?SPECS[carIdx(LV.car)]:null,
       mh=dn?'<div class="smed">'+CLASSES.slice(0,5).map(function(c,k){var m=medalOf(k,SAVE.mb[k]);return '<button type="button" data-mk="'+k+'" class="'+(k===LV.k?'on':'')+'">'+c.n+'<small>'+(m>=0?MEDN[m]:'–')+'</small></button>';}).join('')+'</div>':'';
-    sc.innerHTML='<div class="s1"><span>'+(dn?'Meister · Medaillenjagd · '+CL.n:(LV.dial?'Finale · Top Fuel':'Klasse '+(LV.k+1)+' · '+CL.n+' ('+CL.t+') · '+(LV.boss?'Boss':'Rennen '+raceNo(carLvl())+' von 3')))+'</span></div>'+mh+
+    /* Version 95: Rennkarte nur noch Klasse, Gegner, Vorsprung, Preis */
+    sc.innerHTML='<div class="s1"><span>'+(dn?'Meister · Medaillenjagd · '+CL.n:(LV.dial?'Finale · Top Fuel':'Klasse '+(LV.k+1)+' · '+CL.n+' · '+(LV.boss?'Boss':'Rennen '+raceNo(carLvl())+' von 3')))+'</span></div>'+mh+
       '<div class="s2">'+ch.who+'<small>'+shortName(SPECS[carIdx(ch.car)])+(ch.sw?' · '+LVN[2+ch.sw]:(ch.up?' · '+LVN[ch.up]:''))+'</small></div>'+
-      '<div class="sq">'+ch.quote+'</div>'+'<div class="stl"><span>Dein '+shortName(SPECS[pIdx])+': <b>'+LVN[lvOf(id)]+'</b></span><i><b style="width:'+Math.round(100*xpBar(id))+'%"></b></i><small>'+xpText(id)+'</small></div>'+
-      '<div class="lad" aria-hidden="true">'+CAREER.map(function(c,i){return '<i class="'+(i<SAVE.round?'dn':(i===SAVE.round?'cur':''))+(i&&c.k!==CAREER[i-1].k?' gap':'')+'"></i>';}).join('')+'</div>'+
-      (dn?'<div class="s4">Ziel für '+CL.n+': Bronze '+f1(CL.med[0])+' s, Silber '+f1(CL.med[1])+' s, Gold '+f1(CL.med[2])+' s. Es zählen nur Autos der Klasse '+CL.n+' oder langsamer, getunt sein dürfen sie.'+(SAVE.mb[LV.k]!=null?' Deine Bestzeit: '+f1(SAVE.mb[LV.k])+' s.':'')+'</div>'
-        :'<div class="s4">'+(rw?'Sieg: Der '+shortName(rw)+' kommt in deine Garage':'Sieg: Pokal')+(LV.boss?(LV.dial?'. Gewinnst du, bist du Meister!':'. Boss geschlagen = Pokal und Aufstieg in die Klasse '+CLASSES[LV.k+1].n+'.'):'.')+(LV.dial?' Der Nitro Rail startet erst, wenn dein Vorsprung abgelaufen ist (etwa '+f1(Math.max(0,est-4.7))+' s).':'')+' Verlierst du, passiert nichts.</div>')+warn+
-      '<button type="button" class="shelp" id="serHelp">So geht die Karriere</button>';
-    $('serHelp').onclick=function(){serIntro(false);};
+      '<div class="sq">'+ch.quote+'</div>'+
+      '<div class="sdl">'+dialTxt(ch)+'</div>'+
+      (dn?'<div class="s4">Medaillen für '+CL.n+': Bronze '+f1(CL.med[0])+' s, Silber '+f1(CL.med[1])+' s, Gold '+f1(CL.med[2])+' s.'+(SAVE.mb[LV.k]!=null?' Deine Bestzeit: '+f1(SAVE.mb[LV.k])+' s.':'')+'</div>'
+        :'<div class="s4">'+(LV.dial?'Sieg: Du bist Meister!':(LV.boss?'Sieg: Pokal, Aufstieg und '+(lvOf(id)<maxLv(id)?LVN[lvOf(id)+1]:'Ruhm')+' für deinen '+shortName(SPECS[pIdx]):(rw?'Sieg: Der '+shortName(rw)+' kommt in deine Garage':'Sieg: Punkte für dein Auto')))+'.</div>');
     sc.querySelectorAll('[data-mk]').forEach(function(b){b.onclick=function(){SAVE.mk=+b.getAttribute('data-mk');saveSave();reset();};});
   }
   $('recap').innerHTML='<b>'+shortName(SPECS[pIdx])+'</b> · '+(sw?sw.n+' '+sw.sub:'Serienmotor')+(ser?' · '+LVN[lvOf(id)]:(tuneSel.p?' · Stage '+Math.min(tuneSel.p,upStage(id)):''))+(ser?'':' · gegen '+shortName(SPECS[oIdx])+(oIdx===pIdx&&typeof TWIN!=='undefined'?' ('+(TWIN[SPECS[oIdx].id]||[0,'blau'])[1]+')':''));
   $('oppBtn').textContent='Gegner: '+shortName(SPECS[oIdx])+(oIdx===pIdx&&typeof TWIN!=='undefined'?' ('+(TWIN[SPECS[oIdx].id]||[0,'blau'])[1]+')':'')+' ›';
   var wd=(WX.wet?'Nass: weniger Grip, Slick kaum fahrbar, Bremsen blockieren.':(WX.n==='Kalt'?'Kalt: weniger Grip, Slick leidet, dichte Luft gibt Leistung.':'Trocken: beste Bedingungen.')),
-    th=(HM.first?'<div class="first">Dein erstes Rennen: Unterwegs zeigen wir dir jeden Schritt.</div>':'')+
-    '<button type="button" class="wxb" id="wxBtn" aria-expanded="false"><span class="wi" aria-hidden="true">'+(WX.wet?'☂':(WX.n==='Kalt'?'❄':'☀'))+'</span>'+WX.n+' · '+WX.t+' °C<span class="wm">Mehr</span></button>'+
-    '<div class="wxd" id="wxD" hidden><p>'+wd+'</p>'+(ser?'<p>'+ch.who+': '+ch.tip+'</p>':'')+'<p>'+AIDD[AID]+'</p>'+(player&&player.autoBrake?'':'<p>Nach dem Ziel selbst bremsen, sonst Crash!</p>')+'</div>';
+    th=(HM.first?'<div class="first">Dein erstes Rennen: Unterwegs zeigen wir dir jeden Schritt.</div>':'');
   $('tHint').innerHTML=th;
-  $('wxBtn').onclick=function(){var d=$('wxD');d.hidden=!d.hidden;this.setAttribute('aria-expanded',d.hidden?'false':'true');this.querySelector('.wm').textContent=d.hidden?'Mehr':'Weniger';};
+  /* Version 95: Wetter, Gegner-Tipp und Fahrhilfen hinter „Mehr“ */
+  $('moreTx').innerHTML='<p><span aria-hidden="true">'+(WX.wet?'☂':(WX.n==='Kalt'?'❄':'☀'))+'</span> '+WX.n+' · '+WX.t+' °C. '+wd+'</p>'+(ser?'<p>'+ch.who+': '+ch.tip+'</p>':'')+'<p>'+AIDD[AID]+'</p>'+(player&&player.autoBrake?'':'<p>Nach dem Ziel selbst bremsen, sonst Crash!</p>');
+  $('ladBtn').hidden=!ser;$('recap').style.display=ser?'none':'';
   $('aidBtn').textContent='Fahrhilfen: '+AIDN[AID];
 }
 /* Fahrhilfen (Version 50): 0 aus, 1 schalten ohne Gas weg + bremst selbst, 2 zusätzlich Automatik */
 var AIDN=['Aus','Etwas','Viel'],AID=0;
 var AIDD=['Fahrhilfen aus: Vor dem Schalten Gas loslassen.','Fahrhilfen etwas: Schalten ohne Gas loslassen, das Auto bremst nach dem Ziel von allein.','Fahrhilfen viel: Das Auto schaltet und bremst von allein. Du gibst Gas und startest.'];
 try{AID=Math.max(0,Math.min(2,parseInt(localStorage.getItem('s402aid')||'0',10)||0));}catch(e){}
-$('aidBtn').onclick=function(){if(state!=='ready')return;AID=(AID+1)%3;try{localStorage.setItem('s402aid',String(AID));}catch(e){}reset();var d=$('wxD');if(d){d.hidden=false;$('wxBtn').setAttribute('aria-expanded','true');$('wxBtn').querySelector('.wm').textContent='Weniger';}};
+$('aidBtn').onclick=function(){if(state!=='ready')return;AID=(AID+1)%3;try{localStorage.setItem('s402aid',String(AID));}catch(e){}reset();};
+$('moreBtn').onclick=function(){var d=$('more');d.hidden=!d.hidden;this.setAttribute('aria-expanded',d.hidden?'false':'true');this.textContent=d.hidden?'Mehr':'Weniger';};
+$('ladBtn').onclick=function(){ladShow();};
 function tuneTap(r,v){
   var key=['g','t','p','s'][r],id=SPECS[pIdx].id;mMsg='';
   if(r===2&&v>upStage(id)){
@@ -3383,11 +3423,12 @@ function start(){
   if(state!=='ready')return;
   state='run';startT=T;
   var roll=T+3.8,arrive=roll+2.8,a=arrive+1.4+Math.random()*0.8;
-  seq={roll:roll,arrive:arrive,pre:arrive+0.3,stg:arrive+0.9,a1:a,a2:a+0.5,a3:a+1.0,g:a+1.5};
-  var Q=opp.quirk;
-  opp.dial=Q.dial?Math.max(0,estET(player.id)-4.7):0;
-  opp.launchAt=opp.dial+(opp.willFoul?seq.g-(0.06+Math.random()*0.14):seq.g+Q.rt[0]+Math.random()*(Q.rt[1]-Q.rt[0]));
-  opp.rt=opp.launchAt-seq.g-opp.dial;
+  var Q=opp.quirk,Dd=(mode==='series'&&!PRAC&&!EMB)?dialOf(carOpp()):0,pd=Dd<0?-Dd:0,od=Dd>0?Dd:0;
+  /* Version 95: jede Spur hat ihre eigene Ampel; das langsamere Auto bekommt zuerst Grün */
+  seq={roll:roll,arrive:arrive,pre:arrive+0.3,stg:arrive+0.9,a1:a+pd,a2:a+0.5+pd,a3:a+1.0+pd,g:a+1.5+pd,o:{a1:a+od,a2:a+0.5+od,a3:a+1.0+od,g:a+1.5+od}};
+  opp.dial=Dd;
+  opp.launchAt=opp.willFoul?seq.o.g-(0.06+Math.random()*0.14):seq.o.g+Q.rt[0]+Math.random()*(Q.rt[1]-Q.rt[0]);
+  opp.rt=opp.launchAt-seq.o.g;
   ghostUse=GH[ghKey()]||null;ghostRec=[];
   opp.bluffT=[];var bw=seq.a1-0.45-(seq.arrive+0.4);if(bw>0.35){opp.bluffT.push(seq.arrive+0.4+Math.random()*Math.max(0,bw-0.3));if(bw>1.0)opp.bluffT.push(opp.bluffT[0]+0.45+Math.random()*Math.max(0,bw-0.9));}
   sheetEl.hidden=true;$('menu').hidden=true;hudEl.hidden=false;gasLvl=0;
@@ -3433,14 +3474,14 @@ function torque(c,r){
 function fwheel(c,g,r){return torque(c,r)*c.eff*c.gr[g]*c.fd/RW;}
 function engInit(c){
   var e=c.eng||ENG[c.id],i,r,q,lo=null,hi=null;
-  var tn=c.tune||(c.tune={g:1,t:0,p:0}),pm=[1,1.09,1.18][tn.p];
+  var tn=c.tune||(c.tune={g:1,t:0,p:0}),lf=lvF(c.id,tn.p,c.swap),pm=[1,1.09,1.18][tn.p]*lf;
   c.e=e;c.gr=e.gr;c.fd=e.fd*[1.16,1,0.87][tn.g];c.ng=e.gr.length;c.slick=tn.t===1;
   var Tp=Math.min(c.kw*9549/e.rP,c.nm);
   c.pts=[[e.idle,(e.f0||0.55)*c.nm*pm],[e.rT,c.nm*pm],[e.rP,Tp*pm],[e.red,0.68*Tp*pm]];
   /* Version 86: Elektromotor: volles Drehmoment ab Stand bis zur Eckdrehzahl, danach konstante Leistung */
   c.ev=!!e.ev;
   if(c.ev){var rb=c.kw*9549/c.nm;c.pts=[[0,c.nm*pm],[rb,c.nm*pm]];for(r=rb*1.25;r<e.red;r*=1.25)c.pts.push([r,c.kw*9549/r*pm]);c.pts.push([e.red,c.kw*9549/e.red*pm]);}
-  c.Ftr=MU*c.m*G*c.trac;
+  c.Ftr=MU*c.m*G*c.trac*(lf>1?1+(lf-1)*0.7:1);
   /* Startzone: Raddrehmoment im 1. Gang nahe der Haftgrenze */
   for(r=e.idle+400;r<=e.rP;r+=50){
     q=fwheel(c,0,r)/c.Ftr;
@@ -4034,7 +4075,16 @@ function raceNo(i){var n=0;for(var j=0;j<=i;j++)if(CAREER[j].k===CAREER[i].k)n++
 function carOpp(){var L=curRace(),a={};for(var k in CHARS[L.ch])a[k]=CHARS[L.ch][k];a.car=L.car;a.up=L.up||0;a.sw=L.sw||0;a.k=L.k;a.dial=!!L.dial;
   if(L.k>=3){a.pw=Math.max(a.pw,1);a.foulP=a.foulP*0.5;}return a;}
 /* Bestzeit des Spielers mit diesem Auto (sonst Serienzeit), für Warnung und Bracket-Vorsprung */
-function estET(id){var b=null;for(var k in GH)if(k.indexOf(id)===0&&/^[sdw0-9]*$/.test(k.slice(id.length))&&GH[k]&&GH[k].et&&(b==null||GH[k].et<b))b=GH[k].et;return b!=null?b:parseFloat(String(GET[id]||'15').replace(',','.'));}
+/* Version 95: Zeit je Auto und Tuning-Stufe, vom Testfahrer gemessen (perfekte Fahrt); geschätzt wird mit 4,5 % Aufschlag für eine normale Fahrt */
+var ETL={"911":[13.16,12.2,11.1,10.13,9.13],"testarossa":[12.91,11.9,11.04,10.06,9.12],"countach":[12.37,11.52,10.77,9.91,9.12],"skyline":[15.69,14.11,12.41,10.76,9.12],"challenger":[10.53,10.14,9.76,9.55,9.13],"vento":[10.29,9.96,9.71,9.42,9.11],"voltaris":[11.28,10.77,10.2,9.62,9.05],"brixton":[15.97,14.29,12.57,10.78,9.11],"dragster":[4.61,4.49,4.49],"sarthe":[9.64,9.38,9.25,9.03,8.85],"chronos":[12.01,11.17,10.48,9.76,9],"kitt":[10.62,10.08,9.49,9,8.42],"f89":[8.65,8.33,7.89,7.64,7.22],"munja":[8.7,8.41,8.24,8,7.82],"tempest":[8.25,7.95,7.69,7.43,7.19]};
+function lvEst(id,l){var t=ETL[id];if(!t)return parseFloat(String(GET[id]||'15').replace(',','.'));return t[Math.max(0,Math.min(l|0,t.length-1))]*1.045;}
+/* Version 95: Schätzung = eigene Bestzeit mit diesem Auto, aber höchstens die Zeit der aktuellen Tuning-Stufe (vorher fiel sie auf die Serienzeit zurück) */
+function estET(id){var b=null;for(var k in GH)if(k.indexOf(id)===0&&/^[sdw0-9]*$/.test(k.slice(id.length))&&GH[k]&&GH[k].et&&(b==null||GH[k].et<b))b=GH[k].et;var e=lvEst(id,lvOf(id));return b!=null?Math.min(b,e):e;}
+function oppEst(ch){return lvEst(ch.car,ch.sw?2+ch.sw:Math.min(2,ch.up||0));}
+/* Version 95: Vorsprung-Start in jedem Karriere-Rennen. Positiv = der Gegner wartet, negativ = du wartest. 80 % des Unterschieds, im Finale der volle */
+function dialOf(ch){if(!ch||!ch.car)return 0;var d=estET(SPECS[pIdx].id)-oppEst(ch);d*=ch.dial?1:0.8;return Math.max(-6,Math.min(6,d));}
+function dialTxt(ch){var d=dialOf(ch),on=shortName(SPECS[carIdx(ch.car)]);if(Math.abs(d)<0.05)return 'Ihr startet gleichzeitig.';
+  return d>0?'Du startest <b>'+f1(d)+' s</b> vor dem '+on+'.':'Der '+on+' startet <b>'+f1(-d)+' s</b> vor dir.';}
 function medalOf(k,et){var m=CLASSES[k].med;if(!m||et==null)return -1;return et<=m[2]?2:(et<=m[1]?1:(et<=m[0]?0:-1));}
 var MEDN=['Bronze','Silber','Gold'];
 function medCount(){var n=0;for(var k=0;k<5;k++)if(SAVE.mb[k]!=null&&medalOf(k,SAVE.mb[k])>=0)n++;return n;}
@@ -4063,7 +4113,7 @@ function gainXp(id,n){if(!SAVE.xp)SAVE.xp={};var l=lvOf(id);if(l>=maxLv(id))retu
   if(SAVE.xp[id]>=LVNEED[l]){SAVE.xp[id]-=LVNEED[l];SAVE.lv[id]=l+1;if(l+1>=maxLv(id))SAVE.xp[id]=0;return l+1;}return -1;}
 function xpLeft(id){var l=lvOf(id);return l>=maxLv(id)?0:LVNEED[l]-((SAVE.xp||{})[id]||0);}
 function xpBar(id){var l=lvOf(id);if(l>=maxLv(id))return 1;return ((SAVE.xp||{})[id]||0)/LVNEED[l];}
-function xpText(id){var l=lvOf(id),n=xpLeft(id);if(l>=maxLv(id))return 'Voll getunt';var w=Math.ceil(n/2);return 'Noch '+(w===1?'1 Sieg':w+' Siege')+' bis '+LVN[l+1];}
+function xpText(id){var l=lvOf(id),n=xpLeft(id);if(l>=maxLv(id))return 'Voll getunt';var w=Math.ceil(n/2);return LVN[l+1]+': Boss schlagen oder noch '+(w===1?'1 Sieg':w+' Siege');}
 var BO=14,brakeTouch=false,kSpace=false,shakeUntil=0,gasLvl=0,liftT=-9,kUp=false,kDown=false;
 function smooth(u){u=Math.max(0,Math.min(1,u));return u*u*(3-2*u);}
 function preStep(c,dt){
@@ -4120,7 +4170,7 @@ function simStep(dt){
   if(player.launched)player.thrIn=(T-player.launchT<0.4)?1:gasLvl;
   player.brakeIn=brakeTouch||kDown||kSpace||(player.autoBrake&&player.over);
   if(state==='ready')return;
-  if(!opp.launched&&T>=opp.launchAt){if(opp.willFoul)opp.foul=true;opp.rt=T-seq.g-(opp.dial||0);launch(opp);}
+  if(!opp.launched&&T>=opp.launchAt){if(opp.willFoul)opp.foul=true;opp.rt=T-(seq.o?seq.o.g:seq.g);launch(opp);}
   if(!player.launched)preStep(player,dt);
   if(!opp.launched)preStep(opp,dt);
   if(opp.launched&&opp.shiftT<=0&&opp.gear<opp.ng-1&&!opp.over&&opp.er>=opp.aiShift[opp.gear]&&(!opp.quirk.late||opp.limT>opp.quirk.late))doShift(opp);
@@ -4195,7 +4245,9 @@ function finish(){
     }else if(won){
       var upL=gainXp(player.id,2);st='Sieg! ';
       if(!owned(L.car)){SAVE.garage.push(L.car);st+='Der '+shortName(SPECS[carIdx(L.car)])+' von '+opp.who+' gehört jetzt dir! ';}
-      if(L.boss){SAVE.trophies++;st+=L.dial?'POKAL! ':'POKAL! Aufstieg in die Klasse '+CLASSES[L.k+1].n+'. ';}
+      if(L.boss){SAVE.trophies++;st+=L.dial?'POKAL! ':'POKAL! Aufstieg in die Klasse '+CLASSES[L.k+1].n+'. ';
+        /* Version 95: jeder geschlagene Boss bringt dem gefahrenen Auto die nächste Tuning-Stufe */
+        var bl=lvOf(player.id);if(!L.dial&&bl<maxLv(player.id)){SAVE.lv[player.id]=bl+1;SAVE.xp[player.id]=0;upL=bl+1;st+='Dein '+shortName(SPECS[carIdx(player.id)])+' bekommt '+LVN[bl+1]+'. ';}}
       SAVE.round=r0+1;btn=carDone()?'Weiter':(L.boss?'Nächste Klasse':'Nächstes Rennen');
       if(carDone()){st+='Karriere geschafft, du bist Meister! ';
         /* Version 94: zum Titel gibt es den Albion Tempest */
@@ -4987,13 +5039,15 @@ function drawTach(){
 }
 function drawTags(){
   cars.forEach(function(c){
-    var sx=X(c.x),sy=Y(c.y-c.L-0.35),me=c.isPlayer,w=me?46:76,h=me?26:22;
+    var sx=X(c.x),sy=Y(c.y-c.L-0.35),me=c.isPlayer,w=me?46:76,h=me?26:22,lb=me?'DU':'GEGNER';
+    /* Version 95: das Auto, das noch auf Grün wartet, zeigt die Restzeit */
+    if(state==='run'&&seq&&seq.o&&!c.launched&&!c.foul){var gm=me?seq.g:seq.o.g,go=me?seq.o.g:seq.g,wt=gm-T;if(wt>0.05&&T>=go){lb=(me?'DU ':'')+f1(wt)+' s';w=me?96:76;}}
     ctx.save();
     ctx.fillStyle=me?'#ffd23f':'rgba(235,240,250,.82)';
     ctx.beginPath();ctx.moveTo(sx-7,sy);ctx.lineTo(sx+7,sy);ctx.lineTo(sx,sy-8);ctx.closePath();ctx.fill();
     rr(ctx,sx-w/2,sy,w,h,h/2);ctx.fill();
     ctx.fillStyle='#14161c';ctx.font='700 '+(me?18:14)+'px '+FONT;ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(me?'DU':'GEGNER',sx,sy+h/2+1);
+    ctx.fillText(lb,sx,sy+h/2+1);
     ctx.restore();
   });
 }
@@ -5127,33 +5181,36 @@ function gLocked(i){return mode==='series'&&!owned(SPECS[i].id);}
 function garageRender(){
   gIdx=pIdx;
   var ser=mode==='series',n=SPECS.filter(function(s){return owned(s.id);}).length;
-  var h='<div class="gar"><div class="gar-ml"><span>'+(ser?'Karriere · <b>'+n+' von '+SPECS.length+' Autos</b> in deiner Garage':'Freies Rennen · <b>alle Autos offen</b>')+'</span><span id="garPos"></span></div>'+
-    '<div class="gar-rail" id="garRail" tabindex="0" aria-label="Autos: wischen oder Pfeiltasten">';
-  SPECS.forEach(function(s,i){var o=ownerOf(s.id);
+  /* Version 95: eigene Autos vorn, gesperrte hinten */
+  GORD=SPECS.map(function(s,i){return i;});if(ser)GORD=GORD.filter(function(i){return !gLocked(i);}).concat(GORD.filter(function(i){return gLocked(i);}));
+  var h='<div class="gar"><div class="gar-rail" id="garRail" tabindex="0" aria-label="Autos: wischen oder Pfeiltasten">';
+  GORD.forEach(function(i){var s=SPECS[i],o=ownerOf(s.id);
     h+='<div class="gar-sl'+(gLocked(i)?' lk':'')+(i%2?' mir':'')+'">'+GAR_DECO+'<div class="gar-bay" data-no="'+(i+1)+'"><canvas data-top="'+i+'" role="img" aria-label="'+shortName(s)+' von oben"></canvas><span class="gar-lock">'+(o?'Sieg gegen '+o.who:'Gesperrt')+'</span></div></div>';});
   h+='</div><div class="gar-info" id="garInfo"><div class="gar-br"><span class="gar-brand" id="garBrand"></span><span class="gar-own" id="garOwn"></span></div>'+
     '<div class="gar-mod"><h2 id="garName"></h2><div class="gar-et"><b id="garEt"></b><span>Viertelmeile Serie</span></div></div>'+
-    '<div class="gar-sub" id="garSub"></div><div class="gar-lv" id="garLv"></div><div class="gar-st" id="garSt"></div><div class="gar-leg" id="garLeg"><s></s>Strich = dein aktuelles Auto</div>'+
-    '<button type="button" class="gar-ws" id="garWs" data-act="ws">Werkstatt <span>Motor, Leistung, Reifen</span><em>›</em></button></div>'+
+    '<div class="gar-sub" id="garSub"></div><div class="gar-lv" id="garLv"></div>'+
+    '<div class="gar-hub"><button type="button" class="gar-ws" id="garWs" data-act="ws">Werkstatt</button><button type="button" class="gar-ws" id="garLad">Klassen</button></div></div>'+
     '<div class="gar-th" id="garTh" role="tablist" aria-label="Schnellwahl">';
-  SPECS.forEach(function(s,i){h+='<button type="button" role="tab" class="'+(gLocked(i)?'lk':'')+'" data-gi="'+i+'" aria-label="'+shortName(s)+(gLocked(i)?', gesperrt':'')+'"><canvas data-th="'+i+'"></canvas>'+(i===pIdx?'<span class="dot"></span>':'')+'</button>';});
+  GORD.forEach(function(i){var s=SPECS[i];h+='<button type="button" role="tab" class="'+(gLocked(i)?'lk':'')+'" data-gi="'+i+'" aria-label="'+shortName(s)+(gLocked(i)?', gesperrt':'')+'"><canvas data-th="'+i+'"></canvas>'+(i===pIdx?'<span class="dot"></span>':'')+'</button>';});
   h+='</div></div>';
   $('mbody').innerHTML=h;
   var rail=$('garRail'),k=Math.max(26,Math.min(52,((rail.clientHeight||300)-30)/5.45));
   rail.querySelectorAll('canvas[data-top]').forEach(function(c){drawTop(c,SPECS[+c.getAttribute('data-top')],k);});
   $('garTh').querySelectorAll('canvas[data-th]').forEach(function(c){drawTop(c,SPECS[+c.getAttribute('data-th')],8.4);});
   $('garTh').onclick=function(e){var b=e.target.closest('[data-gi]');if(b)garGo(+b.getAttribute('data-gi'),true);};
+  $('garLad').onclick=function(){ladShow();};
   var st;
-  rail.addEventListener('scroll',function(){clearTimeout(st);st=setTimeout(function(){var i=Math.round(rail.scrollLeft/Math.max(1,rail.clientWidth));if(i!==gIdx&&i>=0&&i<SPECS.length){gIdx=i;garInfo();}},60);});
-  rail.addEventListener('keydown',function(e){
-    if(e.key==='ArrowRight'&&gIdx<SPECS.length-1){garGo(gIdx+1,true);e.preventDefault();}
-    if(e.key==='ArrowLeft'&&gIdx>0){garGo(gIdx-1,true);e.preventDefault();}
+  rail.addEventListener('scroll',function(){clearTimeout(st);st=setTimeout(function(){var q=Math.round(rail.scrollLeft/Math.max(1,rail.clientWidth));if(q>=0&&q<GORD.length&&GORD[q]!==gIdx){gIdx=GORD[q];garInfo();}},60);});
+  rail.addEventListener('keydown',function(e){var q=GORD.indexOf(gIdx);
+    if(e.key==='ArrowRight'&&q<GORD.length-1){garGo(GORD[q+1],true);e.preventDefault();}
+    if(e.key==='ArrowLeft'&&q>0){garGo(GORD[q-1],true);e.preventDefault();}
   });
-  rail.scrollLeft=gIdx*rail.clientWidth;
-  requestAnimationFrame(function(){rail.scrollLeft=gIdx*rail.clientWidth;});
+  var q0=GORD.indexOf(gIdx);rail.scrollLeft=q0*rail.clientWidth;
+  requestAnimationFrame(function(){rail.scrollLeft=q0*rail.clientWidth;});
   garInfo();
 }
-function garGo(i,sm){var r=$('garRail');if(!r)return;gIdx=i;r.scrollTo({left:i*r.clientWidth,behavior:sm&&!reduceMo?'smooth':'auto'});garInfo();}
+var GORD=[];
+function garGo(i,sm){var r=$('garRail');if(!r)return;gIdx=i;var q=Math.max(0,GORD.indexOf(i));r.scrollTo({left:q*r.clientWidth,behavior:sm&&!reduceMo?'smooth':'auto'});garInfo();}
 function gb(l,v,mx,cv,t){var w=Math.max(4,Math.min(100,100*v/mx)),m=Math.max(0,Math.min(100,100*cv/mx));return '<div class="gb"><span>'+l+'</span><i><b style="width:'+w+'%"></b><s style="left:calc('+m+'% - 1px)"></s></i><em>'+t+'</em></div>';}
 function garInfo(){
   if(!$('garInfo'))return;
@@ -5161,24 +5218,21 @@ function garInfo(){
   $('garBrand').textContent=s.name.split(' ')[0];
   $('garName').textContent=shortName(s);
   $('garSub').textContent=s.sub;
-  $('garEt').textContent=(GET[s.id]||'–')+' s';
+  /* Version 95: Zeit mit der Tuning-Stufe, nicht mehr die Serienzeit */
+  var gl0=mode==='series'?lvOf(s.id):0;$('garEt').textContent=f1(lvEst(s.id,gl0))+' s';$('garEt').nextSibling.textContent=gl0?'Viertelmeile '+LVN[gl0]:'Viertelmeile Serie';
   var ow=$('garOwn');
   if(lk){ow.textContent=o?'Gewinne gegen '+o.who+' ('+o.k+')':'Gesperrt';ow.className='gar-own lk';}
   else{ow.textContent=gIdx===pIdx?'Dein Auto':(mode==='series'?'In deiner Garage':'Frei wählbar');ow.className='gar-own';}
   $('garInfo').className='gar-info'+(lk?' lk':'');
-  $('garSt').innerHTML=gb('Leistung',ps,1000,mps,ps+' PS')+gb('Drehmoment',s.nm,1300,me.nm,s.nm+' Nm')+gb('Leichtbau',2300-s.kg,1300,2300-me.kg,dots(s.kg)+' kg')+gb('Grip',s.trac,1.3,me.trac,Math.round(s.trac*100)+' %');
-  $('garLeg').style.visibility=gIdx===pIdx?'hidden':'visible';
-  $('garPos').textContent=(gIdx+1)+'/'+SPECS.length;
-  var ws=$('garWs');ws.hidden=lk||mode==='series';ws.innerHTML='Werkstatt <span>Motor, Leistung, Reifen</span><em>›</em>';
+  var ws=$('garWs');ws.hidden=lk||mode==='series';$('garLad').hidden=mode!=='series';
   var gl=$('garLv'),l=lvOf(s.id);gl.hidden=lk;gl.innerHTML='<span>Tuning: <b>'+LVN[l]+'</b></span><i><b style="width:'+Math.round(100*xpBar(s.id))+'%"></b></i><small>'+(mode==='series'?xpText(s.id):(l?'Aus der Karriere':'Upgrades gibt es in der Karriere'))+'</small>';
-  $('garLeg').style.display=gIdx===pIdx?'none':'block';
-  $('garTh').querySelectorAll('[data-gi]').forEach(function(b,i){b.setAttribute('aria-current',i===gIdx?'true':'false');});
+  $('garTh').querySelectorAll('[data-gi]').forEach(function(b){b.setAttribute('aria-current',+b.getAttribute('data-gi')===gIdx?'true':'false');});
   garageFoot();
 }
 function garageFoot(){
   var s=SPECS[gIdx],n=$('mNext');if(mstep!=='car')return;
   if(gLocked(gIdx)){var o=ownerOf(s.id);n.disabled=true;n.textContent=o?'Erst '+o.who+' schlagen':'Gesperrt';}
-  else{n.disabled=false;n.textContent='Weiter: Rennen ›';}
+  else{n.disabled=false;n.textContent='Fahren ›';}
 }
 function garagePick(){
   if(gLocked(gIdx))return;
@@ -5285,6 +5339,7 @@ function serIntro(first){
   var TRO='<svg class="trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8.5 20h7M9.5 17h5v3h-5z"/></svg>';
   function car(i,k,cls,lv){return '<canvas data-i="'+i+'" data-k="'+k+'"'+(lv!=null?' data-lv="'+lv+'"':'')+(cls?' class="'+cls+'"':'')+'></canvas>';}
   function close(){el.hidden=true;el.innerHTML='';try{localStorage.setItem('s402serIntro','1');}catch(e){}}
+  el.classList.remove('lad');
   function render(){
     var v='',t='',p='';
     if(st===0){
@@ -5292,10 +5347,10 @@ function serIntro(first){
       t='<em>Fünf Klassen</em>, dann das Finale';p='Jede Klasse hat drei Rennen: zwei Herausforderer, dann den Boss. Schlägst du den Boss, steigst du auf.';
     }else if(st===1){
       v='<div class="sx"><div class="sbox op">Gegner'+car(oi,24,'gone')+'</div><div class="sarr">›</div><div class="sbox me">Deine Garage'+car(oi,24,'come')+'</div></div>';
-      t='Gewinnst du, bekommst du <em>sein Auto</em>';p='Du kannst weiter dein Lieblingsauto fahren oder das gewonnene Auto nehmen.';
+      t='Gewinnst du, bekommst du <em>sein Auto</em>';p='Wechseln musst du nie: In jedem Rennen startet das langsamere Auto etwas früher.';
     }else if(st===2){
       v='<div class="sx"><div class="sbox me">Serie'+car(mi,22,'',0)+'</div><div class="sarr">›</div><div class="sbox op" style="border-color:rgba(255,210,63,.6);color:var(--accent)">Getunt'+car(mi,22,'',4)+'<span class="plus" style="background:rgba(255,210,63,.16);color:var(--accent)">+ PS</span></div></div>';
-      t='Jedes Rennen macht <em>dein Auto stärker</em>';p='Sieg 2 Punkte, Niederlage 1 Punkt. Ist der Balken voll, baut die Werkstatt das nächste Teil ein: erst Tuning, dann Motortausch, dann Drag-Umbau.';
+      t='Jedes Rennen macht <em>dein Auto stärker</em>';p='Jeder geschlagene Boss baut die nächste Stufe ein. Auch normale Rennen füllen den Balken: Sieg 2 Punkte, Niederlage 1.';
     }else{
       v=TRO;t='Boss geschlagen: <em>Pokal!</em>';p='Im Finale wartet der Nitro Rail, du bekommst Vorsprung. Danach jagst du in jeder Klasse Medaillen.';
     }
@@ -5310,6 +5365,20 @@ function serIntro(first){
     if($('siSkip'))$('siSkip').onclick=close;
   }
   el.hidden=false;render();
+}
+/* Version 95: Klassenleiter: wo du stehst, Bosse, Medaillen, Pokale */
+function ladShow(){
+  var el=$('serIntro'),r=SAVE.round,dn=carDone();
+  function cell(k){var B=bossOf(k),i0=-1,i1=-1;CAREER.forEach(function(L,i){if(L.k===k){if(i0<0)i0=i;i1=i;}});
+    var st=r>i1?'done':(r>=i0?'cur':''),m=k<5?medalOf(k,SAVE.mb[k]):-1,c=CLASSES[k];
+    return '<div class="'+(st==='cur'&&!dn?'cur':'')+(st==='done'?' dn':'')+'"><b>'+(st==='done'?'✓':(k<5?k+1:'F'))+'</b><span>'+c.n+'<small>'+(k<5?c.t+' · ':'')+'Boss: '+CHARS[B.ch].who+(st==='cur'&&!dn?' · Du bist hier':'')+(m>=0?' · '+MEDN[m]:'')+'</small></span><canvas data-i="'+carIdx(B.car)+'" data-k="9"></canvas></div>';}
+  el.innerHTML='<div class="lad-h"><h2>Klassen</h2><span>Pokale <b>'+SAVE.trophies+'</b>'+(dn?' · Medaillen <b>'+medCount()+'</b>/5':'')+'</span></div>'+
+    '<div class="sv"><div class="sl">'+CLASSES.map(function(c,k){return cell(k);}).join('')+'</div></div>'+
+    '<p class="lad-p">Jede Klasse hat drei Rennen, zuletzt den Boss. Das langsamere Auto startet früher. Jeder geschlagene Boss baut deinem Auto die nächste Stufe ein.'+(dn?' Medaillen gibt es für feste Zeiten.':'')+'</p>'+
+    '<button type="button" class="sbtn" id="ladOk">Zurück</button>';
+  el.querySelectorAll('canvas[data-i]').forEach(function(c){drawTop(c,SPECS[+c.getAttribute('data-i')],+c.getAttribute('data-k'),false);});
+  $('ladOk').onclick=function(){el.hidden=true;el.innerHTML='';el.classList.remove('lad');};
+  el.classList.add('lad');el.hidden=false;
 }
 $('hSeries').onclick=function(){startMode('series',this);};
 $('hFree').onclick=function(){startMode('free',this);};
@@ -5351,6 +5420,14 @@ function pracFinish(){
   $('again').onclick=function(){startPractice(false);};$('pracHome').onclick=pracEnd;
 }
 $('hDay').onclick=function(){setNight(!night);titleRender();};
+/* Version 95: Zahnrad mit Ton, Tageszeit, Fahrhilfen und Zurücksetzen */
+function hSetR(){$('hsSnd').innerHTML='Ton<b>'+(Snd.on?'An':'Aus')+'</b>';$('hsDay').innerHTML='Tageszeit<b>'+(night?'Nacht':'Tag')+'</b>';$('hsAid').innerHTML='Fahrhilfen<b>'+AIDN[AID]+'</b>';}
+$('hSet').onclick=function(){hSetR();$('hSetP').hidden=false;};
+$('hsOk').onclick=function(){$('hSetP').hidden=true;};
+$('hSetP').onclick=function(e){if(e.target===this)this.hidden=true;};
+$('hsSnd').onclick=function(){$('hSnd').click();hSetR();};
+$('hsDay').onclick=function(){$('hDay').click();hSetR();};
+$('hsAid').onclick=function(){AID=(AID+1)%3;try{localStorage.setItem('s402aid',String(AID));}catch(e){}hSetR();};
 $('hSnd').onclick=function(){$('bSnd').click();titleRender();if(Snd.on)hmIdle();};
 
 /* ---------- Splash ---------- */
