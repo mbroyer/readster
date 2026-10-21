@@ -55,6 +55,11 @@ button:focus-visible{outline:2px solid #fff;outline-offset:2px}
 
 .msg{position:absolute;left:50%;bottom:226px;transform:translateX(-50%);max-width:calc(100% - 32px);padding:6px 14px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font:600 14px/1.2 var(--f-display);letter-spacing:.06em;text-transform:uppercase;text-align:center;white-space:nowrap}
 .msg:empty{display:none}
+.bob{position:absolute;top:150px;left:16px;padding:6px 10px;border-radius:10px;background:var(--panel);border:1px solid var(--line);font:600 13px/1.5 var(--f-display);letter-spacing:.04em;text-transform:uppercase;z-index:5}
+.bob i{display:inline-block;width:9px;height:9px;border-radius:50%;border:1.5px solid #ffd23f;margin-left:5px;vertical-align:-1px}.bob i.on{background:#ffd23f}
+.bob.pink{border-color:#ff7aa8;color:#ff9cc0}
+.stake.pink{border-color:rgba(255,122,168,.5)!important;background:rgba(255,122,168,.1)!important}
+.rk{display:block;width:100%;margin:0 0 8px;padding:10px 12px;border-radius:12px;background:rgba(255,122,168,.14);border:1px solid rgba(255,122,168,.5);color:#ffd0e0;font:600 14px/1.3 var(--f-display);text-align:left;cursor:pointer}
 #pf{position:absolute;left:0;right:0;top:34%;text-align:center;pointer-events:none;z-index:6;animation:pf .5s ease-out}#pf[hidden]{display:none}
 #pf b{display:inline-block;padding:8px 18px;border:3px solid #fff;background:rgba(10,12,18,.72);color:#fff;font:700 30px var(--f-display);letter-spacing:.2em;text-transform:uppercase}
 #pf span{display:block;margin-top:8px;font:700 18px var(--f-mono);color:#ffd23f;text-shadow:0 1px 6px #000}
@@ -663,6 +668,7 @@ html,body{touch-action:manipulation}
 
   <div class="tree" id="tree" aria-hidden="true"></div>
   <div class="msg" id="msg" role="status" aria-live="polite"></div>
+  <div class="bob" id="boBar" hidden></div>
   <div id="flash"></div><div id="pf" hidden></div>
 
   <div class="hud" id="hud" hidden>
@@ -3608,15 +3614,15 @@ function renderSheet(){
   $('freeRow').style.display=ser?'none':'grid';if($('bkSetup'))$('bkSetup').style.display=ser?'none':'';
   var sc=$('serCard');sc.style.display=ser?'block':'none';
   if(ser){
-    var LV=curRace(),CL=CLASSES[LV.k],dn=carDone(),rw=!dn&&!owned(LV.car)?SPECS[carIdx(LV.car)]:null,
+    var SP=spRace(),LV=SP||curRace(),CL=CLASSES[LV.k],dn=carDone()&&!SP,bq=boNow(),rw=!dn&&!owned(LV.car)?SPECS[carIdx(LV.car)]:null,
       mh=dn?'<div class="smed">'+CLASSES.slice(0,5).map(function(c,k){var m=medalOf(k,SAVE.mb[k]);return '<button type="button" data-mk="'+k+'" class="'+(k===LV.k?'on':'')+'">'+c.n+'<small>'+(m>=0?MEDN[m]:'–')+'</small></button>';}).join('')+'</div>':'';
     /* Version 95: Rennkarte nur noch Klasse, Gegner, Vorsprung, Preis */
-    sc.innerHTML='<div class="s1"><span>'+(dn?'Meister · Medaillenjagd · '+CL.n:(LV.dial?'Finale · Top Fuel':'Klasse '+(LV.k+1)+' · '+CL.n+' · '+(LV.boss?'Boss':'Rennen '+raceNo(carLvl())+' von 3')))+'</span></div>'+mh+
+    sc.innerHTML='<div class="s1"><span>'+(SP?(SAVE.sp.t==='pink'?'Pink Slip':'Rückkampf')+' · '+CL.n:(dn?'Meister · Medaillenjagd · '+CL.n:(LV.dial?'Finale · Top Fuel · Best of 3':'Klasse '+(LV.k+1)+' · '+CL.n+' · '+(LV.boss?'Boss · Best of 3':'Rennen '+raceNo(carLvl())+' von 3'))))+(LV.boss&&!SP&&!dn&&bq?' · '+bq.p+':'+bq.o:'')+'</span></div>'+mh+
       '<div class="s2">'+ch.who+'<small>'+shortName(SPECS[carIdx(ch.car)])+(ch.sw?' · '+LVN[2+ch.sw]:(ch.up?' · '+LVN[ch.up]:''))+'</small></div>'+
       '<div class="sq">'+ch.quote+'</div>'+
       '<div class="sdl">'+dialTxt(ch)+'</div>'+
       (dn?'<div class="s4">Medaillen für '+CL.n+': Bronze '+f1(CL.med[0])+' s, Silber '+f1(CL.med[1])+' s, Gold '+f1(CL.med[2])+' s.'+(SAVE.mb[LV.k]!=null?' Deine Bestzeit: '+f1(SAVE.mb[LV.k])+' s.':'')+'</div>'
-        :'<div class="s4">'+(LV.dial?'Sieg: Du bist Meister!':(LV.boss?'Sieg: Pokal, Aufstieg und '+(lvOf(id)<maxLv(id)?LVN[lvOf(id)+1]:'Ruhm')+' für deinen '+shortName(SPECS[pIdx]):(rw?'Sieg: Der '+shortName(rw)+' kommt in deine Garage':'Sieg: Punkte für dein Auto')))+'.</div>');
+        :'<div class="s4">'+(SP?(SAVE.sp.t==='pink'?(SAVE.garage.indexOf(LV.car)<0?'Sieg: Der '+shortName(SPECS[carIdx(LV.car)])+' gehört dir':'Sieg: ein Pokal-Aufkleber')+'. Niederlage: Dein '+shortName(SPECS[pIdx])+' geht an '+ch.who:'Sieg: Dein '+shortName(SPECS[carIdx(SAVE.sp.car)])+' kommt zurück'):LV.dial?'Sieg: Du bist Meister!':(LV.boss?'Sieg: Pokal, Aufstieg und '+(lvOf(id)<maxLv(id)?LVN[lvOf(id)+1]:'Ruhm')+' für deinen '+shortName(SPECS[pIdx]):(rw?'Sieg: Der '+shortName(rw)+' kommt in deine Garage':'Sieg: Punkte für dein Auto')))+'.</div>');
     sc.querySelectorAll('[data-mk]').forEach(function(b){b.onclick=function(){SAVE.mk=+b.getAttribute('data-mk');saveSave();reset();};});
   }
   $('recap').innerHTML='<b>'+shortName(SPECS[pIdx])+'</b> · '+(sw?sw.n+' '+sw.sub:'Serienmotor')+(ser?' · '+LVN[lvOf(id)]:(tuneSel.p?' · Stage '+Math.min(tuneSel.p,upStage(id)):''))+(ser?'':' · gegen '+shortName(SPECS[oIdx])+(oIdx===pIdx&&typeof TWIN!=='undefined'?' ('+(TWIN[SPECS[oIdx].id]||[0,'blau'])[1]+')':''));
@@ -3672,7 +3678,7 @@ $('bkSetup').onclick=function(){if(state==='ready')showStep('setup');};
 var TWIN={'911':['#2a5fc4','blau'],'testarossa':['#2a5fc4','blau'],'countach':['#e4e7ea','weiß'],'skyline':['#c8161d','rot'],'challenger':['#2a5fc4','blau'],'vento':['#c8161d','rot'],'voltaris':['#1d1f24','schwarz'],'brixton':['#2f6b3a','grün'],'sarthe':['#2a5fc4','blau'],'chronos':['#1d1f24','schwarz'],'dragster':['#2a5fc4','blau'],'kitt':['#c8161d','rot'],'f89':['#2a5fc4','blau'],'munja':['#e4e7ea','weiß'],'tempest':['#e8742a','orange'],'excalibur':['#9fb4d8','silber'],'rennsau':['#b9a06a','schlammbraun']};
 function twinColor(c){var t=TWIN[c.id]||['#2a5fc4','blau'],sh=CarLab.shade;c.lab=Object.assign({},c.lab,{body:t[0],roof:sh(t[0],0.12),dark:sh(t[0],-0.45)});c.body=t[0];c.twin=t[1];}
 function reset(){
-  if(mode==='series'){oIdx=carIdx(carOpp().car);if(!owned(SPECS[pIdx].id))pIdx=carIdx(SAVE.garage[0]);}
+  if(mode==='series'){oIdx=carIdx(carOpp().car);if(!owned(SPECS[pIdx].id))pIdx=carIdx(SAVE.garage.filter(owned)[0]||'skyline');}
   applyLv();
   if(tuneSel.p>upStage(SPECS[pIdx].id))tuneSel.p=upStage(SPECS[pIdx].id);
   if(tuneSel.s>0&&!swOwned(SPECS[pIdx].id,tuneSel.s))tuneSel.s=0;
@@ -3683,7 +3689,7 @@ function reset(){
   if(oIdx===pIdx)twinColor(opp);
   pickWx();if(mode==='series'&&!EMB&&WX.wet&&player.slick){player.slick=false;player.tune.t=0;}cars=[player,opp];parts.length=0;
   Snd.brake(false,0);state='ready';seq=null;endAt=0;camY=0;camOff=0;gasLvl=0;fbT=-9;brakeTouch=false;kSpace=false;shakeUntil=0;Snd.end();
-  slipEl.hidden=true;hudEl.hidden=true;$('abortBtn').hidden=true;
+  slipEl.hidden=true;hudEl.hidden=true;$('abortBtn').hidden=true;$('boBar').hidden=true;
   spdEl.textContent='0';etEl.textContent='0,000';
   ghostUse=GH[ghKey()]||null;ghostRec=[];slow=1;$('pf').hidden=true;
   wxInfo();showStep(mstep);setTree();setMsg('');
@@ -3702,6 +3708,11 @@ function start(){
   ghostUse=GH[ghKey()]||null;ghostRec=[];
   opp.bluffT=[];var bw=seq.a1-0.45-(seq.arrive+0.4);if(bw>0.35){opp.bluffT.push(seq.arrive+0.4+Math.random()*Math.max(0,bw-0.3));if(bw>1.0)opp.bluffT.push(opp.bluffT[0]+0.45+Math.random()*Math.max(0,bw-0.9));}
   sheetEl.hidden=true;$('menu').hidden=true;hudEl.hidden=false;gasLvl=0;
+  /* Version 97: Stand im Boss-Duell oder Pink Slip über der Strecke */
+  (function bob(){var bb=$('boBar'),ser=mode==='series'&&!PRAC&&!EMB;bb.className='bob';bb.hidden=true;if(!ser)return;
+    function lp(n){return '<i class="'+(n>0?'on':'')+'"></i><i class="'+(n>1?'on':'')+'"></i>';}
+    if(SAVE.sp){bb.className='bob pink';bb.textContent=SAVE.sp.t==='pink'?'Pink Slip':'Rückkampf';bb.hidden=false;return;}
+    if(!carDone()&&curRace().boss){var q=boNow()||{p:0,o:0};bb.innerHTML='Du'+lp(q.p)+'<br>'+opp.who.split(' ').pop()+lp(q.o);bb.hidden=false;}})();
   Snd.begin(player,(PRAC||(EMB&&EMB.prac))?null:opp);
   /* Erstes Rennen der Vollversion: Mitmach-Anleitung wie in Readster, nur Text, Gegner bleibt dabei */
   /* Übungsfahrt (Training, Version 51): allein auf der Strecke, Gegner bleibt in der Box */
@@ -4368,15 +4379,27 @@ if(!SAVE.xp)SAVE.xp={};
 /* alte Spielstände (10 Stufen) auf Klassen umrechnen, Autos und Teile bleiben */
 if(SAVE.cv!==2){SAVE.round=[0,1,3,4,6,7,9,10,12,13,16][Math.max(0,Math.min(10,SAVE.round|0))];SAVE.cv=2;}
 if(!(SAVE.round>=0&&SAVE.round<=CAREER.length))SAVE.round=0;
-CAREER.forEach(function(L,i){if(SAVE.round>i&&SAVE.garage.indexOf(L.car)<0)SAVE.garage.push(L.car);});
+/* Version 97: Boss-Autos gibt es nur noch per Pink Slip (das Finale gibt den Nitro Rail weiter). SAVE.lost = an einen Boss verlorene Autos, SAVE.sp = Pink Slip oder Rückkampf, SAVE.bo = Stand im Boss-Duell */
+CAREER.forEach(function(L,i){if(SAVE.round>i&&(!L.boss||L.dial)&&SAVE.garage.indexOf(L.car)<0)SAVE.garage.push(L.car);});
+if(!SAVE.lost)SAVE.lost={};
 function carLvl(){return Math.min(SAVE.round,CAREER.length-1);}
 function carDone(){return SAVE.round>=CAREER.length;}
-if(carDone()&&!owned('tempest'))SAVE.garage.push('tempest');if(carDone()&&!owned('excalibur'))SAVE.garage.push('excalibur');
+if(carDone()&&SAVE.garage.indexOf('tempest')<0)SAVE.garage.push('tempest');if(carDone()&&SAVE.garage.indexOf('excalibur')<0)SAVE.garage.push('excalibur');
 function bossOf(k){for(var i=0;i<CAREER.length;i++)if(CAREER[i].k===k&&CAREER[i].boss)return CAREER[i];return CAREER[0];}
 function curRace(){return carDone()?bossOf(SAVE.mk||0):CAREER[carLvl()];}
 function raceNo(i){var n=0;for(var j=0;j<=i;j++)if(CAREER[j].k===CAREER[i].k)n++;return n;}
-function carOpp(){var L=curRace(),a={};for(var k in CHARS[L.ch])a[k]=CHARS[L.ch][k];a.car=L.car;a.up=L.up||0;a.sw=L.sw||0;a.k=L.k;a.dial=!!L.dial;
-  if(L.k>=3){a.pw=Math.max(a.pw,1);a.foulP=a.foulP*0.5;}return a;}
+/* Version 97: Schwierigkeit je Klasse (karriere/KONZEPT_karriere_spannend.md). Der Vorsprung gleicht den Unterschied der Autos aus, abzüglich DIALM Sekunden, die du selbst herausfahren musst (mit dem Testfahrer eingestellt).
+   ERRF = wie viel von den Fehlern der Gegner übrig bleibt (Bosse × 0,7) */
+var DIALM=[-0.15,0.1,0.2,0,0],ERRF=[1,0.8,0.6,0.45,0.3];
+function errApply(a,f){var q=0.5+0.5*f;a.rt=[Math.max(0.04,a.rt[0]*q),Math.max(0.06,a.rt[1]*q)];a.u=[0.5+(a.u[0]-0.5)*f,0.5+(a.u[1]-0.5)*f];
+  a.sn=a.sn*f;a.sb=a.sb+(0.65-a.sb)*(1-f);a.foulP=a.foulP*f;if(a.late)a.late=a.late*f;a.pw=1-(1-a.pw)*f;}
+function spRace(){var s=SAVE.sp;return s&&CAREER[s.r]?CAREER[s.r]:null;}
+function boNow(){return SAVE.bo&&SAVE.bo.r===SAVE.round?SAVE.bo:null;}
+function boRun(w){if(!boNow())SAVE.bo={r:SAVE.round,p:0,o:0};if(w)SAVE.bo.p++;else SAVE.bo.o++;return SAVE.bo;}
+function pinkOk(){return SAVE.garage.filter(owned).length>=2;}
+function carOpp(){var S0=spRace(),L=S0||curRace(),a={};for(var k in CHARS[L.ch])a[k]=CHARS[L.ch][k];a.car=L.car;a.up=L.up||0;a.sw=L.sw||0;a.k=L.k;a.dial=!!L.dial&&!S0;a.boss=!!L.boss;a.hu=!!S0;
+  if(L.k<5&&(S0||!carDone())){errApply(a,ERRF[L.k]*(L.boss?0.7:1));if(L.boss&&a.tjP)a.tjP=1;}
+  else if(L.k>=3){a.pw=Math.max(a.pw,1);a.foulP=a.foulP*0.5;}return a;}
 /* Bestzeit des Spielers mit diesem Auto (sonst Serienzeit), für Warnung und Bracket-Vorsprung */
 /* Version 95: Zeit je Auto und Tuning-Stufe, vom Testfahrer gemessen (perfekte Fahrt); geschätzt wird mit 4,5 % Aufschlag für eine normale Fahrt */
 var ETL={excalibur:[5.81,5.56,5.56],rennsau:[9.43,9.06,8.72,8.47,8.12],"911":[13.16,12.2,11.1,10.13,9.13],"testarossa":[12.91,11.9,11.04,10.06,9.12],"countach":[12.37,11.52,10.77,9.91,9.12],"skyline":[15.69,14.11,12.41,10.76,9.12],"challenger":[10.53,10.14,9.76,9.55,9.13],"vento":[10.29,9.96,9.71,9.42,9.11],"voltaris":[11.28,10.77,10.2,9.62,9.05],"brixton":[15.97,14.29,12.57,10.78,9.11],"dragster":[4.61,4.49,4.49],"sarthe":[9.64,9.38,9.25,9.03,8.85],"chronos":[12.01,11.17,10.48,9.76,9],"kitt":[10.62,10.08,9.49,9,8.42],"f89":[8.65,8.33,7.89,7.64,7.22],"munja":[8.7,8.41,8.24,8,7.82],"tempest":[8.25,7.95,7.69,7.43,7.19]};
@@ -4385,7 +4408,7 @@ function lvEst(id,l){var t=ETL[id];if(!t)return parseFloat(String(GET[id]||'15')
 function estET(id){var b=null;for(var k in GH)if(k.indexOf(id)===0&&/^[sdw0-9]*$/.test(k.slice(id.length))&&GH[k]&&GH[k].et&&(b==null||GH[k].et<b))b=GH[k].et;var e=lvEst(id,lvOf(id));return b!=null?Math.min(b,e):e;}
 function oppEst(ch){return lvEst(ch.car,ch.sw?2+ch.sw:Math.min(2,ch.up||0));}
 /* Version 95: Vorsprung-Start in jedem Karriere-Rennen. Positiv = der Gegner wartet, negativ = du wartest. 80 % des Unterschieds, im Finale der volle */
-function dialOf(ch){if(!ch||!ch.car)return 0;var d=estET(SPECS[pIdx].id)-oppEst(ch);d*=ch.dial?1:0.8;return Math.max(-6,Math.min(6,d));}
+function dialOf(ch){if(!ch||!ch.car||ch.hu)return 0;var d=estET(SPECS[pIdx].id)-oppEst(ch);if(!ch.dial){if(carDone())d*=0.8;else d-=DIALM[ch.k];}return Math.max(-6,Math.min(6,d));}
 function dialTxt(ch){var d=dialOf(ch),on=shortName(SPECS[carIdx(ch.car)]);if(Math.abs(d)<0.05)return 'Ihr startet gleichzeitig.';
   return d>0?'Du startest <b>'+f1(d)+' s</b> vor dem '+on+'.':'Der '+on+' startet <b>'+f1(-d)+' s</b> vor dir.';}
 function medalOf(k,et){var m=CLASSES[k].med;if(!m||et==null)return -1;return et<=m[2]?2:(et<=m[1]?1:(et<=m[0]?0:-1));}
@@ -4397,7 +4420,7 @@ function aiParams(){
   var D=DIFFS[diff];return {who:'Computer',rt:D.rt,u:D.u,sn:D.sn,sb:D.sb,pw:D.pw,foulP:0,heat:[0.3,0.8]};
 }
 function carIdx(id){for(var i=0;i<SPECS.length;i++)if(SPECS[i].id===id)return i;return 0;}
-function owned(id){return SAVE.garage.indexOf(id)>=0;}
+function owned(id){return SAVE.garage.indexOf(id)>=0&&!(SAVE.lost&&SAVE.lost[id]!=null);}
 /* Version 93: jedes Auto hat eine Tuning-Stufe 0-4, die es in der Karriere durch Rennen automatisch bekommt (Sieg 2, Niederlage 1 Punkt) */
 var LVN=['Serie','Straßentuning','Sporttuning','Motortausch','Drag-Umbau'],LVNEED=[2,4,6,8];
 function maxLv(id){return SWAPS[id]?2+SWAPS[id].length:2;}
@@ -4535,8 +4558,19 @@ function finish(){
     h+='<p class="stake">'+(rec?(old?'NEUE BESTZEIT mit dem '+shortName(player)+': '+f3(myet)+' s (vorher '+f3(old.et)+')':'Erste Bestzeit mit dem '+shortName(player)+': '+f3(myet)+' s. Beim nächsten Lauf fährt sie als Geisterauto mit.'):'Bestzeit mit dem '+shortName(player)+': '+f3(old.et)+' s (diese Fahrt '+f3(myet)+')')+'</p>';
   }
   if(mode==='series'){
-    var st='',r0=carLvl(),L=curRace(),fin=carDone();
-    if(fin){
+    var st='',r0=carLvl(),L=curRace(),fin=carDone(),pk=-1,bo=null;
+    /* Version 97: Pink Slip (Auto gegen Auto) und Rückkampf um ein verlorenes Auto, je ein Lauf ohne Vorsprung */
+    if(SAVE.sp){var sp=SAVE.sp,B=CAREER[sp.r]||CAREER[0],bn=shortName(SPECS[carIdx(B.car)]),bw=CHARS[B.ch].who;delete SAVE.sp;
+      var upL=gainXp(player.id,won?2:1);btn='Weiter';
+      if(sp.t==='pink'){
+        if(won){if(SAVE.garage.indexOf(B.car)<0){SAVE.garage.push(B.car);st='PINK SLIP gewonnen! Der '+bn+' von '+bw+' gehört jetzt dir.';}
+          else{SAVE.stk=(SAVE.stk||0)+1;st='PINK SLIP gewonnen! Den '+bn+' hast du schon, dafür gibt es einen Pokal-Aufkleber ('+SAVE.stk+').';}}
+        else{SAVE.lost[player.id]=sp.r;upL=-1;st='Pink Slip verloren. Dein '+shortName(player)+' steht jetzt bei '+bw+'. Unter Klassen kannst du ihn im Rückkampf zurückholen.';}
+      }else{var lc=shortName(SPECS[carIdx(sp.car)]);
+        if(won){delete SAVE.lost[sp.car];st='Rückkampf gewonnen! Dein '+lc+' steht wieder in deiner Garage.';}
+        else st='Rückkampf verloren. '+bw+' behält deinen '+lc+'. Du kannst es jederzeit noch mal versuchen.';}
+    }
+    else if(fin){
       var met=(player.done&&!player.foul)?player.finishAbs-seq.g:null,kk=L.k,okc=(CCLS[player.id]==null?0:CCLS[player.id])<=kk;
       var upL=gainXp(player.id,won?2:1);
       if(met==null)st='Für eine Medaille musst du sauber ins Ziel kommen.';
@@ -4545,26 +4579,33 @@ function finish(){
         st=nm>om?'MEDAILLE in '+CLASSES[kk].n+': '+MEDN[nm]+'! ':(nm>=0?MEDN[nm]+'-Zeit in '+CLASSES[kk].n+'. ':'Noch keine Medaille: Bronze gibt es ab '+f1(CLASSES[kk].med[0])+' s. ');
         if(nm>=0&&nm<2)st+='Für '+MEDN[nm+1]+' brauchst du '+f1(CLASSES[kk].med[nm+1])+' s.';}
       btn='Nochmal';
+    }else if(L.boss&&(bo=boRun(won)).p<2&&bo.o<2){
+      /* Version 97: Boss-Duell über bis zu drei Läufe */
+      var upL=gainXp(player.id,won?2:1);st=(won?'Lauf gewonnen. ':'Lauf verloren. ')+'Stand '+bo.p+':'+bo.o+(bo.p>bo.o?' für dich':(bo.p<bo.o?' für '+opp.who:''))+'. Wer zuerst zwei Läufe gewinnt, gewinnt das Duell.';
+      btn='Nächster Lauf';next=upL>0?reset:function(){reset();start();};
     }else if(won){
-      var upL=gainXp(player.id,2);st='Sieg! ';
-      if(!owned(L.car)){SAVE.garage.push(L.car);st+='Der '+shortName(SPECS[carIdx(L.car)])+' von '+opp.who+' gehört jetzt dir! ';}
+      var upL=gainXp(player.id,2);st=bo?'Duell gewonnen, '+bo.p+':'+bo.o+'! ':'Sieg! ';if(bo)delete SAVE.bo;
+      if((!L.boss||L.dial)&&SAVE.garage.indexOf(L.car)<0){SAVE.garage.push(L.car);st+='Der '+shortName(SPECS[carIdx(L.car)])+' von '+opp.who+' gehört jetzt dir! ';}
       if(L.boss){SAVE.trophies++;st+=L.dial?'POKAL! ':'POKAL! Aufstieg in die Klasse '+CLASSES[L.k+1].n+'. ';
         /* Version 95: jeder geschlagene Boss bringt dem gefahrenen Auto die nächste Tuning-Stufe */
         var bl=lvOf(player.id);if(!L.dial&&bl<maxLv(player.id)){SAVE.lv[player.id]=bl+1;SAVE.xp[player.id]=0;upL=bl+1;st+='Dein '+shortName(SPECS[carIdx(player.id)])+' bekommt '+LVN[bl+1]+'. ';}}
-      SAVE.round=r0+1;btn=carDone()?'Weiter':(L.boss?'Nächste Klasse':'Nächstes Rennen');
+      SAVE.round=r0+1;btn=carDone()?'Weiter':(L.boss?'Nächste Klasse':'Nächstes Rennen');if(L.boss&&!L.dial&&pinkOk())pk=r0;
       if(carDone()){st+='Karriere geschafft, du bist Meister! ';
         /* Version 94: zum Titel gibt es den Albion Tempest */
-        if(!owned('tempest')){SAVE.garage.push('tempest');st+='Als Geschenk wartet der '+shortName(SPECS[carIdx('tempest')])+' in deiner Garage. ';}
+        if(SAVE.garage.indexOf('tempest')<0){SAVE.garage.push('tempest');st+='Als Geschenk wartet der '+shortName(SPECS[carIdx('tempest')])+' in deiner Garage. ';}
         /* Version 96: dazu der Schwert-Dragster */
-        if(!owned('excalibur')){SAVE.garage.push('excalibur');st+='Dazu bekommst du den '+shortName(SPECS[carIdx('excalibur')])+'. ';}
+        if(SAVE.garage.indexOf('excalibur')<0){SAVE.garage.push('excalibur');st+='Dazu bekommst du den '+shortName(SPECS[carIdx('excalibur')])+'. ';}
         st+='Jetzt kannst du in jeder Klasse Medaillen jagen.';}
     }else{
-      var upL=gainXp(player.id,1);st='Verloren, aber dein '+shortName(SPECS[carIdx(player.id)])+' hat dazugelernt. Probier es noch mal.';btn='Nochmal';
+      var upL=gainXp(player.id,1);st=(bo?'Duell verloren, '+bo.p+':'+bo.o+'. ':'Verloren, aber ')+(bo?'Dein ':'dein ')+shortName(SPECS[carIdx(player.id)])+' hat dazugelernt. Probier es noch mal.';btn='Nochmal';if(bo)delete SAVE.bo;
     }
-    if(upL<0&&lvOf(player.id)<maxLv(player.id))st+=' '+xpText(player.id)+'.';
+    if(upL<0&&owned(player.id)&&lvOf(player.id)<maxLv(player.id))st+=' '+xpText(player.id)+'.';
+    if(pk>=0){var PB=CAREER[pk],pw=CHARS[PB.ch].who,pn=shortName(SPECS[carIdx(PB.car)]);
+      st+='</p><p class="stake pink"><b>'+pw+': „Ein Lauf. Dein Auto gegen meins.“</b> Pink Slip ohne Vorsprung. '+(SAVE.garage.indexOf(PB.car)<0?'Gewinnst du, gehört dir der '+pn+'.':'Den '+pn+' hast du schon, es geht um einen Pokal-Aufkleber.')+' Verlierst du, geht dein '+shortName(player)+' an '+pw+'.';
+      btn='Pink Slip annehmen';next=function(){SAVE.sp={t:'pink',r:pk};saveSave();reset();};}
     saveSave();h+='<p class="stake">'+st+'</p>';if(upL>0)UPG={id:player.id,lv:upL};
   }
-  h+='<button class="again" id="again" type="button">'+btn+'</button>';
+  h+='<button class="again" id="again" type="button">'+btn+'</button>'+(mode==='series'&&pk>=0?'<button class="slbtn" id="pkNo" type="button">Ablehnen</button>':'');
   /* Version 50: oben das Ergebnis, Zeit und ein Tipp; die Tabelle klappt auf */
   var rt=won?'Gewonnen!':(player.foul?'Zu früh gestartet':(!player.done?'Nicht gestartet':'Verloren')),
     et4=(player.done&&!player.foul)?player.finishAbs-seq.g:null,lg=player.launched&&!player.foul?launchGrade(player):0,
@@ -4585,7 +4626,7 @@ function finish(){
   else if(!EMB&&HM.first&&player.done){HM.first=false;hSave();}
   slipEl.innerHTML=h;slipEl.hidden=false;hudEl.hidden=true;slipEl.scrollTop=0;
   $('slBtn').onclick=function(){var x=$('slX');x.hidden=!x.hidden;this.textContent=x.hidden?'Zeitslip ansehen':'Zeitslip zuklappen';this.setAttribute('aria-expanded',x.hidden?'false':'true');};
-  $('again').onclick=next;
+  $('again').onclick=next;if($('pkNo'))$('pkNo').onclick=function(){reset();};
   if(UPG&&!EMB){var u=UPG;UPG=null;setTimeout(function(){upgShow(u.id,u.lv);},700);}
   if(EMB){slipEl.hidden=true;embFinish({won:won,foul:!!player.foul,oppFoul:!!opp.foul,crashed:!!player.crashed,done:!!player.done,et:(player.done&&!player.foul)?player.finishAbs-seq.g:null,rt:player.foul?null:player.rt,launch:player.launched?launchGrade(player):0,shifts:player.shifts.length,good:player.shifts.filter(function(s){return s.grade===0&&s.lift;}).length,v:player.rec[4]?player.rec[4].v*3.6:0,who:opp.who,gap:diff});}
 }
@@ -5516,7 +5557,9 @@ function fitAllWb(){fitWb($('hWbS'),Math.max(160,$('hSplash').clientHeight-250))
 /* ---------- Garage (Schritt 1 Auto) ---------- */
 var gIdx=0;
 var GET={'excalibur':'6,1','rennsau':'9,9','tempest':'8,3','kitt':'12,9','f89':'8,9','munja':'8,8','sarthe':'10,1','chronos':'12,0','dragster':'4,6','911':'13,8','testarossa':'13,5','countach':'13,1','skyline':'16,5','challenger':'11,0','vento':'10,2','voltaris':'11,5','brixton':'15,9'};
-function ownerOf(id){for(var i=0;i<CAREER.length;i++)if(CAREER[i].car===id)return {who:CHARS[CAREER[i].ch].who,r:i+1,k:CLASSES[CAREER[i].k].n};return null;}
+function ownerOf(id){for(var i=0;i<CAREER.length;i++)if(CAREER[i].car===id)return {who:CHARS[CAREER[i].ch].who,r:i+1,k:CLASSES[CAREER[i].k].n,boss:!!CAREER[i].boss&&!CAREER[i].dial};return null;}
+/* Version 97: Text für gesperrte Autos: verloren, Boss-Auto (Pink Slip) oder Herausforderer */
+function lockTxt(id,b){var L=mode==='series'&&SAVE.lost[id]!=null?CAREER[SAVE.lost[id]]:null,o=ownerOf(id);if(L)return (b?'Rückkampf gegen ':'Bei ')+CHARS[L.ch].who;if(!o)return 'Gesperrt';return o.boss?'Pink Slip gegen '+o.who:(b?'Erst '+o.who+' schlagen':'Sieg gegen '+o.who);}
 function gLocked(i){return mode==='series'&&!owned(SPECS[i].id);}
 function garageRender(){
   gIdx=pIdx;
@@ -5525,7 +5568,7 @@ function garageRender(){
   GORD=SPECS.map(function(s,i){return i;});if(ser)GORD=GORD.filter(function(i){return !gLocked(i);}).concat(GORD.filter(function(i){return gLocked(i);}));
   var h='<div class="gar"><div class="gar-rail" id="garRail" tabindex="0" aria-label="Autos: wischen oder Pfeiltasten">';
   GORD.forEach(function(i){var s=SPECS[i],o=ownerOf(s.id);
-    h+='<div class="gar-sl'+(gLocked(i)?' lk':'')+(i%2?' mir':'')+'">'+GAR_DECO+'<div class="gar-bay" data-no="'+(i+1)+'"><canvas data-top="'+i+'" role="img" aria-label="'+shortName(s)+' von oben"></canvas><span class="gar-lock">'+(o?'Sieg gegen '+o.who:'Gesperrt')+'</span></div></div>';});
+    h+='<div class="gar-sl'+(gLocked(i)?' lk':'')+(i%2?' mir':'')+'">'+GAR_DECO+'<div class="gar-bay" data-no="'+(i+1)+'"><canvas data-top="'+i+'" role="img" aria-label="'+shortName(s)+' von oben"></canvas><span class="gar-lock">'+lockTxt(s.id,0)+'</span></div></div>';});
   h+='</div><div class="gar-info" id="garInfo"><div class="gar-br"><span class="gar-brand" id="garBrand"></span><span class="gar-own" id="garOwn"></span></div>'+
     '<div class="gar-mod"><h2 id="garName"></h2><div class="gar-et"><b id="garEt"></b><span>Viertelmeile Serie</span></div></div>'+
     '<div class="gar-sub" id="garSub"></div><div class="gar-lv" id="garLv"></div>'+
@@ -5561,7 +5604,7 @@ function garInfo(){
   /* Version 95: Zeit mit der Tuning-Stufe, nicht mehr die Serienzeit */
   var gl0=mode==='series'?lvOf(s.id):0;$('garEt').textContent=f1(lvEst(s.id,gl0))+' s';$('garEt').nextSibling.textContent=gl0?'Viertelmeile '+LVN[gl0]:'Viertelmeile Serie';
   var ow=$('garOwn');
-  if(lk){ow.textContent=o?'Gewinne gegen '+o.who+' ('+o.k+')':'Gesperrt';ow.className='gar-own lk';}
+  if(lk){var lr=mode==='series'&&SAVE.lost[s.id]!=null?CAREER[SAVE.lost[s.id]]:null;ow.textContent=lr?'Bei '+CHARS[lr.ch].who+' · Rückkampf unter Klassen':(o?(o.boss?'Pink Slip gegen ':'Gewinne gegen ')+o.who+' ('+o.k+')':'Gesperrt');ow.className='gar-own lk';}
   else{ow.textContent=gIdx===pIdx?'Dein Auto':(mode==='series'?'In deiner Garage':'Frei wählbar');ow.className='gar-own';}
   $('garInfo').className='gar-info'+(lk?' lk':'');
   var ws=$('garWs');ws.hidden=lk||mode==='series';$('garLad').hidden=mode!=='series';
@@ -5571,7 +5614,7 @@ function garInfo(){
 }
 function garageFoot(){
   var s=SPECS[gIdx],n=$('mNext');if(mstep!=='car')return;
-  if(gLocked(gIdx)){var o=ownerOf(s.id);n.disabled=true;n.textContent=o?'Erst '+o.who+' schlagen':'Gesperrt';}
+  if(gLocked(gIdx)){var o=ownerOf(s.id);n.disabled=true;n.textContent=lockTxt(s.id,1);}
   else{n.disabled=false;n.textContent='Fahren ›';}
 }
 function garagePick(){
@@ -5684,10 +5727,10 @@ function serIntro(first){
     var v='',t='',p='';
     if(st===0){
       v='<div class="sl">'+CLASSES.map(function(c,i){var B=bossOf(i);return '<div class="'+(i===LV.k?'cur':'')+'" style="animation-delay:'+(i*0.09)+'s"><b>'+(i+1)+'</b><span>'+c.n+'<small>'+c.t+' · Boss: '+CHARS[B.ch].who+'</small></span>'+car(carIdx(B.car),9)+'</div>';}).join('')+'</div>';
-      t='<em>Fünf Klassen</em>, dann das Finale';p='Jede Klasse hat drei Rennen: zwei Herausforderer, dann den Boss. Schlägst du den Boss, steigst du auf.';
+      t='<em>Fünf Klassen</em>, dann das Finale';p='Jede Klasse hat drei Rennen: zwei Herausforderer, dann den Boss im Best of 3. Schlägst du den Boss, steigst du auf.';
     }else if(st===1){
       v='<div class="sx"><div class="sbox op">Gegner'+car(oi,24,'gone')+'</div><div class="sarr">›</div><div class="sbox me">Deine Garage'+car(oi,24,'come')+'</div></div>';
-      t='Gewinnst du, bekommst du <em>sein Auto</em>';p='Wechseln musst du nie: In jedem Rennen startet das langsamere Auto etwas früher.';
+      t='Gewinnst du, bekommst du <em>sein Auto</em>';p='Das langsamere Auto startet früher, aber die Gegner werden von Klasse zu Klasse besser. Das Auto eines Bosses gibt es nur im Pink Slip: dein Auto gegen seins.';
     }else if(st===2){
       v='<div class="sx"><div class="sbox me">Serie'+car(mi,22,'',0)+'</div><div class="sarr">›</div><div class="sbox op" style="border-color:rgba(255,210,63,.6);color:var(--accent)">Getunt'+car(mi,22,'',4)+'<span class="plus" style="background:rgba(255,210,63,.16);color:var(--accent)">+ PS</span></div></div>';
       t='Jedes Rennen macht <em>dein Auto stärker</em>';p='Jeder geschlagene Boss baut die nächste Stufe ein. Auch normale Rennen füllen den Balken: Sieg 2 Punkte, Niederlage 1.';
@@ -5707,6 +5750,8 @@ function serIntro(first){
   el.hidden=false;render();
 }
 /* Version 95: Klassenleiter: wo du stehst, Bosse, Medaillen, Pokale */
+/* Version 97: Rückkampf um verlorene Autos */
+function rkBtns(){if(mode!=='series'||(SAVE.sp&&SAVE.sp.t==='pink'))return '';var h='';for(var id in SAVE.lost){var R=CAREER[SAVE.lost[id]];if(R)h+='<button type="button" class="rk" data-rk="'+id+'">Rückkampf gegen '+CHARS[R.ch].who+': hol deinen '+shortName(SPECS[carIdx(id)])+' zurück</button>';}return h;}
 function ladShow(){
   var el=$('serIntro'),r=SAVE.round,dn=carDone();
   function cell(k){var B=bossOf(k),i0=-1,i1=-1;CAREER.forEach(function(L,i){if(L.k===k){if(i0<0)i0=i;i1=i;}});
@@ -5714,10 +5759,11 @@ function ladShow(){
     return '<div class="'+(st==='cur'&&!dn?'cur':'')+(st==='done'?' dn':'')+'"><b>'+(st==='done'?'✓':(k<5?k+1:'F'))+'</b><span>'+c.n+'<small>'+(k<5?c.t+' · ':'')+'Boss: '+CHARS[B.ch].who+(st==='cur'&&!dn?' · Du bist hier':'')+(m>=0?' · '+MEDN[m]:'')+'</small></span><canvas data-i="'+carIdx(B.car)+'" data-k="9"></canvas></div>';}
   el.innerHTML='<div class="lad-h"><h2>Klassen</h2><span>Pokale <b>'+SAVE.trophies+'</b>'+(dn?' · Medaillen <b>'+medCount()+'</b>/5':'')+'</span></div>'+
     '<div class="sv"><div class="sl">'+CLASSES.map(function(c,k){return cell(k);}).join('')+'</div></div>'+
-    '<p class="lad-p">Jede Klasse hat drei Rennen, zuletzt den Boss. Das langsamere Auto startet früher. Jeder geschlagene Boss baut deinem Auto die nächste Stufe ein.'+(dn?' Medaillen gibt es für feste Zeiten.':'')+'</p>'+
+    '<p class="lad-p">Jede Klasse hat drei Rennen, zuletzt den Boss im Best of 3. Das langsamere Auto startet früher. Ab der Sport-Klasse musst du ein Stück selbst herausfahren, und die Gegner machen von Klasse zu Klasse weniger Fehler. Jeder geschlagene Boss baut deinem Auto die nächste Stufe ein, sein Auto gibt es nur im Pink Slip.'+(dn?' Medaillen gibt es für feste Zeiten.':'')+'</p>'+rkBtns()+
     '<button type="button" class="sbtn" id="ladOk">Zurück</button>';
   el.querySelectorAll('canvas[data-i]').forEach(function(c){drawTop(c,SPECS[+c.getAttribute('data-i')],+c.getAttribute('data-k'),false);});
   $('ladOk').onclick=function(){el.hidden=true;el.innerHTML='';el.classList.remove('lad');};
+  el.querySelectorAll('[data-rk]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-rk');if(SAVE.lost[id]==null)return;SAVE.sp={t:'back',r:SAVE.lost[id],car:id};saveSave();el.hidden=true;el.innerHTML='';el.classList.remove('lad');mstep='race';reset();};});
   el.classList.add('lad');el.hidden=false;
 }
 $('hSeries').onclick=function(){startMode('series',this);};
