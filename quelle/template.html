@@ -640,15 +640,17 @@ SYNC_URL=SYNC_URL.replace(/\/+$/,'');
 var GATE=!!SYNC_URL;
 var SY={timer:null,busy:false,again:false,dirty:false,state:''};
 function syncUrl(c){return SYNC_URL+'/fortschritt/'+encodeURIComponent(c);}
-function syncSoon(){if(!CODE||!SYNC_URL)return;SY.dirty=true;clearTimeout(SY.timer);SY.timer=setTimeout(syncPush,2500);}
+/* Hochladen beim Verlassen der App und sonst höchstens alle 5 Minuten, damit Workers KV weit unter dem täglichen Schreiblimit bleibt.
+   Lokal wird weiter bei jeder Änderung gespeichert. */
+function syncSoon(){if(!CODE||!SYNC_URL)return;SY.dirty=true;if(!SY.timer)SY.timer=setTimeout(syncPush,300000);}
 function syncPush(leaving){
-  clearTimeout(SY.timer);
+  clearTimeout(SY.timer);SY.timer=null;
   if(!CODE||!SYNC_URL)return Promise.resolve();
   if(SY.busy){SY.again=true;return Promise.resolve();}
   var c=CODE,body=JSON.stringify({state:S});SY.busy=true;SY.dirty=false;
   return fetch(syncUrl(c),{method:'PUT',headers:{'Content-Type':'application/json'},body:body,keepalive:!!leaving&&body.length<60000}).then(function(r){
     if(!r.ok)throw new Error(r.status);SY.state='ok';
-  }).catch(function(){if(c===CODE)SY.dirty=true;SY.state='off';}).then(function(){SY.busy=false;if(SY.again){SY.again=false;syncSoon();}});
+  }).catch(function(){if(c===CODE){SY.dirty=true;if(!SY.timer)SY.timer=setTimeout(syncPush,60000);}SY.state='off';}).then(function(){SY.busy=false;if(SY.again){SY.again=false;syncSoon();}});
 }
 /* Antwort: {state} gefunden, {neu:true} gibt es noch nicht, {nein:true} Code nicht erlaubt; Fehler = keine Verbindung */
 function syncGet(c){
