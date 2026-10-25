@@ -10,6 +10,11 @@ Readster ist nur mit einem Code nutzbar (Liste `CODES` beim Cloudflare-Worker, s
 - `quelle/`: Vorlage, Lesetexte (`lesetexte_stufe1.json`) und Skripte.
 - `audio/`: Vorlese-Aufnahmen (MP3 plus Wortzeiten), erzeugt von ElevenLabs.
 - `cloudflare/`: Whisper-Dienst für die genaue Auswertung.
+- `vorschau-1.jpg` bis `vorschau-3.jpg`: Screenshots für die Anmeldeseite (Vorschau in `renderGate()` in `quelle/template.html`).
+
+## Demo
+
+`/readster/?demo` startet Readster ohne Code (Knopf „Demo ausprobieren“ auf der Anmeldeseite). Dann gibt es keinen Abgleich mit dem Dienst und keine Whisper-Anfragen: localStorage liegt nur im Arbeitsspeicher und Anfragen an andere Server werden abgelehnt. Nach dem Schließen ist alles weg.
 
 ## Vorlesen erzeugen
 
