@@ -498,6 +498,7 @@ input.name{width:100%;font:700 1.1rem var(--f-body);color:var(--ink);background:
 .pick .gatebox{display:flex;flex-direction:column;gap:14px;background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:20px}
 .pick .gatebox h2{margin:0}
 .pick .ask{text-align:center;margin:0}.pick .ask a{color:var(--accent);font-weight:700}
+.demo details.adult{display:none!important}
 .demotoast{position:fixed;z-index:2147483647;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));padding:9px 16px;border-radius:999px;background:rgba(0,0,0,.78);color:#fff;font:600 14px/1 system-ui,sans-serif;white-space:nowrap;pointer-events:none;transition:opacity .6s}
 @media (min-width:640px){.pick .steps{grid-template-columns:repeat(3,1fr)}.pick .steps li{flex-direction:column;gap:4px}}
 @media (max-width:700px){.pick .shots{justify-content:flex-start}}
@@ -536,8 +537,27 @@ if(DEMO)(function(){
   window.fetch=function(u){var x=String(u&&u.url||u);if(/^https?:/i.test(x)&&new URL(x).origin!==location.origin)return Promise.reject(new TypeError('Demo'));return F.apply(this,arguments);};
   if(navigator.sendBeacon)navigator.sendBeacon=function(){return false;};
   window.__syncServer='';
+  document.documentElement.classList.add('demo'); /* blendet den Bereich „Für Erwachsene“ aus */
   document.addEventListener('DOMContentLoaded',function(){var a=document.createElement('div');a.className='demotoast';a.textContent='Demo: Nichts wird gespeichert';document.body.appendChild(a);
     setTimeout(function(){a.style.opacity='0';setTimeout(function(){a.remove();},700);},4000);});
+})();
+</script>
+<script>
+if(DEMO)(function(){
+  var shown=false,S=Storage.prototype,st=S.setItem;
+  S.setItem=function(k,v){st.call(this,k,v);if(!shown&&k==='lesemonster.v1'){try{var s=JSON.parse(v);if(s&&s.done&&Object.keys(s.done).length>=1){shown=true;setTimeout(card,6000);}}catch(_){}}};
+  function card(){
+    var o=document.createElement('div');
+    o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Ende der Demo');
+    o.style.cssText='position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif';
+    o.innerHTML='<div style="width:100%;max-width:360px;background:#fff;color:#16181d;border-radius:22px;padding:26px 22px;text-align:center;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.4)">'+
+      '<div style="font-size:2.2rem;line-height:1">🎉</div>'+
+      '<h2 style="margin:0;font-size:1.35rem">Das war die Demo!</h2>'+
+      '<p style="margin:0;color:#555b66">Gefällt dir Readster? Mit einem eigenen Code geht es weiter, und dein Fortschritt bleibt gespeichert.</p>'+
+      '<a href="mailto:hello@asimplemanslab.com?subject=Code%20f%C3%BCr%20Readster" style="display:block;margin-top:6px;padding:14px;border-radius:14px;background:#16181d;color:#fff;font-weight:700;text-decoration:none">Code anfragen</a>'+
+      '<a href="./" style="display:block;padding:10px;color:#16181d;font-weight:600">Zurück zur Übersicht</a></div>';
+    document.body.appendChild(o);
+  }
 })();
 </script>
 <script>
