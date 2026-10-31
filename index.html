@@ -562,6 +562,18 @@ input.name{width:100%;font:700 1.1rem var(--f-body);color:var(--ink);background:
   .gtsheet{align-items:flex-end;padding:0}
   .gtbox{max-width:none;border-radius:26px 26px 0 0;border-width:2px 0 0;padding-bottom:calc(26px + env(safe-area-inset-bottom))}
 }
+/* Vorschau als schwebende Karte (Variante C): kein Handyrahmen, dahinter ein kleiner Stapel für die übrigen Schritte */
+.gtphone{position:relative;width:250px;margin-block:14px}
+.gtphone img{position:relative;z-index:2;border:0;border-radius:22px;box-shadow:0 0 0 1px var(--line),0 2px 4px rgba(0,0,0,.06),0 28px 56px -16px rgba(0,0,0,.35)}
+.gtphone::before,.gtphone::after{content:"";position:absolute;inset:0;border-radius:22px;background:var(--bg);box-shadow:0 0 0 1px var(--line),0 10px 30px -12px rgba(0,0,0,.25)}
+.gtphone::before{transform:rotate(-6deg) translate(-16px,6px);z-index:0;opacity:.7}
+.gtphone::after{transform:rotate(4deg) translate(14px,4px);z-index:1}
+@media (max-width:760px){
+  .gtphone{width:200px;margin-block:10px 16px}
+  /* Reiter: lange Wörter trennen statt über den Rahmen laufen */
+  .gtsteps button{padding-inline:3px}
+  .gtsteps strong{font-size:.85rem;-webkit-hyphens:auto;hyphens:auto;overflow-wrap:anywhere}
+}
 </style>
 </head>
 <body>
